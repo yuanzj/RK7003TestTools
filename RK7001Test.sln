@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RK7001Test", "RK7001Test\RK7001Test.csproj", "{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "CommonUtils\CommonUtils.csproj", "{03CBD632-539A-457E-ADE9-C857A4B800E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roky", "Roky\Roky.csproj", "{F154AABA-60DA-42F1-AB7C-D996DC684B8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RokyTask", "RokyTask\RokyTask.csproj", "{0586A632-5AB5-4C74-8FA5-4D5479E16371}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03CBD632-539A-457E-ADE9-C857A4B800E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03CBD632-539A-457E-ADE9-C857A4B800E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03CBD632-539A-457E-ADE9-C857A4B800E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03CBD632-539A-457E-ADE9-C857A4B800E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F154AABA-60DA-42F1-AB7C-D996DC684B8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F154AABA-60DA-42F1-AB7C-D996DC684B8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F154AABA-60DA-42F1-AB7C-D996DC684B8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F154AABA-60DA-42F1-AB7C-D996DC684B8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0586A632-5AB5-4C74-8FA5-4D5479E16371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0586A632-5AB5-4C74-8FA5-4D5479E16371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0586A632-5AB5-4C74-8FA5-4D5479E16371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0586A632-5AB5-4C74-8FA5-4D5479E16371}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0586A632-5AB5-4C74-8FA5-4D5479E16371}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RokyTask</RootNamespace>
+    <AssemblyName>RokyTask</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Const.cs" />
+    <Compile Include="CoreBussinessTask.cs" />
+    <Compile Include="Entity\BaseResponse.cs" />
+    <Compile Include="Entity\Protocols\BaseProtocolImpl.cs" />
+    <Compile Include="Entity\Protocols\ProtocolAttribute.cs" />
+    <Compile Include="Entity\Protocols\request\boardTestResultReq.cs" />
+    <Compile Include="Entity\Protocols\request\btTestReq.cs" />
+    <Compile Include="Entity\Protocols\request\NullEntity.cs" />
+    <Compile Include="Entity\Protocols\response\btTestRsp.cs" />
+    <Compile Include="Entity\Protocols\request\chk4103Server.cs" />
+    <Compile Include="Entity\Protocols\request\get4103BroadcastReq.cs" />
+    <Compile Include="Entity\Protocols\request\get7001Result.cs" />
+    <Compile Include="Entity\Protocols\request\get7001Version.cs" />
+    <Compile Include="Entity\Protocols\request\ParameterSettingReq.cs" />
+    <Compile Include="Entity\Protocols\request\SaveNvReq.cs" />
+    <Compile Include="Entity\Protocols\response\boardTestResultRsp.cs" />
+    <Compile Include="Entity\Protocols\response\chk4103ServerRsp.cs" />
+    <Compile Include="Entity\Protocols\response\get4103BroadcastRsp.cs" />
+    <Compile Include="Entity\Protocols\response\get7001ResultRsp.cs" />
+    <Compile Include="Entity\Protocols\response\get7001VersionRsp.cs" />
+    <Compile Include="Entity\Protocols\response\ParameterSettingRsp.cs" />
+    <Compile Include="Entity\Protocols\response\SaveNvRsp.cs" />
+    <Compile Include="ManualVisio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManualVisio.Designer.cs">
+      <DependentUpon>ManualVisio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SerialPortProtocoImpl.cs" />
+    <Compile Include="SimpleSerialPortTask.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ManualVisio.resx">
+      <DependentUpon>ManualVisio.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonUtils\CommonUtils.csproj">
+      <Project>{03cbd632-539a-457e-ade9-c857a4b800e5}</Project>
+      <Name>CommonUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Roky\Roky.csproj">
+      <Project>{f154aaba-60da-42f1-ab7c-d996dc684b8f}</Project>
+      <Name>Roky</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

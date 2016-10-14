@@ -26,7 +26,6 @@ namespace RK7001Test
             {
                 base.OnNotifyMessage(m);
             }
-
         }
     }
 }

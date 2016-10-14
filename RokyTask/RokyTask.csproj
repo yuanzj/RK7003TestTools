@@ -50,6 +50,8 @@
     <Compile Include="Entity\Protocols\request\boardTestResultReq.cs" />
     <Compile Include="Entity\Protocols\request\btTestReq.cs" />
     <Compile Include="Entity\Protocols\request\NullEntity.cs" />
+    <Compile Include="Entity\Protocols\request\pcTakeoverReq.cs" />
+    <Compile Include="Entity\Protocols\request\ResetEcuReq.cs" />
     <Compile Include="Entity\Protocols\response\btTestRsp.cs" />
     <Compile Include="Entity\Protocols\request\chk4103Server.cs" />
     <Compile Include="Entity\Protocols\request\get4103BroadcastReq.cs" />
@@ -63,6 +65,8 @@
     <Compile Include="Entity\Protocols\response\get7001ResultRsp.cs" />
     <Compile Include="Entity\Protocols\response\get7001VersionRsp.cs" />
     <Compile Include="Entity\Protocols\response\ParameterSettingRsp.cs" />
+    <Compile Include="Entity\Protocols\response\pcTakeOverRsp.cs" />
+    <Compile Include="Entity\Protocols\response\ResetEcuRsp.cs" />
     <Compile Include="Entity\Protocols\response\SaveNvRsp.cs" />
     <Compile Include="ManualVisio.cs">
       <SubType>Form</SubType>

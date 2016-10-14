@@ -20,10 +20,10 @@ namespace RokyTask.Entity.Protocols.request
         [ProtocolAttribute("outpin2", 7, 1)]
         public int outpin2 { get; set; }
 
-        [ProtocolAttribute("reserv1", 8, 4)]
-        public int reserv1 { get; set; }
+        [ProtocolAttribute("extensionOut", 8, 2)]
+        public int extensionOut { get; set; }
 
-        [ProtocolAttribute("reserv2", 12, 2)]
+        [ProtocolAttribute("reserv2", 10, 4)]
         public int reserv2 { get; set; }
 
         [ProtocolAttribute("adc1", 14, 4)]

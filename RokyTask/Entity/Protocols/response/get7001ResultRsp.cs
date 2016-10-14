@@ -8,23 +8,38 @@ namespace RokyTask.Entity.Protocols.response
 {
     class get7001ResultRsp : BaseProtocolImpl<get7001ResultRsp>
     {
-        [ProtocolAttribute("AccStatus", 0, 1)]
+        [ProtocolAttribute("ack_device", 0, 1)]
+        public int ack_device { get; set; }
+
+        [ProtocolAttribute("ack_value", 1, 1)]
+        public int ack_value { get; set; }
+
+        [ProtocolAttribute("AccStatus", 2, 1)]
         public int AccStatus { get; set; }
 
-        [ProtocolAttribute("DeviceFault", 1, 1)]
+        [ProtocolAttribute("DeviceFault", 3, 1)]
         public int DeviceFault { get; set; }
 
-        [ProtocolAttribute("DcCurrent", 2, 1)]
+        [ProtocolAttribute("DcCurrent", 4, 1)]
         public int DcCurrent { get; set; }
 
-        [ProtocolAttribute("PcuTemper", 3, 1)]
-        public int PcuTemper { get; set; }
+        [ProtocolAttribute("DcVoltage", 5, 1)]
+        public int DcVoltage { get; set; }
 
-        [ProtocolAttribute("CutError", 4, 2)]
-        public int CutError { get; set; }
+        [ProtocolAttribute("CutError_1", 6, 1)]
+        public int CutError_1 { get; set; }
 
-        [ProtocolAttribute("ShortError", 6, 2)]
-        public int ShortError { get; set; }
+        [ProtocolAttribute("CutError_2", 7, 1)]
+        public int CutError_2 { get; set; }
+
+        [ProtocolAttribute("ShortError_1", 8, 1)]
+        public int ShortError_1 { get; set; }
+
+        [ProtocolAttribute("ShortError_2", 9, 1)]
+        public int ShortError_2 { get; set; }
+
+        [ProtocolAttribute("RemoteCmd", 10, 1)]
+        public int RemoteCmd { get; set; }
 
         public override int GetCommand()
         {

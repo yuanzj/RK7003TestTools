@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -44,34 +42,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.BackColor = System.Drawing.Color.Silver;
-            this.panel1.Controls.Add(this.label5);
-            this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(1, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(935, 542);
+            this.panel1.Size = new System.Drawing.Size(899, 482);
             this.panel1.TabIndex = 0;
-            // 
-            // label5
-            // 
-            this.label5.Font = new System.Drawing.Font("宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label5.ForeColor = System.Drawing.Color.Maroon;
-            this.label5.Location = new System.Drawing.Point(5, 471);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(698, 40);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "2、遮住光感，是否有反应？";
-            // 
-            // label4
-            // 
-            this.label4.Font = new System.Drawing.Font("宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.ForeColor = System.Drawing.Color.Maroon;
-            this.label4.Location = new System.Drawing.Point(3, 412);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(698, 42);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "1、外接仪表是否显示正常？";
             // 
             // label3
             // 
@@ -88,16 +64,16 @@
             this.label1.ForeColor = System.Drawing.Color.Blue;
             this.label1.Location = new System.Drawing.Point(0, 28);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(880, 298);
+            this.label1.Size = new System.Drawing.Size(932, 444);
             this.label1.TabIndex = 0;
-            this.label1.Text = "按如下步骤，进行目检...";
+            this.label1.Text = "是否听到蜂鸣声音？...";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button1
             // 
             this.button1.BackColor = System.Drawing.SystemColors.Control;
             this.button1.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(293, 574);
+            this.button1.Location = new System.Drawing.Point(257, 516);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(165, 53);
             this.button1.TabIndex = 1;
@@ -108,7 +84,7 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(491, 574);
+            this.button2.Location = new System.Drawing.Point(470, 516);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(160, 53);
             this.button2.TabIndex = 2;
@@ -121,7 +97,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
-            this.ClientSize = new System.Drawing.Size(937, 639);
+            this.ClientSize = new System.Drawing.Size(901, 579);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.panel1);
@@ -143,7 +119,5 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
     }
 }

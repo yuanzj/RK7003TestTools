@@ -245,7 +245,6 @@ public class DbHelperSQL
         }
     }
 
-
     /// <summary>
     /// 执行一条返回结果集的OleDbCommand命令，通过专用的连接字符串。
     /// 使用参数数组提供参数
@@ -278,8 +277,6 @@ public class DbHelperSQL
         OleDbDataReader reader = cmd.ExecuteReader(); //执行命令
         //返回一个数据库记录集
         return reader;
-
-
     }
     #endregion
 

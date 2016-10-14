@@ -25,6 +25,7 @@ namespace RK7001Test
         private ListViewItem lv7001dc;
         private ListViewItem lv7001ampf;
         private ListViewItem lv7001mosfet;
+        private ListViewItem lv7001buzzer;
         private ListViewItem lv4103sw;
         private ListViewItem lv4103lgtsensor;
         private ListViewItem lv4103gsensor;
@@ -61,6 +62,7 @@ namespace RK7001Test
             lv7001dc = new ListViewItem("DC故障");
             lv7001ampf = new ListViewItem("运放故障");
             lv7001mosfet = new ListViewItem("Mos短路");
+            lv7001buzzer = new ListViewItem("Buzzer故障");
 
             lv7001uid.UseItemStyleForSubItems = false;
             lv7001sw.UseItemStyleForSubItems = false;
@@ -68,7 +70,7 @@ namespace RK7001Test
             lv7001dc.UseItemStyleForSubItems = false;
             lv7001ampf.UseItemStyleForSubItems = false;
             lv7001mosfet.UseItemStyleForSubItems = false;
-
+            lv7001buzzer.UseItemStyleForSubItems = false;
 
             this.lvRK7001ErrItem.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             lv7001uid,
@@ -76,7 +78,8 @@ namespace RK7001Test
             lv7001hw,
             lv7001dc,
             lv7001ampf,
-            lv7001mosfet});
+            lv7001mosfet,
+            lv7001buzzer});
 
             lv4103sw = new ListViewItem("软件版本号");
             lv4103lgtsensor = new ListViewItem("光感异常测试");
@@ -185,6 +188,20 @@ namespace RK7001Test
                     SetMainText(mArgs.msg, mArgs.submsg, mArgs.level);
                 }
             };
+            mCoreTask.UpdateRemoteHandler += (object _sender, EventArgs _e) =>
+            {
+                UIEventArgs mArgs = _e as UIEventArgs;
+                if(mArgs != null)
+                {
+                    SetRemoteStatus(mArgs.level);
+                }
+            };
+            //初始化界面
+            SetValidSN(INFO_LEVEL.INIT);
+            SetTestServer(INFO_LEVEL.INIT);
+            SetRK7001PinList(null, INFO_LEVEL.INIT);
+            SetRK4103PinList(null, INFO_LEVEL.INIT);
+
 
             this.tbInputSN.Focus();
             this.tbInputSN.TabIndex = 0;
@@ -328,6 +345,42 @@ namespace RK7001Test
         }
         #endregion
 
+        #region 设置遥控器测试界面
+        delegate void SetRemoteStatusCallback(INFO_LEVEL level);
+        private void SetRemoteStatus(INFO_LEVEL level)
+        {
+            if (this.panel_remoter.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            {
+                while (!this.panel_remoter.IsHandleCreated)
+                {
+                    //解决窗体关闭时出现“访问已释放句柄“的异常
+                    if (this.panel_remoter.Disposing || this.panel_remoter.IsDisposed)
+                        return;
+                }
+                SetRemoteStatusCallback d = new SetRemoteStatusCallback(SetRemoteStatus);
+                this.panel_remoter.Invoke(d, new object[] { level });
+            }
+            else
+            {
+                switch (level)
+                {
+                    case INFO_LEVEL.INIT:
+                        this.panel_remoter.BackColor = Color.White;
+                        break;
+                    case INFO_LEVEL.PASS:
+                        this.panel_remoter.BackColor = Color.Green;
+                        break;
+                    case INFO_LEVEL.FAIL:
+                        this.panel_remoter.BackColor = Color.Red;
+                        break;
+                    case INFO_LEVEL.PROCESS:
+                        this.panel_remoter.BackColor = Color.Yellow;
+                        break;
+                }
+            }
+        }
+        #endregion
+
         #region 设置RK7001的列表项目
         delegate void SetRK7001ItemListCallback(RK7001ITEM item, DeviceInfo info, INFO_LEVEL level);
         private void SetRK7001ItemList(RK7001ITEM item, DeviceInfo info, INFO_LEVEL level)
@@ -363,26 +416,31 @@ namespace RK7001Test
                                 this.lv7001dc.SubItems.Clear();
                                 this.lv7001ampf.SubItems.Clear();
                                 this.lv7001mosfet.SubItems.Clear();
+                                this.lv7001buzzer.SubItems.Clear();                                
                                 this.lv7001uid.BackColor = Color.White;
                                 this.lv7001sw.BackColor = Color.White;
                                 this.lv7001hw.BackColor = Color.White;
                                 this.lv7001dc.BackColor = Color.White;
                                 this.lv7001ampf.BackColor = Color.White;
                                 this.lv7001mosfet.BackColor = Color.White;
+                                this.lv7001buzzer.BackColor = Color.White;
                                 this.lv7001uid.Text = "设备UID";
                                 this.lv7001sw.Text = "软件版本号";
                                 this.lv7001hw.Text = "硬件版本号";
                                 this.lv7001dc.Text = "DC故障";
                                 this.lv7001ampf.Text = "运放故障";
                                 this.lv7001mosfet.Text = "Mos短路";
+                                this.lv7001buzzer.Text = "Buzzer故障";
                                 break;
                             case INFO_LEVEL.PASS:
                                 this.lv7001dc.SubItems.Add("通过");
                                 this.lv7001ampf.SubItems.Add("通过");
                                 this.lv7001mosfet.SubItems.Add("通过");
+                                this.lv7001buzzer.SubItems.Add("通过");
                                 this.lv7001dc.SubItems[1].ForeColor = Color.Green;
                                 this.lv7001ampf.SubItems[1].ForeColor = Color.Green;
                                 this.lv7001mosfet.SubItems[1].ForeColor = Color.Green;
+                                this.lv7001buzzer.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }                 
                         
@@ -426,6 +484,20 @@ namespace RK7001Test
                                 this.lv7001mosfet.SubItems.Add("失败");
                                 this.lv7001mosfet.SubItems[0].BackColor = Color.Red;
                                 this.lv7001mosfet.SubItems[1].BackColor = Color.Red;
+                                break;
+                        }
+                        break;
+                    case RK7001ITEM.BUZZER:
+                        switch (level)
+                        {
+                            case INFO_LEVEL.PASS:
+                                this.lv7001buzzer.SubItems.Add("通过");
+                                this.lv7001buzzer.SubItems[1].ForeColor = Color.Green;
+                                break;
+                            case INFO_LEVEL.FAIL:
+                                this.lv7001buzzer.SubItems.Add("失败");
+                                this.lv7001buzzer.SubItems[0].BackColor = Color.Red;
+                                this.lv7001buzzer.SubItems[1].BackColor = Color.Red;
                                 break;
                         }
                         break;
@@ -1012,8 +1084,7 @@ namespace RK7001Test
 
         #region key键事件
         private void KeyDown_Start(object sender, KeyEventArgs e)
-        {
-            
+        {         
             if (e.KeyCode == Keys.Enter)
             {
                 if (mCoreTask.bTaskRunning)
@@ -1028,15 +1099,8 @@ namespace RK7001Test
                     this.tbInputSN.Text = mCoreTask.DefaultSN;
                     StartTask();
                 }                
-            }
-            else if(e.KeyCode == Keys.Escape)
-            {
-                //设备在运行中
-                if(mCoreTask.bKsiTesting)
-                    mCoreTask.RK7001KSICheckFail();
-            }        
+            }                   
         }
         #endregion
-
     }
 }

@@ -8,28 +8,31 @@ namespace RokyTask.Entity.Protocols.request
 {
     class get7001Result : BaseProtocolImpl<get7001Result>
     {
-        [ProtocolAttribute("ecu_status", 0, 1)]
+        [ProtocolAttribute("ack_device", 0, 1)]
+        public int ack_device { get; set; }
+
+        [ProtocolAttribute("ecu_status", 1, 1)]
         public int ecu_status { get; set; }
 
-        [ProtocolAttribute("remote_code", 1, 1)]
-        public int remote_code { get; set; }
+        [ProtocolAttribute("server_mode", 2, 1)]
+        public int server_mode { get; set; }
 
-        [ProtocolAttribute("gear_level", 2, 1)]
-        public int gear_level { get; set; }
+        [ProtocolAttribute("reserv", 3, 1)]
+        public int reserv { get; set; }
 
-        [ProtocolAttribute("limit_per", 3, 1)]
+        [ProtocolAttribute("limit_per", 4, 1)]
         public int limit_per { get; set; }
 
-        [ProtocolAttribute("level_ctrl", 4, 2)]
+        [ProtocolAttribute("level_ctrl", 5, 2)]
         public int level_ctrl { get; set; }
 
-        [ProtocolAttribute("trigger_ctrl", 6, 1)]
+        [ProtocolAttribute("trigger_ctrl", 7, 1)]
         public int trigger_ctrl { get; set; }
 
-        [ProtocolAttribute("backlight", 7, 3)]
+        [ProtocolAttribute("backlight", 8, 3)]
         public int backlight { get; set; }
 
-        [ProtocolAttribute("batt_soc", 10, 1)]
+        [ProtocolAttribute("batt_soc", 11, 1)]
         public int batt_soc { get; set; }
 
         public override int GetCommand()

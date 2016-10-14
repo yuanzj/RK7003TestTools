@@ -32,7 +32,8 @@ namespace RokyTask
         VERSION = 2,
         DC = 3,
         AMPLIFY = 4,
-        MOSFET = 5
+        MOSFET = 5,
+        BUZZER = 6
     }
 
     public enum RK4103ITEM
@@ -97,7 +98,41 @@ namespace RokyTask
         public INFO_LEVEL level { get; set; }
     }
 
-    
+    public enum RK7001ResultType
+    {
+        NONE_CHECK = 0,
+        NORMAL_CHECK = 1,
+        SERVER_KSI_OFF_RSP = 2,
+        SERVER_KSI_ON_RSP = 3,
+        CLIENT_KSI_ON = 4,
+        CLIENT_KSI_OFF = 5,
+        SERVER_REMOTE_RSP = 6,
+        CLIENT_REMOTE_RSP = 7,
+        OPEN_BUZZER_RSP = 8,
+    }
+
+
+    public enum RK7001Steps
+    {
+        Step0_Init_1 = 0,
+        Step1_SelfCheck = 1,
+        Step2_Init_2 = 2,
+        Step3_OpenKSI = 3,
+        Step4_CloseKSI = 4,
+        Step5_SoftOpenEcu = 5,
+        Step6_ReadOpenEcu = 6,
+        Step7_SoftCloseEcu = 7,
+        Step8_ReadCloseEcu = 8,
+        Step9_RemoteInit = 9,
+        Step10_RemoteTest = 10,
+    }
+
+    public enum Level
+    {
+        FALSE = 0,
+        TRUE = 1,
+        REPEAT = 2,
+    }
 
     #region PIN脚状态
     public class PIN_STATUS
@@ -170,19 +205,14 @@ namespace RokyTask
     {
         #region 私有变量
         public bool bTaskRunning { get; set; }
-        public bool bKsiTesting { get; set; }
-
-        private int potCnts { get; set; }
-        private byte mAccStatus { get; set; }
-        private byte mOldAccStatus { get; set; }
-        private int KsiCompCnts { get; set; }
-        private ushort mKsiOverTimeCnts { get; set; }
 
         private int nPotTicker { get; set; }
 
-        private bool PcuFlag { get; set; }
-
         private TASK_TYPE mTaskType { get; set; }
+
+        private RK7001ResultType mRK7001ResultType { get; set; }
+
+        private RK7001Steps mStep;
 
         private PIN_STATUS mRK7001Pins;
         private PIN_STATUS mRK4103Pins;
@@ -191,6 +221,7 @@ namespace RokyTask
         public bool bRepaired { get; set; }
         public bool bPushcar { get; set; }
         public bool bBackcar { get; set; }
+        public bool bTest4103 { get; set; }
 
         public bool bServerActivated { get; set; }
         public string DefaultSN { get; set; }
@@ -215,6 +246,7 @@ namespace RokyTask
         public event EventHandler Update4103PinListHandler;
         public event EventHandler Update7001ListViewHandler;
         public event EventHandler Update7001PinListHandler;
+        public event EventHandler UpdateRemoteHandler;
         #endregion
         
         #region 注册串口报文事件
@@ -246,7 +278,14 @@ namespace RokyTask
         SimpleSerialPortTask<btTestRsp, NullEntity> mCompeteTestTask;
         btTestRsp mBtTestRspParam;
 
-        System.Timers.Timer SelfCheckTimer;
+        //发送0x06 0x86
+        SimpleSerialPortTask<pcTakeOverRsp, NullEntity> mPCTaskOverRspTask;
+        pcTakeOverRsp mTakeOverParam;
+
+        //发送0x0A，0x8A
+        SimpleSerialPortTask<ResetEcuReq, ResetEcuRsp> mResetEcuTask;
+        ResetEcuReq mResetEcuReqParam;
+
         System.Timers.Timer DynamicPotTicker;
         #endregion
 
@@ -260,324 +299,317 @@ namespace RokyTask
         #region 构造任务
         private void TaskBuilder()
         {
+            #region 重启ECU
+            mResetEcuTask = new SimpleSerialPortTask<ResetEcuReq, ResetEcuRsp>();
+            mResetEcuReqParam = mResetEcuTask.GetRequestEntity();
+            mResetEcuTask.RetryMaxCnts = 2;
+            mResetEcuTask.Timerout = 2000;
+            mResetEcuReqParam.deviceType = 0xF1;
+            mResetEcuReqParam.cmdCode = 0x02; //回复ECU同步命令
+            mResetEcuTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<ResetEcuRsp> mEventArgs = e as SerialPortEventArgs<ResetEcuRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    if(mEventArgs.Data.RspType == 0)
+                    {
+                        bTest4103 = true;
+                        StartDynamicPotTicker(30, TASK_TYPE.RK4103_PARAMSETTING);
+                        mFirstRunRspParam.deviceType = 0x01;
+                        mFirstRunRspParam.firmwareYears = 0;
+                        mFirstRunRspParam.firmwareWeeks = 0;
+                        mFirstRunRspParam.firmwareVersion = 0;
+                        mFirstRunRspParam.hardwareID = 0xFB;
+                        mParamSettingReqTask.Excute();
+                    }                    
+                }
+            };            
+            #endregion
+
+            #region PC接管报文 回应
+            mPCTaskOverRspTask = new SimpleSerialPortTask<pcTakeOverRsp, NullEntity>();
+            mPCTaskOverRspTask.RetryMaxCnts = 0;
+            mPCTaskOverRspTask.Timerout = 1000;
+            mTakeOverParam = mPCTaskOverRspTask.GetRequestEntity();
+            mTakeOverParam.deviceType = 0xF1;
+            mTakeOverParam.hardVare = 0xF1;
+            #endregion
+
             #region 自检报文
             mGet7001ResultTask = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
             mGet700ResultParam = mGet7001ResultTask.GetRequestEntity();
-            mGet7001ResultTask.RetryMaxCnts = 10;
+            mGet7001ResultTask.RetryMaxCnts = 30;
             mGet7001ResultTask.Timerout = 1000;//10s超时
-            mGet700ResultParam.ecu_status = 0x04;
+            mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+            mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+            mGet700ResultParam.server_mode = 0x04;//开启软件上电
             mGet700ResultParam.backlight = 0;
             mGet700ResultParam.batt_soc = 0;
-            mGet700ResultParam.gear_level = 0;
-            mGet700ResultParam.level_ctrl = 0 | 1 << 8;
+            mGet700ResultParam.level_ctrl = 0 | 0x01 << 8;
             mGet700ResultParam.limit_per = 0;
-            mGet700ResultParam.remote_code = 0;
-            mGet700ResultParam.trigger_ctrl = 0;
+            mGet700ResultParam.trigger_ctrl = 0;            
             mGet7001ResultTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
                 if (mEventArgs.Data != null)
-                {                 
-                    mAccStatus = (byte)mEventArgs.Data.AccStatus;
-            
-                    byte mDeviceFault = (byte)mEventArgs.Data.DeviceFault;
-                    byte mDcCurrent = (byte)mEventArgs.Data.DcCurrent;
-                    byte mPcuTemper = (byte)mEventArgs.Data.PcuTemper;
-                    byte l_cut = (byte)(mEventArgs.Data.CutError & 0xff);
-                    byte h_cut = (byte)(mEventArgs.Data.CutError >> 8 & 0xff);
-                    ushort mCutError = (ushort)(l_cut << 8 | h_cut);
-                    byte l_short = (byte)(mEventArgs.Data.ShortError & 0xff);
-                    byte h_short = (byte)(mEventArgs.Data.ShortError >> 8 & 0xff);
-                    ushort mShortError = (ushort)(l_short << 8 | h_short);
-                    bool testResult = false;
-
-                    if (mDeviceFault == 0 && mCutError == 0 && mShortError == 0)
+                {
+                    bool bExcute = false;
+                    Level level = Level.FALSE;
+                    switch (mStep)
                     {
-                        testResult = false;            
-                    }
-                    else
-                    {
-                        //分析是哪个错误
-                        #region 运放故障
-                        if ((mDeviceFault >> 1 & 0x1) == 1)//U200
-                        {
-                            testResult = true;
-                            UpdateRK7001Items(sender, RK7001ITEM.AMPLIFY, null, INFO_LEVEL.FAIL);
-                        }
-                        else
-                        {
-                            UpdateRK7001Items(sender, RK7001ITEM.AMPLIFY, null, INFO_LEVEL.PASS);
-                        }
-                        #endregion
-
-                        #region dc使能控制
-                        if ((mDeviceFault >> 2 & 0x1) == 1)//运放故障
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin10_Open = true;
-                            mRK7001Pins.Pin21_Open = true;
-                        }
-                        #endregion
-
-                        #region 输出过压 DC故障
-                        if ((mDeviceFault >> 3 & 0x1) == 1 || (mDeviceFault >> 4 & 0x1) == 1)//DC故障
-                        {
-                            testResult = true;
-                            UpdateRK7001Items(sender, RK7001ITEM.DC, null, INFO_LEVEL.FAIL);
-                        }
-                        else
-                        {
-                            UpdateRK7001Items(sender, RK7001ITEM.DC, null, INFO_LEVEL.PASS);
-                        }
-                        #endregion
-
-                        #region Mos短路故障
-                        if ((mDeviceFault >> 5 & 0x1) == 1) //mosfet故障
-                        {
-                            testResult = true;
-                            UpdateRK7001Items(sender, RK7001ITEM.MOSFET, null, INFO_LEVEL.FAIL);
-                        }
-                        else
-                        {
-                            UpdateRK7001Items(sender, RK7001ITEM.MOSFET, null, INFO_LEVEL.PASS);
-                        }
-                        #endregion
-
-                        #region 断路故障
-                        if ((mCutError >> 0 & 0x1) == 1)//前左转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin27_Open = true;
-                        }
-                        if ((mCutError >> 1 & 0x1) == 1)//后左转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin30_Open = true;
-                        }
-                        if ((mCutError >> 2 & 0x1) == 1)//前右转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin26_Open = true;
-                        }
-                        if ((mCutError >> 3 & 0x1) == 1)//后右转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin29_Open = true;
-                        }
-                        if ((mCutError >> 4 & 0x1) == 1)//近光
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin5_Open = true;
-                        }
-                        if ((mCutError >> 5 & 0x1) == 1)//远光
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin6_Open = true;
-                        }
-                        if ((mCutError >> 6 & 0x1) == 1)//尾灯
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin2_Open = true;
-                        }
-                        
-                        if ((mCutError >> 7 & 0x1) == 1)//刹车灯
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin3_Open = true;
-                        }
-                        
-                        if ((mCutError >> 8 & 0x1) == 1)//背景灯R
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin25_Open = true;
-                        }
-                        /*
-                        if ((mCutError >> 9 & 0x1) == 1)//背景灯G
-                            mRK7001Pins.Pin7_Open = true;
-                        if ((mCutError >> 10 & 0x1) == 1)//背景灯B
-                            mRK7001Pins.Pin24_Open = true;
-                        */
-                        if ((mCutError >> 11 & 0x1) == 1)//喇叭
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin4_Open = true;
-                        }
-                        #endregion
-
-                        #region 短路故障
-                        if ((mShortError >> 0 & 0x1) == 1)//前左转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin27_Short = true;
-                        }
-                        if ((mShortError >> 1 & 0x1) == 1)//后左转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin30_Short = true;
-                        }
-                        if ((mShortError >> 2 & 0x1) == 1)//前右转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin26_Short = true;
-                        }
-                        if ((mShortError >> 3 & 0x1) == 1)//后右转
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin29_Short = true;
-                        }
-                        if ((mShortError >> 4 & 0x1) == 1)//近光
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin5_Short = true;
-                        }
-                        if ((mShortError >> 5 & 0x1) == 1)//远光
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin6_Short = true;
-                        }
-                        if ((mShortError >> 6 & 0x1) == 1)//尾灯
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin2_Short = true;
-                        }
-                        
-                        if ((mShortError >> 7 & 0x1) == 1)//刹车灯
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin3_Short = true;
-                        }
-                        
-                        if ((mShortError >> 8 & 0x1) == 1)//背景灯R
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin25_Short = true;
-                        }
-                        /*
-                        if ((mShortError >> 9 & 0x1) == 1)//背景灯G
-                            mRK7001Pins.Pin7_Short = true;
-                        if ((mShortError >> 10 & 0x1) == 1)//背景灯B
-                            mRK7001Pins.Pin24_Short = true;
-                        */
-                        if ((mShortError >> 11 & 0x1) == 1)//喇叭
-                        {
-                            testResult = true;
-                            mRK7001Pins.Pin4_Open = true;
-                        }
-                        #endregion
-                    }
-                    if(!testResult)
-                    {
-                        bKsiTesting = true;
-                        StopDynamicPotTicker(sender);
-                        UpdateRK7001Items(sender, RK7001ITEM.INIT, null, INFO_LEVEL.PASS);
-
-                        UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
-
-                        #region 动态显示界面
-                        if (potCnts > 2)
-                            potCnts = 0;
-                        switch (potCnts)
-                        {
-                            case 0:
-                                SetMainText(sender, "目检成功，按动KSI开关", ".", INFO_LEVEL.PROCESS);
-                                break;
-                            case 1:
-                                SetMainText(sender, "目检成功，按动KSI开关", "..", INFO_LEVEL.PROCESS);
-                                break;
-                            case 2:
-                                SetMainText(sender, "目检成功，按动KSI开关", "...", INFO_LEVEL.PROCESS);
-                                break;
-                        }
-                        potCnts++;
-                        #endregion
-
-                        #region 判断ksi次数
-                        if (mAccStatus != mOldAccStatus)
-                        {
-                            if (++KsiCompCnts >= 1)
+                        case RK7001Steps.Step0_Init_1:
+                            level = Step0_OpenSoftDC(sender, mEventArgs.Data);
+                            switch(level)
                             {
-                                //判断KSI之后，再判断HORE
-                                SelfCheckTimer.Enabled = false;
-                                mGet700ResultParam.level_ctrl = mGet700ResultParam.level_ctrl & 0XFE;//关闭喇叭
-                                if ((mDcCurrent * 100 >= 50) && (mDcCurrent * 100 <= 150))
-                                {
-                                    bKsiTesting = false;
-                                    StartDynamicPotTicker(40, TASK_TYPE.RK4103_POWERON);
-                                    mFirstRunningReqTask.Excute();                                    
-                                }
-                                else
-                                {
-                                    mRK7001Pins.Pin3_Open = true;
-                                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
-                                    StopDynamicPotTicker(sender);
-                                    SetMainText(sender, "测试失败!", "再次扫描,进行下一次测试!", INFO_LEVEL.FAIL);
+                                case Level.FALSE:
                                     mGet7001ResultTask.ClearAllEvent();
-                                    return;
-                                }                                                             
-                            }
-                        }
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step1_SelfCheck;
+                                    mGet700ResultParam.ack_device = Const.PCU;
+                                    mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                                    mGet700ResultParam.server_mode = 0x4;//开启软件上电
+                                    mGet700ResultParam.level_ctrl = 0 | 0x01 << 8;
+                                    bExcute = true;
+                                    break;
+                            }                                                         
+                            break;
+                        case RK7001Steps.Step1_SelfCheck:
+                            level = Step1_SelfCheck(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    SetMainText(sender, "测试失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step2_Init_2;
+                                    mGet700ResultParam.ack_device = Const.PCU;//自测结果请求
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                                                            
+                            break;
+                        case RK7001Steps.Step2_Init_2:
+                            level = Step2_Init_2(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:                                    
+                                    mStep = RK7001Steps.Step3_OpenKSI;
+                                    mGet700ResultParam.ack_device = Const.TESTSERVER;//自测结果请求
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x2;
+                                    mGet700ResultParam.level_ctrl = 0;                                    
+                                    bExcute = true;
+                                    break;
+                            }                            
+                            break;
+                        case RK7001Steps.Step3_OpenKSI:
+                            level = Step3_OpenKSI(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    mRK7001Pins.Pin14_Open = true;
+                                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
+                                    SetMainText(sender, "测试失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step4_CloseKSI;
+                                    mGet700ResultParam.ack_device = Const.TESTSERVER;//自测结果请求
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                           
+                            break;
+                        case RK7001Steps.Step4_CloseKSI:
+                            level = Step4_CloseKSI(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    mRK7001Pins.Pin14_Open = true;
+                                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
+                                    SetMainText(sender, "测试失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step5_SoftOpenEcu;
+                                    mGet700ResultParam.ack_device = Const.PCU;
+                                    mGet700ResultParam.ecu_status = 0x14;
+                                    mGet700ResultParam.server_mode = 0x4;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                            
+                            break;
+                        case RK7001Steps.Step5_SoftOpenEcu:
+                            level = Step5_SoftOpenEcu(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    SetMainText(sender, "软件打开ACC_ECU失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step6_ReadOpenEcu;
+                                    mGet700ResultParam.ack_device = Const.TESTSERVER;
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x4;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                            
+                            break;
+                        case RK7001Steps.Step6_ReadOpenEcu:
+                            level = Step6_ReadOpenEcu(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    mRK7001Pins.Pin16_Open = true;
+                                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
+                                    SetMainText(sender, "测试失败", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step7_SoftCloseEcu;
+                                    mGet700ResultParam.ack_device = Const.PCU;
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                                                           
+                            break;
+                        case RK7001Steps.Step7_SoftCloseEcu:
+                            level = Step7_SoftCloseEcu(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    SetMainText(sender, "软件关闭ACC_ECU失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step8_ReadCloseEcu;
+                                    mGet700ResultParam.ack_device = Const.TESTSERVER;
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                                                            
+                            break;
+                        case RK7001Steps.Step8_ReadCloseEcu:
+                            level = Step8_ReadCloseEcu(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    mRK7001Pins.Pin16_Open = true;
+                                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
+                                    SetMainText(sender, "测试失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step9_RemoteInit;
+                                    mGet700ResultParam.ack_device = Const.TESTSERVER;
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x1;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                            
+                            break;
+                        case RK7001Steps.Step9_RemoteInit:
+                            level = Step9_RemoteInit(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    SetMainText(sender, "测试Server遥控器未按下键！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    mStep = RK7001Steps.Step10_RemoteTest;
+                                    mGet700ResultParam.ack_device = Const.PCU;
+                                    mGet700ResultParam.ecu_status = 0x0;
+                                    mGet700ResultParam.server_mode = 0x1;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    bExcute = true;
+                                    break;
+                            }                            
+                            break;
+                        case RK7001Steps.Step10_RemoteTest:
+                            level = Step10_RemoteTest(sender, mEventArgs.Data);
+                            switch(level)
+                            {
+                                case Level.FALSE:
+                                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
+                                    SetMainText(sender, "遥控器测试失败！", "", INFO_LEVEL.FAIL);
+                                    mGet7001ResultTask.ClearAllEvent();
+                                    break;
+                                case Level.REPEAT:
+                                    bExcute = true;
+                                    break;
+                                case Level.TRUE:
+                                    UpdateRemoteStatus(sender, INFO_LEVEL.PASS);
+                                    mResetEcuTask.Excute();                                    
+                                    bExcute = false;
+                                    break;
+                            }                            
+                            break;                                                                      
+                    }
 
-                        mOldAccStatus = mAccStatus;
-                        #endregion
-                    }
-                    else
+                    if(bExcute)
                     {
-                        SelfCheckTimer.Enabled = false;
-                        UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
-                        StopDynamicPotTicker(sender);
-                        SetMainText(sender, "测试失败!", "", INFO_LEVEL.FAIL);
-                        mGet7001ResultTask.ClearAllEvent();
-                        return;
-                    }
+                        Thread.Sleep(500);
+                        mGet7001ResultTask.Excute();
+                    }                                                          
                 }
                 else
                 {
-                    SelfCheckTimer.Enabled = false;
                     StopDynamicPotTicker(sender);
                     SetMainText(sender, "自检超时！", "",INFO_LEVEL.FAIL);
                     mGet7001ResultTask.ClearAllEvent();
-                }
+                }                
             };
             #endregion
 
-            SelfCheckTimer = new System.Timers.Timer(500);
-            SelfCheckTimer.Elapsed += new ElapsedEventHandler((object sender, ElapsedEventArgs ElapsedEventArgs) =>
-            {
-                SelfCheckTimer.Enabled = false;
-                if (mKsiOverTimeCnts > Const.MAX_TRY_COUNT)
-                {
-                    SelfCheckTimer.Enabled = false;
-                    mRK7001Pins.Pin14_Open = true;
-                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
-                    StopDynamicPotTicker(sender);
-                    SetMainText(sender, "测试失败!", "再次扫描,进行下一次测试!", INFO_LEVEL.FAIL);
-                    mGet7001ResultTask.ClearAllEvent();
-                    return;
-                }
-                else
-                {
-                    mKsiOverTimeCnts++;
-                    mGet700ResultParam.level_ctrl = mGet700ResultParam.level_ctrl | 1 << 0;//开启喇叭
-                    #region ACC_ECU闪烁
-                    if (!PcuFlag)
-                    {
-                        mGet700ResultParam.ecu_status = mGet700ResultParam.ecu_status | 1 << 4;
-                        PcuFlag = true;
-                    }
-                    else
-                    {
-                        mGet700ResultParam.ecu_status = mGet700ResultParam.ecu_status & ~(1 << 4);
-                        PcuFlag = false;
-                    }
-                    #endregion
-                    
-                    mGet7001ResultTask.Excute();
-                    SelfCheckTimer.Enabled = true;
-                }                                
-            });
-
-            
-            //动态显示
+            #region 动态显示
             DynamicPotTicker = new System.Timers.Timer(1000);
             DynamicPotTicker.Elapsed += new ElapsedEventHandler((object sender, ElapsedEventArgs ElapsedEventArgs) =>
             {
@@ -590,7 +622,7 @@ namespace RokyTask
                         SetMainText(sender, "测试Server是否在线?", nPotTicker.ToString(), INFO_LEVEL.PROCESS);
                         break;
                     case TASK_TYPE.RK7001_CHKVERSION:
-                        SetMainText(sender, "等待RK7001上电...", nPotTicker.ToString(), INFO_LEVEL.PROCESS);
+                        SetMainText(sender, "等待设备上电中...", nPotTicker.ToString(), INFO_LEVEL.PROCESS);
                         break;
                     case TASK_TYPE.RK7001_SELFTEST:
                         SetMainText(sender, "RK7001自检中...", nPotTicker.ToString(), INFO_LEVEL.PROCESS);
@@ -612,7 +644,8 @@ namespace RokyTask
                         break;
                 }
             });
-            
+            #endregion
+
             #region 查找UID报文
             mGet7001VersionTask = new SimpleSerialPortTask<get7001Version, get7001VersionRsp>();
             mGet7001VersionParam = mGet7001VersionTask.GetRequestEntity();
@@ -680,7 +713,9 @@ namespace RokyTask
                         SetMainText(sender, "RK7001未上电", "请下压夹具，再测一次", INFO_LEVEL.FAIL);
                         return;
                     }
-                    SelfCheckTimer.Enabled = true;
+                    //开始执行查询
+                    mStep = RK7001Steps.Step0_Init_1;
+                    mGet7001ResultTask.Excute();
                     StartDynamicPotTicker(30, TASK_TYPE.RK7001_SELFTEST);
                 }
                 else
@@ -705,8 +740,9 @@ namespace RokyTask
                 {
                     UpdateTestServer(sender, INFO_LEVEL.PASS);
                     //先来获取版本号和uid
+                    bTest4103 = false;
                     StartDynamicPotTicker(30, TASK_TYPE.RK7001_CHKVERSION);
-                    mGet7001VersionTask.Excute();
+                    mFirstRunningReqTask.Excute();                
                 }
                 else
                 {
@@ -716,12 +752,13 @@ namespace RokyTask
                     mChk4103ServerTask.ClearAllEvent();
                 }
             };
-            #endregion
+#endregion
 
-            #region RK4103上电 发送广播报文
+#region RK4103上电 发送广播报文
             mFirstRunningReqTask = new SimpleSerialPortTask<NullEntity, get4103BroadcastReq>();
             mFirstRunningReqTask.RetryMaxCnts = 1;
             mFirstRunningReqTask.Timerout = 20*1000;
+            bTest4103 = false;
             mFirstRunningReqTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<get4103BroadcastReq> mEventArgs = e as SerialPortEventArgs<get4103BroadcastReq>;
@@ -733,12 +770,21 @@ namespace RokyTask
                     DeviceInfo info = new DeviceInfo();
                     info.sw = softVersion;
                     UpdateRK4103Items(sender, RK4103ITEM.VERSION, info, INFO_LEVEL.NONE);
-                    mFirstRunRspParam.deviceType = 0x01;
-                    mFirstRunRspParam.firmwareYears = (byte)(mEventArgs.Data.hardwareID >> 24);
-                    mFirstRunRspParam.firmwareWeeks = (byte)(mEventArgs.Data.hardwareID >> 16);
-                    mFirstRunRspParam.firmwareVersion = (byte)(mEventArgs.Data.hardwareID >> 8);
-                    mFirstRunRspParam.hardwareID = 0xFB;
-                    mParamSettingReqTask.Excute();
+                    if(!bTest4103)
+                    {
+                        mPCTaskOverRspTask.Excute();
+                        Thread.Sleep(100);
+                        mGet7001VersionTask.Excute();
+                    }
+                    else
+                    {
+                        mFirstRunRspParam.deviceType = 0x01;
+                        mFirstRunRspParam.firmwareYears = (byte)(mEventArgs.Data.hardwareID >> 24);
+                        mFirstRunRspParam.firmwareWeeks = (byte)(mEventArgs.Data.hardwareID >> 16);
+                        mFirstRunRspParam.firmwareVersion = (byte)(mEventArgs.Data.hardwareID >> 8);
+                        mFirstRunRspParam.hardwareID = 0xFB;
+                        mParamSettingReqTask.Excute();
+                    }                  
                 }
                 else
                 {
@@ -747,9 +793,9 @@ namespace RokyTask
                     mFirstRunningReqTask.ClearAllEvent();
                 }
             };
-            #endregion
+#endregion
 
-            #region 发送0x86, 接受0x03
+#region 发送0x86, 接受0x03
             mParamSettingReqTask = new SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq>();
             mFirstRunRspParam = mParamSettingReqTask.GetRequestEntity();
             mParamSettingReqTask.RetryMaxCnts = 1;
@@ -770,7 +816,7 @@ namespace RokyTask
                     mParamSettingParam.v15Param = temp;
                     mParamSettingParam.sntemp = temp;
                     //等待接受结果
-                    StartDynamicPotTicker(30, TASK_TYPE.RK4103_SELFTEST);
+                    StartDynamicPotTicker(50, TASK_TYPE.RK4103_SELFTEST);
                     Thread.Sleep(100);
                     mRecvTestResultTask.Excute();
                 }
@@ -781,13 +827,13 @@ namespace RokyTask
                     mParamSettingReqTask.ClearAllEvent();
                 }
             };
-            #endregion
+#endregion
 
-            #region 发送0x83， 接受0x23
+#region 发送0x83， 接受0x23
             mRecvTestResultTask = new SimpleSerialPortTask<ParameterSettingRsp, boardTestResultReq>();
             mParamSettingParam = mRecvTestResultTask.GetRequestEntity();
-            mRecvTestResultTask.RetryMaxCnts = 1;
-            mRecvTestResultTask.Timerout = 15 * 1000;
+            mRecvTestResultTask.RetryMaxCnts = 10;
+            mRecvTestResultTask.Timerout = 5 * 1000;
             mRecvTestResultTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<boardTestResultReq> mEventArgs = e as SerialPortEventArgs<boardTestResultReq>;
@@ -797,6 +843,7 @@ namespace RokyTask
                     int inputPin = (int)mEventArgs.Data.inputPin;
                     byte outpin1 = (byte)mEventArgs.Data.outpin1;
                     byte outpin2 = (byte)mEventArgs.Data.outpin2;
+                    byte extensionOut = (byte)mEventArgs.Data.extensionOut;
                     bool InputPinError = false;
                     if(m_result == 0)
                     {
@@ -895,7 +942,7 @@ namespace RokyTask
                             }
                             if(bRepaired)
                             {
-                                if ((inputPin >> 11 & 0x1) == 1)//一键修复
+                                if ((inputPin >> 12 & 0x1) == 1)//一键修复
                                     mRK4103Pins.Pin19_Open = true;
                             }                 
                         }
@@ -917,6 +964,50 @@ namespace RokyTask
                             else
                                 UpdateRK4103Items(sender, RK4103ITEM.PWM, null, INFO_LEVEL.PASS);
                         }
+                        //扩展pin脚
+                        if ((m_result >> 8 & 0x1) == 1)
+                        {
+                            if ((extensionOut >> 0 & 0x1) == 1)//LCM_左转指示
+                            {
+                                mRK4103Pins.Pin8_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 1 & 0x1) == 1)//LCM_远光指示
+                            {
+                                mRK4103Pins.Pin24_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 2 & 0x1) == 1)//LCM_READY指示
+                            {
+                                mRK4103Pins.Pin7_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 3 & 0x1) == 1) //LCM_PARK指示
+                            {
+                                mRK4103Pins.Pin6_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 4 & 0x1) == 1)//LCM_右转指示
+                            {
+                                mRK4103Pins.Pin25_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 5 & 0x1) == 1)//LCM_CS
+                            {
+                                mRK4103Pins.Pin21_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 6 & 0x1) == 1)//LCM_CLK
+                            {
+                                mRK4103Pins.Pin23_Open = true;
+                                InputPinError = true;
+                            }
+                            if ((extensionOut >> 7 & 0x1) == 1)//LCM_DO
+                            {
+                                mRK4103Pins.Pin10_Open = true;
+                                InputPinError = true;
+                            }
+                        }
                         //最后判断
                         if(!InputPinError)
                         {
@@ -932,8 +1023,7 @@ namespace RokyTask
                             SetMainText(sender, "测试失败!", "", INFO_LEVEL.FAIL);
                             mRecvTestResultTask.ClearAllEvent();
                             return;
-                        }   
-                        
+                        }                           
                     }                    
                 }
                 else
@@ -943,9 +1033,9 @@ namespace RokyTask
                     mRecvTestResultTask.ClearAllEvent();
                 }
             };
-            #endregion
+#endregion
 
-            #region 发送0xA3,接受0x24
+#region 发送0xA3,接受0x24
             mSaveNvReqTask = new SimpleSerialPortTask<boardTestResultRsp, SaveNvReq>();
             mTestResultRspParam = mSaveNvReqTask.GetRequestEntity();
             mSaveNvReqTask.RetryMaxCnts = 0;
@@ -958,6 +1048,7 @@ namespace RokyTask
                     mSaveNvRspParam.status = 0x00;                  
                     //启动蓝牙接受测试结果
                     StartDynamicPotTicker(30, TASK_TYPE.RK4103_BLETEST);
+                    Thread.Sleep(100);
                     mBtTestReqTask.Excute();
                 }
                 else
@@ -967,9 +1058,9 @@ namespace RokyTask
                     mSaveNvReqTask.ClearAllEvent();
                 }
             };
-            #endregion
+#endregion
 
-            #region 发送0XA4，接受0x26
+#region 发送0XA4，接受0x26
             mBtTestReqTask = new SimpleSerialPortTask<SaveNvRsp, btTestReq>();
             mSaveNvRspParam = mBtTestReqTask.GetRequestEntity();
             mBtTestReqTask.RetryMaxCnts = 0;
@@ -1010,7 +1101,13 @@ namespace RokyTask
                         mCompeteTestTask.Excute();
                         StopDynamicPotTicker(sender);
                         SetMainText(sender, "蓝牙测试成功!开始目检...", "", INFO_LEVEL.PROCESS);
-                        //人工目检                       
+                        //人工目检
+                        mRK7001ResultType = RK7001ResultType.OPEN_BUZZER_RSP;
+                        mGet700ResultParam.ack_device = 0X07;//发给PCU
+                        mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                        mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                        mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
+                        mGet7001ResultTask.Excute();
                         ManualVisio mMaualFrm = new ManualVisio();
                         DialogResult result = mMaualFrm.ShowDialog();
                         if (result == DialogResult.OK)
@@ -1023,7 +1120,8 @@ namespace RokyTask
                         {
                             SetMainText(sender, "目检失败！", "", INFO_LEVEL.FAIL);
                             mMaualFrm.Close();
-                        }                        
+                        }
+                        mGet700ResultParam.trigger_ctrl = 0;//关闭Buzzer                      
                     }          
                 }
                 else
@@ -1033,20 +1131,473 @@ namespace RokyTask
                     mBtTestReqTask.ClearAllEvent();
                 }
             };
-            #endregion
+#endregion
 
-            #region 测试蓝牙 回应
+#region 测试蓝牙 回应
             mCompeteTestTask = new SimpleSerialPortTask<btTestRsp, NullEntity>();
             mBtTestRspParam = mCompeteTestTask.GetRequestEntity();
             mBtTestRspParam.status = 0;
-            #endregion
+#endregion
         }
         #endregion
+
+        #region Step0:软件上电，开始自测
+        private Level Step0_OpenSoftDC(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            if (mAckDevice == Const.PCU)
+            {
+                return Level.TRUE;
+            }
+            else
+                return Level.REPEAT;
+            return Level.FALSE ;
+        }
+        #endregion
+
+        #region Step1：Client 自检检测  
+        private Level Step1_SelfCheck(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
+            byte mAskResult = (byte)mArgs.ack_value;//响应
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDeviceFault = (byte)mArgs.DeviceFault;
+            byte mDcCurrent = (byte)mArgs.DcCurrent;
+            byte mDcVoltage = (byte)mArgs.DcVoltage;
+            byte mCutError1 = (byte)mArgs.CutError_1;
+            byte mCutError2 = (byte)mArgs.CutError_2;
+            byte mShortError1 = (byte)mArgs.ShortError_1;
+            byte mShortError2 = (byte)mArgs.ShortError_2;
+            byte mRemoteCmd = (byte)mArgs.RemoteCmd;
+            bool testResult = false;
+
+            if (mAskDevice == Const.PCU)
+            {
+                if (mAccStatus != 1)
+                    return Level.FALSE;
+                if (mDeviceFault == 0 && mCutError1 == 0 && mCutError2 == 0 && mShortError1 == 0 && mShortError2 == 0)
+                {
+                    testResult = false;
+                }
+                else
+                {
+                    if ((mDeviceFault >> 1 & 0x1) == 1)//U200 运放故障
+                    {
+                        testResult = true;
+                        UpdateRK7001Items(sender, RK7001ITEM.AMPLIFY, null, INFO_LEVEL.FAIL);
+                    }
+                    else
+                    {
+                        UpdateRK7001Items(sender, RK7001ITEM.AMPLIFY, null, INFO_LEVEL.PASS);
+                    }
+                    if ((mDeviceFault >> 2 & 0x1) == 1)//dc使能控制
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin10_Open = true;
+                        mRK7001Pins.Pin21_Open = true;
+                    }
+                    if ((mDeviceFault >> 3 & 0x1) == 1 || (mDeviceFault >> 4 & 0x1) == 1)//DC故障、输出过压
+                    {
+                        testResult = true;
+                        UpdateRK7001Items(sender, RK7001ITEM.DC, null, INFO_LEVEL.FAIL);
+                    }
+                    else
+                    {
+                        UpdateRK7001Items(sender, RK7001ITEM.DC, null, INFO_LEVEL.PASS);
+                    }
+                    if ((mDeviceFault >> 5 & 0x1) == 1) //mosfet故障
+                    {
+                        testResult = true;
+                        UpdateRK7001Items(sender, RK7001ITEM.MOSFET, null, INFO_LEVEL.FAIL);
+                    }
+                    else
+                    {
+                        UpdateRK7001Items(sender, RK7001ITEM.MOSFET, null, INFO_LEVEL.PASS);
+                    }
+                    if ((mCutError1 >> 0 & 0x1) == 1)//前左转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin27_Open = true;
+                    }
+                    if ((mCutError1 >> 1 & 0x1) == 1)//后左转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin30_Open = true;
+                    }
+                    if ((mCutError1 >> 2 & 0x1) == 1)//前右转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin26_Open = true;
+                    }
+                    if ((mCutError1 >> 3 & 0x1) == 1)//后右转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin29_Open = true;
+                    }
+                    if ((mCutError1 >> 4 & 0x1) == 1)//近光
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin5_Open = true;
+                    }
+                    if ((mCutError1 >> 5 & 0x1) == 1)//远光
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin6_Open = true;
+                    }
+                    if ((mCutError1 >> 6 & 0x1) == 1)//尾灯
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin2_Open = true;
+                    }
+
+                    if ((mCutError1 >> 7 & 0x1) == 1)//刹车灯
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin3_Open = true;
+                    }
+
+                    if ((mCutError2 >> 0 & 0x1) == 1)//背景灯R
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin25_Open = true;
+                    }
+                    /*
+                    if ((mCutError2 >> 1 & 0x1) == 1)//背景灯G
+                        mRK7001Pins.Pin7_Open = true;
+                    if ((mCutError2 >> 2 & 0x1) == 1)//背景灯B
+                        mRK7001Pins.Pin24_Open = true;
+                    */
+                    if ((mCutError2 >> 3 & 0x1) == 1)//喇叭
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin4_Open = true;
+                    }
+                    if ((mCutError2 >> 4 & 0x1) == 1)//BUZZER
+                    {
+                        testResult = true;
+                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
+                    }
+                    else
+                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+                    if ((mShortError1 >> 0 & 0x1) == 1)//前左转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin27_Short = true;
+                    }
+                    if ((mShortError1 >> 1 & 0x1) == 1)//后左转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin30_Short = true;
+                    }
+                    if ((mShortError1 >> 2 & 0x1) == 1)//前右转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin26_Short = true;
+                    }
+                    if ((mShortError1 >> 3 & 0x1) == 1)//后右转
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin29_Short = true;
+                    }
+                    if ((mShortError1 >> 4 & 0x1) == 1)//近光
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin5_Short = true;
+                    }
+                    if ((mShortError1 >> 5 & 0x1) == 1)//远光
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin6_Short = true;
+                    }
+                    if ((mShortError1 >> 6 & 0x1) == 1)//尾灯
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin2_Short = true;
+                    }
+                    if ((mShortError1 >> 7 & 0x1) == 1)//刹车灯
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin3_Short = true;
+                    }
+                    if ((mShortError2 >> 0 & 0x1) == 1)//背景灯R
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin25_Short = true;
+                    }
+                    /*
+                    if ((mShortError2 >> 1 & 0x1) == 1)//背景灯G
+                        mRK7001Pins.Pin7_Short = true;
+                    if ((mShortError2 >> 2 & 0x1) == 1)//背景灯B
+                        mRK7001Pins.Pin24_Short = true;
+                    */
+                    if ((mShortError2 >> 3 & 0x1) == 1)//喇叭
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin4_Open = true;
+                    }
+                    if ((mShortError2 >> 4 & 0x1) == 1)//BUZZER
+                    {
+                        testResult = true;
+                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
+                    }
+                    else
+                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+
+                    if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin3_Open = true;
+                    }
+
+                    if (!testResult)
+                    {
+                        //测试成功                        
+                        UpdateRK7001Items(sender, RK7001ITEM.INIT, null, INFO_LEVEL.PASS);
+                        UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
+                    }
+                    else
+                    {
+                        UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.FAIL);
+                        StopDynamicPotTicker(sender);
+                        SetMainText(sender, "测试失败!", "", INFO_LEVEL.FAIL);
+                        mGet7001ResultTask.ClearAllEvent();
+                        return Level.FALSE;
+                    }
+
+                    return Level.TRUE;
+                }
+            }
+            else
+                return Level.REPEAT;
+            return Level.FALSE;
+        }
+        #endregion
+
+        #region Step2: 开关全部关闭
+        private Level Step2_Init_2(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            if (mAckDevice == Const.PCU)
+            {
+                //读取Server返回的状态数据  
+                /*              
+                if (mAccStatus == 0)
+                {
+                    return Level.TRUE;
+                }
+                */
+                return Level.TRUE;
+            }
+            else if(mAckDevice == Const.TESTSERVER)
+                    return Level.REPEAT;
+
+            return Level.FALSE;
+        }
+        #endregion
+
+        #region Step3: 判断KSI是否打开
+        private Level Step3_OpenKSI(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDcOUT = (byte)mArgs.DcVoltage;
+            if(mAckDevice == Const.TESTSERVER)
+            {
+                if(mAccStatus != 0)
+                {
+                    return Level.TRUE;
+                }              
+            }
+            else
+            {
+                return Level.REPEAT;
+            }
+            return Level.FALSE;
+        }
+        #endregion
+
+        #region Step4:关闭soft
+        private Level Step4_CloseKSI(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDCout = (byte)mArgs.DcVoltage;
+            if(mAckDevice == Const.TESTSERVER)
+            {
+                if(mAccStatus == 0)
+                {
+                    return Level.TRUE;
+                }                        
+            }
+            else
+            {
+                return Level.REPEAT;
+            }
+
+            return Level.FALSE; ;
+        }
+        #endregion
+
+        #region Step5: 软件打开DC
+        private Level Step5_SoftOpenEcu(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDcOUT = (byte)mArgs.DcVoltage;
+            if (mAckDevice == Const.PCU)
+            {                
+                return Level.TRUE;                                            
+            }
+            else if(mAckDevice == Const.TESTSERVER)
+            {
+                return Level.REPEAT;
+            }
+
+            return Level.FALSE;           
+        }
+        #endregion
+
+        #region Step6:读取软件开电状态
+        private Level Step6_ReadOpenEcu(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDcOUT = (byte)mArgs.DcVoltage;
+            if (mAckDevice == Const.TESTSERVER)
+            {
+                //判断是否KSI是否已经关闭
+                if (mAccStatus != 0 && mDcOUT != 0)
+                {
+                    mRK7001Pins.Pin14_Open = false;
+                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
+                    return Level.TRUE;
+                }
+                else
+                {
+                    mRK7001Pins.Pin14_Open = true;
+                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
+                    return Level.FALSE;
+                }
+            }
+            else if(mAckDevice == Const.PCU)
+                       return Level.REPEAT;
+
+
+            return Level.FALSE; ;
+        }
+        #endregion
+
+        #region Step7:软件关电
+        private Level Step7_SoftCloseEcu(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDcOUT = (byte)mArgs.DcVoltage;
+
+            if (mAckDevice == Const.PCU)
+            {
+                return Level.TRUE;
+            }
+            else if(mAckDevice == Const.TESTSERVER)
+                    return Level.REPEAT;
+
+            return Level.FALSE;
+        }
+        #endregion
+
+        #region Step8: 读软件关电状态
+        private Level Step8_ReadCloseEcu(Object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDcOUT = (byte)mArgs.DcVoltage;
+            if (mAckDevice == Const.TESTSERVER)
+            {
+                //判断是否KSI是否已经关闭
+                if (mAccStatus == 0 && mDcOUT == 0)
+                {
+                    mRK7001Pins.Pin14_Open = false;
+                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
+                    return Level.TRUE;
+                }
+                else
+                {
+                    mRK7001Pins.Pin14_Open = true;
+                    UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
+                    return Level.FALSE;
+                }
+            }
+            else if (mAckDevice == Const.PCU)
+                return Level.REPEAT;
+
+            return Level.FALSE;
+        }
+        #endregion
+
+
+        #region Step9: Server 通知server，按下遥控器按键
+        private Level Step9_RemoteInit(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            if(mAckDevice == Const.TESTSERVER)
+            {
+                if(mAckValue == Const.TESTSERVER_KEY_PRESS)
+                {                   
+                    return Level.TRUE;
+                }                        
+            }
+            else if(mAckDevice == Const.PCU)
+            {
+                return Level.REPEAT;
+            }
+
+            return Level.FALSE;
+        }
+        #endregion
+
+        #region Step10: Client 通知client，进行配对
+        private Level Step10_RemoteTest(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            if (mAckDevice == Const.PCU)
+            {
+                if (mAckValue == Const.REMOTE_CONNECTED)
+                {
+                    return Level.TRUE;
+                }
+                else if (mAckValue == Const.REMOTE_CHECK_FAIL)
+                {
+                    return Level.FALSE;
+                }
+                else if (mAckValue == Const.REMOTE_NO_RECV)
+                {
+                    return Level.FALSE;
+                }
+                else
+                    return Level.REPEAT;
+            }
+            else if (mAckDevice == Const.TESTSERVER)
+                return Level.REPEAT;
+
+            return Level.FALSE;
+        }
+        #endregion
+
 
         #region RK7001目检失败
         public void RK7001KSICheckFail()
         {
-            SelfCheckTimer.Enabled = false;
             mGet7001ResultTask.ClearAllEvent();
             SetMainText(this, "RK7001目检失败!", "", INFO_LEVEL.FAIL);
         }
@@ -1065,6 +1616,18 @@ namespace RokyTask
         private void StopDynamicPotTicker(object sender)
         {
             DynamicPotTicker.Enabled = false;
+        }
+        #endregion
+
+        #region 遥控器
+        private void UpdateRemoteStatus(object sender, INFO_LEVEL level)
+        {
+            if(UpdateRemoteHandler != null)
+            {
+                UIEventArgs mArgs = new UIEventArgs();
+                mArgs.level = level;
+                UpdateRemoteHandler(sender, mArgs);
+            }
         }
         #endregion
 
@@ -1247,28 +1810,41 @@ namespace RokyTask
         }
         #endregion
 
-        public void ExcuteTask()
+
+        #region 初始化配置参数
+        private void InitParameters()
         {
+            if(mGet700ResultParam != null)
+            {
+                mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                mGet700ResultParam.ecu_status = 0;//默认;//默认
+                mGet700ResultParam.server_mode = 0x4;//开启软件上电
+                mGet700ResultParam.backlight = 0;
+                mGet700ResultParam.batt_soc = 0;
+                mGet700ResultParam.level_ctrl = 0 | 0x01 << 8;
+                mGet700ResultParam.limit_per = 0;
+                mGet700ResultParam.trigger_ctrl = 0;
+            }
+
             bTaskRunning = true;
-            bKsiTesting = false;
-            mAccStatus = 0;
-            mOldAccStatus = 0;
-            KsiCompCnts = 0;
-            mKsiOverTimeCnts = 0;
-            potCnts = 0;
             nPotTicker = 0;
             mBTaddr = "";
             mBLEaddr = "";
             mKeyt = "";
             mUid = "";
             mTestResult = "";
-            PcuFlag = false;
-            SelfCheckTimer.Enabled = false;
+        }
+        #endregion
+
+        public void ExcuteTask()
+        {
+            InitParameters();
             StopDynamicPotTicker(this);
             mRK7001Pins = new PIN_STATUS();
             mRK4103Pins = new PIN_STATUS();
             UpdateRK7001Pins(this, mRK7001Pins, INFO_LEVEL.PROCESS);
             UpdateRK4103Pins(this, mRK4103Pins, INFO_LEVEL.PROCESS);
+            UpdateRemoteStatus(this, INFO_LEVEL.PROCESS);
             if(bServerActivated)
             {
                 if (!GetValueFrmServer(this))

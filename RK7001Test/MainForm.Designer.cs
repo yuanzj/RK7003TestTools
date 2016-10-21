@@ -33,6 +33,8 @@
             this.LbWorkTip = new System.Windows.Forms.Label();
             this.LbWorkResult = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.panel_remoter = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label5 = new System.Windows.Forms.Label();
@@ -175,15 +177,13 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.panel_remoter = new System.Windows.Forms.Panel();
-            this.label6 = new System.Windows.Forms.Label();
             this.PnWorkStatus.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.panel_remoter.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel12.SuspendLayout();
             this.panel4.SuspendLayout();
             this.panel3.SuspendLayout();
-            this.panel_remoter.SuspendLayout();
             this.SuspendLayout();
             // 
             // PnWorkStatus
@@ -233,6 +233,24 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(469, 306);
             this.panel2.TabIndex = 1;
+            // 
+            // panel_remoter
+            // 
+            this.panel_remoter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel_remoter.Controls.Add(this.label6);
+            this.panel_remoter.Location = new System.Drawing.Point(116, 35);
+            this.panel_remoter.Name = "panel_remoter";
+            this.panel_remoter.Size = new System.Drawing.Size(63, 48);
+            this.panel_remoter.TabIndex = 14;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(11, 19);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(41, 12);
+            this.label6.TabIndex = 15;
+            this.label6.Text = "遥  控";
             // 
             // label4
             // 
@@ -1656,24 +1674,6 @@
             this.columnHeader3.Text = "解决方案";
             this.columnHeader3.Width = 328;
             // 
-            // panel_remoter
-            // 
-            this.panel_remoter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel_remoter.Controls.Add(this.label6);
-            this.panel_remoter.Location = new System.Drawing.Point(116, 35);
-            this.panel_remoter.Name = "panel_remoter";
-            this.panel_remoter.Size = new System.Drawing.Size(63, 48);
-            this.panel_remoter.TabIndex = 14;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(11, 19);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(41, 12);
-            this.label6.TabIndex = 15;
-            this.label6.Text = "遥  控";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1691,13 +1691,15 @@
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "新日RK7003生产测试工具V2.0";
+            this.Text = "新日RK7003生产测试工具V1.1.0";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_Closed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_Start);
             this.PnWorkStatus.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
+            this.panel_remoter.ResumeLayout(false);
+            this.panel_remoter.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel12.ResumeLayout(false);
@@ -1705,8 +1707,6 @@
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             this.panel3.ResumeLayout(false);
-            this.panel_remoter.ResumeLayout(false);
-            this.panel_remoter.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -27,7 +27,7 @@ namespace RK7001Test
         private void LoginForm_Load(object sender, EventArgs e)
         {
             //版本号
-            this.Text = String.Format("RK7100生产测试工具 V{0}", AssemblyFileVersion());
+            this.Text = String.Format("新日RK7003工具 V{0}", AssemblyFileVersion());
             //串口
             this.ccb_Port.DataSource = System.IO.Ports.SerialPort.GetPortNames();
 

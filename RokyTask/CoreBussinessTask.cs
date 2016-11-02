@@ -860,6 +860,7 @@ namespace RokyTask
                         }
                         else
                             UpdateRK4103Items(sender, RK4103ITEM.GSENSOR, null, INFO_LEVEL.PASS);
+                        /*
                         if ((m_result >> 1 & 0x1) == 1)
                         {
                             UpdateRK4103Items(sender, RK4103ITEM.LIGHTSENSOR, null, INFO_LEVEL.FAIL);
@@ -867,6 +868,7 @@ namespace RokyTask
                         }
                         else
                             UpdateRK4103Items(sender, RK4103ITEM.LIGHTSENSOR, null, INFO_LEVEL.PASS);
+                        */
                         if ((m_result >> 2 & 0x1) == 1)
                         {
                             UpdateRK4103Items(sender, RK4103ITEM.VDD33, null, INFO_LEVEL.FAIL);

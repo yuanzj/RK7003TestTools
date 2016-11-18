@@ -50,6 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PhoneTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PhoneTest.Designer.cs">
+      <DependentUpon>PhoneTest.cs</DependentUpon>
+    </Compile>
     <Compile Include="ListViewNF.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -67,6 +73,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="PhoneTest.resx">
+      <DependentUpon>PhoneTest.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

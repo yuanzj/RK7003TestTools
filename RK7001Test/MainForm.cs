@@ -1,4 +1,5 @@
-﻿using RokyTask;
+﻿using CommonUtils;
+using RokyTask;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 
 
@@ -22,21 +24,14 @@ namespace RK7001Test
         private ListViewItem lv7001uid;
         private ListViewItem lv7001sw;
         private ListViewItem lv7001hw;
-        private ListViewItem lv7001dc;
         private ListViewItem lv7001ampf;
         private ListViewItem lv7001mosfet;
         private ListViewItem lv7001buzzer;
         private ListViewItem lv4103sw;
         private ListViewItem lv4103lgtsensor;
         private ListViewItem lv4103gsensor;
-        private ListViewItem lv4103Vdd33;
-        private ListViewItem lv4103io26;
-        private ListViewItem lv4103io27;
-        private ListViewItem lv4103pwm;
-        private ListViewItem lv4103edr;
+        //private ListViewItem lv4103pwm;
         private ListViewItem lv4103ble;
-
-        
         #endregion
 
         public MainForm(string _comPort)
@@ -59,7 +54,6 @@ namespace RK7001Test
             lv7001uid = new ListViewItem("设备UID");
             lv7001sw = new ListViewItem("软件版本号");
             lv7001hw = new ListViewItem("硬件版本号");
-            lv7001dc = new ListViewItem("DC故障");
             lv7001ampf = new ListViewItem("运放故障");
             lv7001mosfet = new ListViewItem("Mos短路");
             lv7001buzzer = new ListViewItem("Buzzer故障");
@@ -67,7 +61,6 @@ namespace RK7001Test
             lv7001uid.UseItemStyleForSubItems = false;
             lv7001sw.UseItemStyleForSubItems = false;
             lv7001hw.UseItemStyleForSubItems = false;
-            lv7001dc.UseItemStyleForSubItems = false;
             lv7001ampf.UseItemStyleForSubItems = false;
             lv7001mosfet.UseItemStyleForSubItems = false;
             lv7001buzzer.UseItemStyleForSubItems = false;
@@ -76,7 +69,6 @@ namespace RK7001Test
             lv7001uid,
             lv7001sw,
             lv7001hw,
-            lv7001dc,
             lv7001ampf,
             lv7001mosfet,
             lv7001buzzer});
@@ -84,34 +76,21 @@ namespace RK7001Test
             lv4103sw = new ListViewItem("软件版本号");
             lv4103lgtsensor = new ListViewItem("光感异常测试");
             lv4103gsensor = new ListViewItem("Gsensor测试");
-            lv4103Vdd33 = new ListViewItem("VDD33测试");
-            lv4103io26 = new ListViewItem("GPIO26测试");
-            lv4103io27 = new ListViewItem("GPIO27测试");
-            lv4103pwm = new ListViewItem("PWM");
-            lv4103edr = new ListViewItem("蓝牙2.1测试");
             lv4103ble = new ListViewItem("蓝牙4.0测试");
 
             lv4103sw.UseItemStyleForSubItems = false;
             lv4103lgtsensor.UseItemStyleForSubItems = false;
             lv4103gsensor.UseItemStyleForSubItems = false;
-            lv4103Vdd33.UseItemStyleForSubItems = false;
-            lv4103io26.UseItemStyleForSubItems = false;
-            lv4103io27.UseItemStyleForSubItems = false;
-            lv4103pwm.UseItemStyleForSubItems = false;
-            lv4103edr.UseItemStyleForSubItems = false;
             lv4103ble.UseItemStyleForSubItems = false;
 
             this.lvRK4003ErrItem.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             lv4103sw,
             lv4103lgtsensor,
             lv4103gsensor,
-            lv4103Vdd33,
-            lv4103io26,
-            lv4103io27,
-            lv4103pwm,
-            lv4103edr,
             lv4103ble});
             #endregion
+
+            UpdateVddGpsPin(INFO_LEVEL.INIT);
 
             mCoreTask = new CoreBussinessTask();
 
@@ -196,18 +175,46 @@ namespace RK7001Test
                     SetRemoteStatus(mArgs.level);
                 }
             };
+
+            mCoreTask.UpdateListViewHandler += (object _sender, EventArgs _e) =>
+            {
+                UIEventArgs mArgs = _e as UIEventArgs;
+                if(mArgs != null)
+                {
+                    SetListView(mArgs.msg, mArgs.submsg);
+                }
+            };
+
+            mCoreTask.UpdatePotTickerHandler += (object _sender, EventArgs _e) =>
+            {
+                UIEventArgs mArgs = _e as UIEventArgs;
+                if (mArgs != null)
+                {
+                    SetPotTicker(mArgs.msg, mArgs.level);
+                }
+            };
+
+            mCoreTask.UpdateVddGpsHandler += (object _sender, EventArgs _e) =>
+            {
+                UIEventArgs mArgs = _e as UIEventArgs;
+                if(mArgs != null)
+                {
+                    UpdateVddGpsPin(mArgs.level);
+                }
+            };
             //初始化界面
             SetValidSN(INFO_LEVEL.INIT);
             SetTestServer(INFO_LEVEL.INIT);
             SetRK7001PinList(null, INFO_LEVEL.INIT);
             SetRK4103PinList(null, INFO_LEVEL.INIT);
 
-
+            this.labelPos.Visible = false;
             this.tbInputSN.Focus();
             this.tbInputSN.TabIndex = 0;
         }
         #endregion
 
+       
         #region 启动任务
         private void StartTask()
         {
@@ -215,11 +222,45 @@ namespace RK7001Test
             SetTestServer(INFO_LEVEL.PROCESS);
             SetRK7001ItemList(RK7001ITEM.INIT, null, INFO_LEVEL.INIT);
             SetRK4103ItemList(RK4103ITEM.INIT, null, INFO_LEVEL.INIT);
+            this.lvSolutions.Items.Clear();
             mCoreTask.mSN = this.tbInputSN.Text;
             this.tbInputSN.Enabled = false;
             mCoreTask.ExcuteTask();
         }
         #endregion
+
+        #region 设置动态
+        delegate void SetPotTickerCallback(string msg, INFO_LEVEL level);
+        private void SetPotTicker(string msg, INFO_LEVEL level)
+        {
+            if (this.labelPos.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            {
+                while (!this.labelPos.IsHandleCreated)
+                {
+                    //解决窗体关闭时出现“访问已释放句柄“的异常
+                    if (this.labelPos.Disposing || this.labelPos.IsDisposed)
+                        return;
+                }
+                SetPotTickerCallback d = new SetPotTickerCallback(SetPotTicker);
+                this.labelPos.Invoke(d, new object[] { msg, level });
+            }
+            else
+            {
+                switch(level)
+                {
+                    case INFO_LEVEL.INIT:
+                        this.labelPos.Visible = false;
+                        break;
+                    case INFO_LEVEL.PROCESS:
+                        this.labelPos.Visible = true;
+                        this.labelPos.Text = msg;
+                        break;                    
+                }
+            }
+        }
+        #endregion
+
+
 
         #region 设置主界面
         delegate void setMainTextCallback(string msg, string submsg, INFO_LEVEL level);
@@ -270,6 +311,79 @@ namespace RK7001Test
             }
 
 
+        }
+        #endregion
+
+        #region 更新VDD_GPS pin
+        delegate void UpdateVddGpsPinCallback(INFO_LEVEL level);
+        private void UpdateVddGpsPin(INFO_LEVEL level)
+        {
+            if (this.rkPin_30.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            {
+                while (!this.rkPin_30.IsHandleCreated)
+                {
+                    //解决窗体关闭时出现“访问已释放句柄“的异常
+                    if (this.rkPin_30.Disposing || this.rkPin_30.IsDisposed)
+                        return;
+                }
+                UpdateVddGpsPinCallback d = new UpdateVddGpsPinCallback(UpdateVddGpsPin);
+                this.rkPin_30.Invoke(d, new object[] { level });
+            }
+            else
+            {
+                switch(level)
+                {
+                    case INFO_LEVEL.INIT:
+                        this.rkPin_30.BackColor = Color.White;
+                        break;
+                    case INFO_LEVEL.FAIL:
+                        this.rkPin_30.BackColor = Color.Red;
+                        break;
+                    case INFO_LEVEL.PASS:
+                        this.rkPin_30.BackColor = Color.Green;
+                        break;
+                    case INFO_LEVEL.PROCESS:
+                        this.rkPin_30.BackColor = Color.Yellow;
+                        break;
+                    case INFO_LEVEL.GREY:
+                        this.rkPin_30.BackColor = Color.Gray;
+                        break;
+                }
+            }
+        }
+        #endregion
+
+
+        #region 设置ListView
+        delegate void SetListViewCallback(string msg, string submsg);
+        private void SetListView(string msg, string submsg)
+        {
+            if (this.lvSolutions.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            {
+                while (!this.lvSolutions.IsHandleCreated)
+                {
+                    //解决窗体关闭时出现“访问已释放句柄“的异常
+                    if (this.lvSolutions.Disposing || this.lvSolutions.IsDisposed)
+                        return;
+                }
+                SetListViewCallback d = new SetListViewCallback(SetListView);
+                this.lvSolutions.Invoke(d, new object[] { msg, submsg});
+            }
+            else
+            {
+                this.lvSolutions.BeginUpdate();
+                ListViewItem lvi = new ListViewItem();
+                lvi.Text = DateTime.Now.ToString("HH:mm:ss:fff");
+                lvi.SubItems.Add(msg);                
+                lvi.SubItems.Add(submsg);
+                this.lvSolutions.Items.Add(lvi);
+                //总是显示最后一行
+                this.lvSolutions.Items[this.lvSolutions.Items.Count - 1].EnsureVisible();
+                this.lvSolutions.EndUpdate();  //结束数据处理，UI界面一次性绘制。
+
+
+
+            }
         }
         #endregion
 
@@ -413,52 +527,33 @@ namespace RK7001Test
                                 this.lv7001uid.SubItems.Clear();
                                 this.lv7001sw.SubItems.Clear();
                                 this.lv7001hw.SubItems.Clear();
-                                this.lv7001dc.SubItems.Clear();
                                 this.lv7001ampf.SubItems.Clear();
                                 this.lv7001mosfet.SubItems.Clear();
                                 this.lv7001buzzer.SubItems.Clear();                                
                                 this.lv7001uid.BackColor = Color.White;
                                 this.lv7001sw.BackColor = Color.White;
                                 this.lv7001hw.BackColor = Color.White;
-                                this.lv7001dc.BackColor = Color.White;
                                 this.lv7001ampf.BackColor = Color.White;
                                 this.lv7001mosfet.BackColor = Color.White;
                                 this.lv7001buzzer.BackColor = Color.White;
                                 this.lv7001uid.Text = "设备UID";
                                 this.lv7001sw.Text = "软件版本号";
                                 this.lv7001hw.Text = "硬件版本号";
-                                this.lv7001dc.Text = "DC故障";
                                 this.lv7001ampf.Text = "运放故障";
                                 this.lv7001mosfet.Text = "Mos短路";
                                 this.lv7001buzzer.Text = "Buzzer故障";
                                 break;
                             case INFO_LEVEL.PASS:
-                                this.lv7001dc.SubItems.Add("通过");
                                 this.lv7001ampf.SubItems.Add("通过");
                                 this.lv7001mosfet.SubItems.Add("通过");
                                 this.lv7001buzzer.SubItems.Add("通过");
-                                this.lv7001dc.SubItems[1].ForeColor = Color.Green;
                                 this.lv7001ampf.SubItems[1].ForeColor = Color.Green;
                                 this.lv7001mosfet.SubItems[1].ForeColor = Color.Green;
                                 this.lv7001buzzer.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }                 
                         
-                        break;
-                    case RK7001ITEM.DC:
-                        switch(level)
-                        {
-                            case INFO_LEVEL.PASS:
-                                this.lv7001dc.SubItems.Add("通过");
-                                this.lv7001dc.SubItems[1].ForeColor = Color.Green;
-                                break;
-                            case INFO_LEVEL.FAIL:
-                                this.lv7001dc.SubItems.Add("失败");
-                                this.lv7001dc.SubItems[0].BackColor = Color.Red;
-                                this.lv7001dc.SubItems[1].BackColor = Color.Red;
-                                break;
-                        }
-                        break;
+                        break;                    
                     case RK7001ITEM.AMPLIFY:
                         switch(level)
                         {
@@ -534,44 +629,21 @@ namespace RK7001Test
                                 this.lv4103sw.SubItems.Clear();
                                 this.lv4103lgtsensor.SubItems.Clear();
                                 this.lv4103gsensor.SubItems.Clear();
-                                this.lv4103io26.SubItems.Clear();
-                                this.lv4103io27.SubItems.Clear();
-                                this.lv4103pwm.SubItems.Clear();
-                                this.lv4103edr.SubItems.Clear();
                                 this.lv4103ble.SubItems.Clear();
-                                this.lv4103Vdd33.SubItems.Clear();
                                 this.lv4103sw.BackColor = Color.White;
                                 this.lv4103lgtsensor.BackColor = Color.White;
                                 this.lv4103gsensor.BackColor = Color.White;
-                                this.lv4103io26.BackColor = Color.White;
-                                this.lv4103io27.BackColor = Color.White;
-                                this.lv4103pwm.BackColor = Color.White;
-                                this.lv4103edr.BackColor = Color.White;
                                 this.lv4103ble.BackColor = Color.White;
-                                this.lv4103Vdd33.BackColor = Color.White;
                                 this.lv4103sw.Text = "软件版本号";
                                 this.lv4103lgtsensor.Text = "光感异常测试";
                                 this.lv4103gsensor.Text = "Gsensor测试";
-                                this.lv4103io26.Text = "GPIO26测试";
-                                this.lv4103io27.Text = "GPIO27测试";
-                                this.lv4103pwm.Text = "PWM";
-                                this.lv4103edr.Text = "蓝牙2.1测试";
                                 this.lv4103ble.Text = "蓝牙4.0测试";
-                                this.lv4103Vdd33.Text = "VDD33";
                                 break;
                             case INFO_LEVEL.PASS:
                                 this.lv4103lgtsensor.SubItems.Add("通过");
                                 this.lv4103gsensor.SubItems.Add("通过");
-                                this.lv4103Vdd33.SubItems.Add("通过");
-                                this.lv4103io26.SubItems.Add("通过");
-                                this.lv4103io27.SubItems.Add("通过");
-                                this.lv4103pwm.SubItems.Add("通过");
                                 this.lv4103lgtsensor.SubItems[1].ForeColor = Color.Green;
                                 this.lv4103gsensor.SubItems[1].ForeColor = Color.Green;
-                                this.lv4103Vdd33.SubItems[1].ForeColor = Color.Green;
-                                this.lv4103io26.SubItems[1].ForeColor = Color.Green;
-                                this.lv4103io27.SubItems[1].ForeColor = Color.Green;
-                                this.lv4103pwm.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
                                          
@@ -606,63 +678,7 @@ namespace RK7001Test
                                 this.lv4103gsensor.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
-                        break;
-                    case RK4103ITEM.GPIO26:
-                        switch(level)
-                        {
-                            case INFO_LEVEL.FAIL:
-                                this.lv4103io26.SubItems.Add("失败");
-                                this.lv4103io26.SubItems[0].BackColor = Color.Red;
-                                this.lv4103io26.SubItems[1].BackColor = Color.Red;
-                                break;
-                            case INFO_LEVEL.PASS:
-                                this.lv4103io26.SubItems.Add("通过");
-                                this.lv4103io26.SubItems[1].ForeColor = Color.Green;
-                                break;
-                        }
-                        break;
-                    case RK4103ITEM.GPIO27:
-                        switch(level)
-                        {
-                            case INFO_LEVEL.FAIL:
-                                this.lv4103io27.SubItems.Add("失败");
-                                this.lv4103io27.SubItems[0].BackColor = Color.Red;
-                                this.lv4103io27.SubItems[1].BackColor = Color.Red;
-                                break;
-                            case INFO_LEVEL.PASS:
-                                this.lv4103io27.SubItems.Add("通过");
-                                this.lv4103io27.SubItems[1].ForeColor = Color.Green;
-                                break;
-                        }
-                        break;
-                    case RK4103ITEM.PWM:
-                        switch(level)
-                        {
-                            case INFO_LEVEL.FAIL:
-                                this.lv4103pwm.SubItems.Add("失败");
-                                this.lv4103pwm.SubItems[0].BackColor = Color.Red;
-                                this.lv4103pwm.SubItems[1].BackColor = Color.Red;
-                                break;
-                            case INFO_LEVEL.PASS:
-                                this.lv4103pwm.SubItems.Add("通过");
-                                this.lv4103pwm.SubItems[1].ForeColor = Color.Green;
-                                break;
-                        }
-                        break;
-                    case RK4103ITEM.EDR:
-                        switch(level)
-                        {
-                            case INFO_LEVEL.FAIL:
-                                this.lv4103edr.SubItems.Add("失败");
-                                this.lv4103edr.SubItems[0].BackColor = Color.Red;
-                                this.lv4103edr.SubItems[1].BackColor = Color.Red;
-                                break;
-                            case INFO_LEVEL.PASS:
-                                this.lv4103edr.SubItems.Add("通过");
-                                this.lv4103edr.SubItems[1].ForeColor = Color.Green;
-                                break;
-                        }
-                        break;
+                        break;                                                            
                     case RK4103ITEM.BLE:
                         switch(level)
                         {
@@ -676,21 +692,7 @@ namespace RK7001Test
                                 this.lv4103ble.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
-                        break;
-                    case RK4103ITEM.VDD33:
-                        switch(level)
-                        {
-                            case INFO_LEVEL.FAIL:
-                                this.lv4103Vdd33.SubItems.Add("失败");
-                                this.lv4103Vdd33.SubItems[0].BackColor = Color.Red;
-                                this.lv4103Vdd33.SubItems[1].BackColor = Color.Red;
-                                break;
-                            case INFO_LEVEL.PASS:
-                                this.lv4103Vdd33.SubItems.Add("通过");
-                                this.lv4103Vdd33.SubItems[1].ForeColor = Color.Green;
-                                break;
-                        }
-                        break;
+                        break;                    
                 }
                 this.lvRK4003ErrItem.EndUpdate();
             }
@@ -704,7 +706,10 @@ namespace RK7001Test
             {
                 for(int i = 1; i <=30; i++)
                 {
-                    Set7001Pin(i, INFO_LEVEL.INIT);
+                    if(i == 1 || i == 7 || i == 24)
+                        Set7001Pin(i, INFO_LEVEL.GREY);
+                    else
+                        Set7001Pin(i, INFO_LEVEL.INIT);
                 }
                 return;
             }
@@ -712,7 +717,10 @@ namespace RK7001Test
             {
                 for (int i = 1; i <= 30; i++)
                 {
-                    Set7001Pin(i, INFO_LEVEL.PROCESS);
+                    if (i == 1 || i == 7 || i == 24)
+                        Set7001Pin(i, INFO_LEVEL.GREY);
+                    else
+                        Set7001Pin(i, INFO_LEVEL.PROCESS);
                 }
                 return;         
             }
@@ -720,16 +728,21 @@ namespace RK7001Test
             {
                 for (int i = 1; i <= 30; i++)
                 {
-                    Set7001Pin(i, INFO_LEVEL.PASS);
+                    if (i == 1 || i == 7 || i == 24)
+                        Set7001Pin(i, INFO_LEVEL.GREY);
+                    else
+                        Set7001Pin(i, INFO_LEVEL.PASS);
                 }
                 return;
             }
 
             //判断错误
+            /*
             if(status.Pin1_Open || status.Pin1_Short)
                 Set7001Pin(1, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(1, INFO_LEVEL.PASS);
+            */
             if (status.Pin2_Open || status.Pin2_Short)
                 Set7001Pin(2, INFO_LEVEL.FAIL);
             else
@@ -750,10 +763,12 @@ namespace RK7001Test
                 Set7001Pin(6, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(6, INFO_LEVEL.PASS);
+            /*
             if (status.Pin7_Open || status.Pin7_Short)
                 Set7001Pin(7, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(7, INFO_LEVEL.PASS);
+            */
             if (status.Pin8_Open || status.Pin8_Short)
                 Set7001Pin(8, INFO_LEVEL.FAIL);
             else
@@ -819,10 +834,12 @@ namespace RK7001Test
                 Set7001Pin(23, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(23, INFO_LEVEL.PASS);
+            /*
             if (status.Pin24_Open || status.Pin24_Short)
                 Set7001Pin(24, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(24, INFO_LEVEL.PASS);
+            */
             if (status.Pin25_Open || status.Pin25_Short)
                 Set7001Pin(25, INFO_LEVEL.FAIL);
             else
@@ -881,6 +898,9 @@ namespace RK7001Test
                     case INFO_LEVEL.INIT:
                         mRK7001Pin[num - 1].BackColor = Color.White;
                         break;
+                    case INFO_LEVEL.GREY:
+                        mRK7001Pin[num - 1].BackColor = Color.Gray;
+                        break;
                 }                             
             }
         }
@@ -891,30 +911,44 @@ namespace RK7001Test
         {
             if (level == INFO_LEVEL.INIT)
             {
-                for (int i = 1; i <= 30; i++)
+                for (int i = 1; i <= 29; i++)
                 {
-                    SetRK4103Pin(i, INFO_LEVEL.INIT);
+                   
+                    if (i == 16 || i == 17 || i == 19 || i == 26 || i== 15 || i == 20 
+                        || i== 5 || i== 1 || i == 2 || i== 29 || i== 9)
+                        SetRK4103Pin(i, INFO_LEVEL.GREY);
+                    else
+                        SetRK4103Pin(i, INFO_LEVEL.INIT);
                 }
                 return;
             }
             else if (level == INFO_LEVEL.PROCESS)
             {
-                for (int i = 1; i <= 30; i++)
-                {
-                    SetRK4103Pin(i, INFO_LEVEL.PROCESS);
+                for (int i = 1; i <= 29; i++)
+                {                    
+                    if (i == 16 || i == 17 || i == 19 || i == 26 || i == 15 || i == 20 
+                        || i == 5 || i == 1 || i == 2 || i == 29 || i== 9)
+                        SetRK4103Pin(i, INFO_LEVEL.GREY);
+                    else
+                        SetRK4103Pin(i, INFO_LEVEL.PROCESS);
                 }
                 return;
             }
             else if (level == INFO_LEVEL.PASS)
             {
-                for (int i = 1; i <= 30; i++)
-                {
-                    SetRK4103Pin(i, INFO_LEVEL.PASS);
+                for (int i = 1; i <= 29; i++)
+                {                    
+                    if (i == 16 || i == 17 || i == 19 || i == 26 || i == 15 || i == 20 
+                        || i == 5 || i == 1 || i == 2 || i== 29 || i== 9)
+                        SetRK4103Pin(i, INFO_LEVEL.GREY);
+                    else
+                        SetRK4103Pin(i, INFO_LEVEL.PASS);
                 }
                 return;
             }
 
             //判断错误
+            /*
             if (status.Pin1_Open || status.Pin1_Short)
                 SetRK4103Pin(1, INFO_LEVEL.FAIL);
             else
@@ -923,6 +957,7 @@ namespace RK7001Test
                 SetRK4103Pin(2, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(2, INFO_LEVEL.PASS);
+            */
             if (status.Pin3_Open || status.Pin3_Short)
                 SetRK4103Pin(3, INFO_LEVEL.FAIL);
             else
@@ -931,10 +966,12 @@ namespace RK7001Test
                 SetRK4103Pin(4, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(4, INFO_LEVEL.PASS);
+            /*
             if (status.Pin5_Open || status.Pin5_Short)
                 SetRK4103Pin(5, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(5, INFO_LEVEL.PASS);
+            */
             if (status.Pin6_Open || status.Pin6_Short)
                 SetRK4103Pin(6, INFO_LEVEL.FAIL);
             else
@@ -947,10 +984,12 @@ namespace RK7001Test
                 SetRK4103Pin(8, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(8, INFO_LEVEL.PASS);
+            /*
             if (status.Pin9_Open || status.Pin9_Short)
                 SetRK4103Pin(9, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(9, INFO_LEVEL.PASS);
+            */
             if (status.Pin10_Open || status.Pin10_Short)
                 SetRK4103Pin(10, INFO_LEVEL.FAIL);
             else
@@ -971,10 +1010,13 @@ namespace RK7001Test
                 SetRK4103Pin(14, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(14, INFO_LEVEL.PASS);
+            /*
             if (status.Pin15_Open || status.Pin15_Short)
                 SetRK4103Pin(15, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(15, INFO_LEVEL.PASS);
+            */
+            /*
             if (status.Pin16_Open || status.Pin16_Short)
                 SetRK4103Pin(16, INFO_LEVEL.FAIL);
             else
@@ -983,19 +1025,23 @@ namespace RK7001Test
                 SetRK4103Pin(17, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(17, INFO_LEVEL.PASS);
+            */
             if (status.Pin18_Open || status.Pin18_Short)
                 SetRK4103Pin(18, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(18, INFO_LEVEL.PASS);
+            /*
             if (status.Pin19_Open || status.Pin19_Short)
                 SetRK4103Pin(19, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(19, INFO_LEVEL.PASS);
-
+            */
+            /*
             if (status.Pin20_Open || status.Pin20_Short)
                 SetRK4103Pin(20, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(20, INFO_LEVEL.PASS);
+            */
             if (status.Pin21_Open || status.Pin21_Short)
                 SetRK4103Pin(21, INFO_LEVEL.FAIL);
             else
@@ -1016,10 +1062,12 @@ namespace RK7001Test
                 SetRK4103Pin(25, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(25, INFO_LEVEL.PASS);
+            /*
             if (status.Pin26_Open || status.Pin26_Short)
                 SetRK4103Pin(26, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(26, INFO_LEVEL.PASS);
+            */
             if (status.Pin27_Open || status.Pin27_Short)
                 SetRK4103Pin(27, INFO_LEVEL.FAIL);
             else
@@ -1028,14 +1076,18 @@ namespace RK7001Test
                 SetRK4103Pin(28, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(28, INFO_LEVEL.PASS);
+            /*
             if (status.Pin29_Open || status.Pin29_Short)
                 SetRK4103Pin(29, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(29, INFO_LEVEL.PASS);
+            */
+            /*
             if (status.Pin30_Open || status.Pin30_Short)
                 SetRK4103Pin(30, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(30, INFO_LEVEL.PASS);
+            */
         }
         #endregion
 
@@ -1070,6 +1122,10 @@ namespace RK7001Test
                     case INFO_LEVEL.INIT:
                         mRK4103Pin[num - 1].BackColor = Color.White;
                         break;
+                    case INFO_LEVEL.GREY:
+                        mRK4103Pin[num - 1].BackColor = Color.Gray;
+                        break;
+
                 }
             }
         }
@@ -1091,7 +1147,7 @@ namespace RK7001Test
                     return;
                 if (mCoreTask.bServerActivated)
                 {
-                    if (this.tbInputSN.TextLength == 10)
+                    if(this.tbInputSN.TextLength == 10)
                         StartTask();
                 }
                 else

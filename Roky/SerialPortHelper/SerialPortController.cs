@@ -142,7 +142,8 @@ namespace Roky.SerialPortHelper
 
                         if (!MyProtocol.CheckOK(buffer)) //如果数据校验失败，丢弃这一包数据
                         {
-                            buffer.RemoveRange(0, buffer.Count);//从缓存中删除错误数据
+                            //buffer.RemoveRange(0, buffer.Count);//从缓存中删除错误数据
+                            buffer.RemoveAt(0);
                             continue;//继续下一次循环
                         }
                         //至此，已经被找到了一条完整数据。我们将数据直接分析，或是缓存起来一起分析

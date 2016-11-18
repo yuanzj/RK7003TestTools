@@ -31,6 +31,8 @@ namespace RokyTask
 
         public const int RECV_BROADCAST_REQ = 0X06;
 
+        public const int RECV_SNYC_REQ = 0X12;
+
         public const int SEND_BROADCAST_RSP = 0X86;
 
         public const int PARAM_SETTING_REQ = 0X03;

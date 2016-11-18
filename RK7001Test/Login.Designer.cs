@@ -30,12 +30,14 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.ccb_Port = new System.Windows.Forms.ComboBox();
             this.btnConfirm = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.labelMode = new System.Windows.Forms.Label();
+            this.ccbMode = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,8 +50,16 @@
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(1, 1);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(509, 205);
+            this.panel1.Size = new System.Drawing.Size(558, 205);
             this.panel1.TabIndex = 2;
+            // 
+            // label2
+            // 
+            this.label2.Image = global::RK7001Test.Properties.Resources.logo;
+            this.label2.Location = new System.Drawing.Point(3, 8);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(161, 44);
+            this.label2.TabIndex = 2;
             // 
             // label1
             // 
@@ -59,16 +69,16 @@
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(5, 52);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(504, 148);
+            this.label1.Size = new System.Drawing.Size(553, 148);
             this.label1.TabIndex = 1;
-            this.label1.Text = "RK7001测试工具";
+            this.label1.Text = "RK7003生产测试工具";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.Location = new System.Drawing.Point(63, 237);
+            this.label4.Location = new System.Drawing.Point(99, 285);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(92, 27);
             this.label4.TabIndex = 15;
@@ -79,7 +89,7 @@
             this.ccb_Port.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ccb_Port.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.ccb_Port.FormattingEnabled = true;
-            this.ccb_Port.Location = new System.Drawing.Point(157, 237);
+            this.ccb_Port.Location = new System.Drawing.Point(197, 284);
             this.ccb_Port.Name = "ccb_Port";
             this.ccb_Port.Size = new System.Drawing.Size(230, 29);
             this.ccb_Port.TabIndex = 16;
@@ -89,7 +99,7 @@
             this.btnConfirm.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(47)))), ((int)(((byte)(211)))), ((int)(((byte)(155)))));
             this.btnConfirm.Font = new System.Drawing.Font("新宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnConfirm.ForeColor = System.Drawing.Color.White;
-            this.btnConfirm.Location = new System.Drawing.Point(157, 291);
+            this.btnConfirm.Location = new System.Drawing.Point(170, 337);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(97, 35);
             this.btnConfirm.TabIndex = 17;
@@ -102,7 +112,7 @@
             this.btnCancel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(47)))), ((int)(((byte)(211)))), ((int)(((byte)(155)))));
             this.btnCancel.Font = new System.Drawing.Font("新宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnCancel.ForeColor = System.Drawing.Color.White;
-            this.btnCancel.Location = new System.Drawing.Point(280, 291);
+            this.btnCancel.Location = new System.Drawing.Point(299, 337);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(97, 35);
             this.btnCancel.TabIndex = 19;
@@ -110,19 +120,33 @@
             this.btnCancel.UseVisualStyleBackColor = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // label2
+            // labelMode
             // 
-            this.label2.Image = global::RK7001Test.Properties.Resources.logo;
-            this.label2.Location = new System.Drawing.Point(3, 8);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(161, 44);
-            this.label2.TabIndex = 2;
+            this.labelMode.AutoSize = true;
+            this.labelMode.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelMode.Location = new System.Drawing.Point(99, 227);
+            this.labelMode.Name = "labelMode";
+            this.labelMode.Size = new System.Drawing.Size(92, 27);
+            this.labelMode.TabIndex = 20;
+            this.labelMode.Text = "生产模式";
+            // 
+            // ccbMode
+            // 
+            this.ccbMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ccbMode.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.ccbMode.FormattingEnabled = true;
+            this.ccbMode.Location = new System.Drawing.Point(197, 228);
+            this.ccbMode.Name = "ccbMode";
+            this.ccbMode.Size = new System.Drawing.Size(230, 29);
+            this.ccbMode.TabIndex = 21;
             // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(511, 345);
+            this.ClientSize = new System.Drawing.Size(560, 384);
+            this.Controls.Add(this.ccbMode);
+            this.Controls.Add(this.labelMode);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnConfirm);
             this.Controls.Add(this.ccb_Port);
@@ -131,7 +155,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "RK7001测试工具";
+            this.Text = "RK7003生产测试工具";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LoginForm_Closed);
             this.Load += new System.EventHandler(this.LoginForm_Load);
             this.panel1.ResumeLayout(false);
@@ -149,5 +173,7 @@
         private System.Windows.Forms.ComboBox ccb_Port;
         private System.Windows.Forms.Button btnConfirm;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.Label labelMode;
+        private System.Windows.Forms.ComboBox ccbMode;
     }
 }

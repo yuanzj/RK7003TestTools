@@ -71,9 +71,9 @@
             // 
             // button1
             // 
-            this.button1.BackColor = System.Drawing.SystemColors.Control;
+            this.button1.BackColor = System.Drawing.Color.ForestGreen;
             this.button1.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button1.Location = new System.Drawing.Point(257, 516);
+            this.button1.Location = new System.Drawing.Point(267, 516);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(165, 53);
             this.button1.TabIndex = 1;
@@ -83,13 +83,14 @@
             // 
             // button2
             // 
+            this.button2.BackColor = System.Drawing.Color.Tomato;
             this.button2.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button2.Location = new System.Drawing.Point(470, 516);
+            this.button2.Location = new System.Drawing.Point(468, 516);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(160, 53);
             this.button2.TabIndex = 2;
             this.button2.Text = "失败(Esc)";
-            this.button2.UseVisualStyleBackColor = true;
+            this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // ManualVisio
@@ -105,7 +106,7 @@
             this.KeyPreview = true;
             this.Name = "ManualVisio";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "ManualVisio";
+            this.Text = "目检";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_Checked);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);

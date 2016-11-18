@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace RK7001Test
     {
         #region 私有变量
         private int com_index { get; set; }
-
+        private int mode_index { get; set; }
         #endregion
 
         public Login()
@@ -30,22 +31,34 @@ namespace RK7001Test
             this.Text = String.Format("新日RK7003工具 V{0}", AssemblyFileVersion());
             //串口
             this.ccb_Port.DataSource = System.IO.Ports.SerialPort.GetPortNames();
+            //生产模式
+            this.ccbMode.Items.Insert(0, "板级测试");
+            this.ccbMode.Items.Insert(1, "整机测试");
 
             LoadSetting();
+
+            this.ccbMode.SelectedIndex = this.mode_index;
         }
         #endregion
 
         #region 加载参数
         private void LoadSetting()
         {
-            
+            this.mode_index = int.Parse(ConfigurationManager.AppSettings["Mode_Index"].ToString());
         }
         #endregion
 
         #region 保存参数
         private void SaveSetting()
         {
-
+            Configuration cfa = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            // 修改
+            cfa.AppSettings.Settings["mode_index"].Value = this.ccbMode.SelectedIndex.ToString();
+            this.mode_index = this.ccbMode.SelectedIndex;           
+            // 最后调用当前的配置文件更新成功。
+            cfa.Save();
+            // 刷新命名节，在下次检索它时将从磁盘重新读取它。记住应用程序要刷新节点
+            ConfigurationManager.RefreshSection("appSettings");
         }
         #endregion
 
@@ -74,6 +87,28 @@ namespace RK7001Test
         #region 点击确认按钮
         private void btnConfirm_Click(object sender, EventArgs e)
         {
+            switch (this.ccbMode.SelectedIndex)
+            {
+                case 0:
+                    BoardTest();
+                    break;
+                case 1:
+                    PhoneTest();
+                    break;
+            }
+        }
+        #endregion
+
+        #region 点击取消按钮
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
+
+        #region 板测
+        private void BoardTest()
+        {
             MainForm mForm = new MainForm((String)this.ccb_Port.SelectedItem);
             this.Hide();
             if (mForm.ShowDialog() == DialogResult.OK)
@@ -87,17 +122,19 @@ namespace RK7001Test
         }
         #endregion
 
-        #region 点击取消按钮
-        private void btnCancel_Click(object sender, EventArgs e)
+        #region 整机测试
+        private void PhoneTest()
         {
-            this.Close();
-        }
-        #endregion
-
-        #region 点击设置按钮
-        private void btn_Settins_Click(object sender, EventArgs e)
-        {
-
+            PhoneTest mForm = new PhoneTest((String)this.ccb_Port.SelectedItem);
+            this.Hide();
+            if (mForm.ShowDialog() == DialogResult.OK)
+            {
+                Application.Restart();
+            }
+            else
+            {
+                this.Close();
+            }
         }
         #endregion
     }

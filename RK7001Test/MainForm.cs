@@ -706,7 +706,7 @@ namespace RK7001Test
             {
                 for(int i = 1; i <=30; i++)
                 {
-                    if(i == 1 || i == 7 || i == 24)
+                    if(i == 1 || i == 7 || i == 24 || i == 13 || i == 15)
                         Set7001Pin(i, INFO_LEVEL.GREY);
                     else
                         Set7001Pin(i, INFO_LEVEL.INIT);
@@ -717,7 +717,7 @@ namespace RK7001Test
             {
                 for (int i = 1; i <= 30; i++)
                 {
-                    if (i == 1 || i == 7 || i == 24)
+                    if (i == 1 || i == 7 || i == 24 || i == 13 || i == 15)
                         Set7001Pin(i, INFO_LEVEL.GREY);
                     else
                         Set7001Pin(i, INFO_LEVEL.PROCESS);
@@ -728,7 +728,7 @@ namespace RK7001Test
             {
                 for (int i = 1; i <= 30; i++)
                 {
-                    if (i == 1 || i == 7 || i == 24)
+                    if (i == 1 || i == 7 || i == 24 || i == 13 || i == 15)
                         Set7001Pin(i, INFO_LEVEL.GREY);
                     else
                         Set7001Pin(i, INFO_LEVEL.PASS);
@@ -789,18 +789,22 @@ namespace RK7001Test
                 Set7001Pin(12, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(12, INFO_LEVEL.PASS);
+            /*
             if (status.Pin13_Open || status.Pin13_Short)
                 Set7001Pin(13, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(13, INFO_LEVEL.PASS);
+            */
             if (status.Pin14_Open || status.Pin14_Short)
                 Set7001Pin(14, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(14, INFO_LEVEL.PASS);
+            /*
             if (status.Pin15_Open || status.Pin15_Short)
                 Set7001Pin(15, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(15, INFO_LEVEL.PASS);
+            */
             if (status.Pin16_Open || status.Pin16_Short)
                 Set7001Pin(16, INFO_LEVEL.FAIL);
             else

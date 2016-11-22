@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -42,12 +43,24 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.BackColor = System.Drawing.Color.Silver;
+            this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(1, 2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(899, 482);
             this.panel1.TabIndex = 0;
+            // 
+            // label2
+            // 
+            this.label2.Font = new System.Drawing.Font("宋体", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.ForeColor = System.Drawing.Color.MidnightBlue;
+            this.label2.Location = new System.Drawing.Point(9, 244);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(887, 118);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "请在10秒内，按“通过”或“失败”！";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label3
             // 
@@ -62,9 +75,9 @@
             // 
             this.label1.Font = new System.Drawing.Font("新宋体", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.ForeColor = System.Drawing.Color.Blue;
-            this.label1.Location = new System.Drawing.Point(0, 28);
+            this.label1.Location = new System.Drawing.Point(0, 60);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(932, 444);
+            this.label1.Size = new System.Drawing.Size(899, 216);
             this.label1.TabIndex = 0;
             this.label1.Text = "是否听到蜂鸣声音？...";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -107,6 +120,8 @@
             this.Name = "ManualVisio";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "目检";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainViso_Closed);
+            this.Load += new System.EventHandler(this.MainViso_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_Checked);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -120,5 +135,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
     }
 }

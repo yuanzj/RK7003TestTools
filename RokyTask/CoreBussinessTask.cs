@@ -1045,6 +1045,7 @@ namespace RokyTask
                 else
                 {
                     SetMainText(sender, "未收到蓝牙测试结果！", "FAIL", INFO_LEVEL.FAIL);
+                    UpdateRK4103Items(sender, RK4103ITEM.BLE, null, INFO_LEVEL.FAIL);
                     UpdateListView(sender, "测试异常中断", "夹具被弹起，或485通讯失败");
                     StopTask();
                 }
@@ -1731,7 +1732,6 @@ namespace RokyTask
         }
         #endregion
 
-
         #region 初始化配置参数
         private void InitParameters()
         {
@@ -1837,8 +1837,7 @@ namespace RokyTask
                 {
                     StopTask();
                     return;
-                }
-                    
+                }                    
             }
             else
             {

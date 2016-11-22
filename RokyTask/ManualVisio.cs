@@ -6,12 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace RK7001Test
 {
     public partial class ManualVisio : Form
     {
+        private System.Timers.Timer DynamicPotTicker;
         public ManualVisio()
         {
             InitializeComponent();
@@ -37,6 +39,24 @@ namespace RK7001Test
             {
                 this.DialogResult = DialogResult.Cancel;
             }
+        }
+
+        //界面的加载
+        private void MainViso_Load(object sender, EventArgs e)
+        {
+            DynamicPotTicker = new System.Timers.Timer(1000*10);
+            DynamicPotTicker.Enabled = true;
+            DynamicPotTicker.Elapsed += new ElapsedEventHandler((object source, ElapsedEventArgs ElapsedEventArgs) =>
+            {
+                this.Close();
+                DynamicPotTicker.Enabled = false;
+                this.DialogResult = DialogResult.Cancel;
+            });
+        }
+
+        private void MainViso_Closed(object sender, FormClosedEventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
         }
     }
 }

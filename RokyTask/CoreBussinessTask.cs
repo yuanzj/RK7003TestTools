@@ -120,6 +120,7 @@ namespace RokyTask
         Step8_RemoteTest = 8,
         Step9_MujianInit = 9,
         Step10_MujianTest = 10,
+        Step11_RetryRemote = 11
     }
 
     public enum Task_Level
@@ -477,7 +478,9 @@ namespace RokyTask
                         case TaskSteps.Step8_RemoteTest:
                             level = Step8_RemoteTest(sender, mEventArgs.Data);
                             if (level == Task_Level.FALSE)
-                                bExcute = true;
+                            {
+                                mTaskSteps = TaskSteps.Step11_RetryRemote;
+                            }
                             else if(level == Task_Level.TRUE)
                             {
                                 UpdateRemoteStatus(sender, INFO_LEVEL.PASS);
@@ -490,6 +493,30 @@ namespace RokyTask
                                 mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
                             }
                             else if(level == Task_Level.REPEAT)
+                            {
+                                mTaskSteps = TaskSteps.Step8_RemoteTest;
+                            }
+                            break;
+                        case TaskSteps.Step11_RetryRemote: //重试Remote测试
+                            level = Step8_RemoteTest(sender, mEventArgs.Data);
+                            if (level == Task_Level.FALSE)
+                            {
+                                UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                                UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
+                                bExcute = true;
+                            }
+                            else if (level == Task_Level.TRUE)
+                            {
+                                UpdateRemoteStatus(sender, INFO_LEVEL.PASS);
+                                //人工目检
+                                SetMainText(sender, "开始目检...", "", INFO_LEVEL.PROCESS);
+                                mTaskSteps = TaskSteps.Step9_MujianInit;
+                                mGet700ResultParam.ack_device = Const.PCU;
+                                mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
+                            }
+                            else if (level == Task_Level.REPEAT)
                             {
                                 mTaskSteps = TaskSteps.Step8_RemoteTest;
                             }
@@ -1003,7 +1030,7 @@ namespace RokyTask
             mBtTestReqTask = new SimpleSerialPortTask<SaveNvRsp, btTestReq>();
             mSaveNvRspParam = mBtTestReqTask.GetRequestEntity();
             mBtTestReqTask.RetryMaxCnts = 0;
-            mBtTestReqTask.Timerout = 30*1000;
+            mBtTestReqTask.Timerout = 50*1000;
             mBtTestReqTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<btTestReq> mEventArgs = e as SerialPortEventArgs<btTestReq>;
@@ -1475,14 +1502,14 @@ namespace RokyTask
                 }
                 else if (mAckValue == Const.REMOTE_CHECK_FAIL)
                 {
-                    UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
-                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
+                    //UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                    //UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
                 else if (mAckValue == Const.REMOTE_NO_RECV)
                 {
-                    UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
-                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
+                    //UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                    //UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
                 else

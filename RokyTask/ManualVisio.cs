@@ -54,9 +54,6 @@ namespace RK7001Test
             });
         }
 
-        private void MainViso_Closed(object sender, FormClosedEventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-        }
+        
     }
 }

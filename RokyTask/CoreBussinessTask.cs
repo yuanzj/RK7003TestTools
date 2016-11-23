@@ -1027,7 +1027,7 @@ namespace RokyTask
             mBtTestReqTask = new SimpleSerialPortTask<SaveNvRsp, btTestReq>();
             mSaveNvRspParam = mBtTestReqTask.GetRequestEntity();
             mBtTestReqTask.RetryMaxCnts = 0;
-            mBtTestReqTask.Timerout = 30*1000;
+            mBtTestReqTask.Timerout = 50*1000;
             mBtTestReqTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<btTestReq> mEventArgs = e as SerialPortEventArgs<btTestReq>;

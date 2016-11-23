@@ -118,7 +118,6 @@
             this.lbPin_13 = new System.Windows.Forms.Label();
             this.panel_remoter = new System.Windows.Forms.Panel();
             this.label6 = new System.Windows.Forms.Label();
-            this.panel7 = new System.Windows.Forms.Panel();
             this.label114 = new System.Windows.Forms.Label();
             this.lbPin_10 = new System.Windows.Forms.Label();
             this.label129 = new System.Windows.Forms.Label();
@@ -157,12 +156,8 @@
             this.panel5 = new System.Windows.Forms.Panel();
             this.label105 = new System.Windows.Forms.Label();
             this.lbPin_1 = new System.Windows.Forms.Label();
-            this.label120 = new System.Windows.Forms.Label();
-            this.lbPin_30 = new System.Windows.Forms.Label();
             this.label106 = new System.Windows.Forms.Label();
             this.lbPin_2 = new System.Windows.Forms.Label();
-            this.label121 = new System.Windows.Forms.Label();
-            this.lbPin_29 = new System.Windows.Forms.Label();
             this.label107 = new System.Windows.Forms.Label();
             this.lbPin_3 = new System.Windows.Forms.Label();
             this.label122 = new System.Windows.Forms.Label();
@@ -171,15 +166,15 @@
             this.tbInputSN = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lbItemValidSN = new System.Windows.Forms.Label();
+            this.lbItemChkServer = new System.Windows.Forms.Label();
             this.lvRK4003ErrItem = new RK7001Test.ListViewNF();
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lvRK7001ErrItem = new RK7001Test.ListViewNF();
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.label3 = new System.Windows.Forms.Label();
-            this.lbItemValidSN = new System.Windows.Forms.Label();
-            this.lbItemChkServer = new System.Windows.Forms.Label();
             this.lvSolutions = new RK7001Test.ListViewNF();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -192,7 +187,6 @@
             this.panel9.SuspendLayout();
             this.panel8.SuspendLayout();
             this.panel_remoter.SuspendLayout();
-            this.panel7.SuspendLayout();
             this.panel6.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -257,7 +251,6 @@
             this.panel2.Controls.Add(this.panel9);
             this.panel2.Controls.Add(this.panel8);
             this.panel2.Controls.Add(this.panel_remoter);
-            this.panel2.Controls.Add(this.panel7);
             this.panel2.Controls.Add(this.panel6);
             this.panel2.Controls.Add(this.panel1);
             this.panel2.Controls.Add(this.panel5);
@@ -917,32 +910,36 @@
             // 
             this.panel8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.panel8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel8.Controls.Add(this.lbPin_19);
             this.panel8.Controls.Add(this.lbPin_16);
+            this.panel8.Controls.Add(this.label131);
             this.panel8.Controls.Add(this.label116);
+            this.panel8.Controls.Add(this.lbPin_18);
             this.panel8.Controls.Add(this.label134);
+            this.panel8.Controls.Add(this.label132);
+            this.panel8.Controls.Add(this.lbPin_10);
             this.panel8.Controls.Add(this.lbPin_12);
             this.panel8.Controls.Add(this.lbPin_15);
+            this.panel8.Controls.Add(this.label114);
             this.panel8.Controls.Add(this.label119);
             this.panel8.Controls.Add(this.lbPin_17);
             this.panel8.Controls.Add(this.label133);
-            this.panel8.Controls.Add(this.label131);
-            this.panel8.Controls.Add(this.lbPin_19);
-            this.panel8.Controls.Add(this.lbPin_18);
+            this.panel8.Controls.Add(this.lbPin_11);
             this.panel8.Controls.Add(this.lbPin_14);
+            this.panel8.Controls.Add(this.label115);
             this.panel8.Controls.Add(this.label118);
-            this.panel8.Controls.Add(this.label132);
             this.panel8.Controls.Add(this.label117);
             this.panel8.Controls.Add(this.lbPin_13);
             this.panel8.Location = new System.Drawing.Point(381, 3);
             this.panel8.Name = "panel8";
-            this.panel8.Size = new System.Drawing.Size(88, 83);
+            this.panel8.Size = new System.Drawing.Size(88, 114);
             this.panel8.TabIndex = 11;
             // 
             // lbPin_16
             // 
             this.lbPin_16.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_16.BackColor = System.Drawing.Color.Green;
-            this.lbPin_16.Location = new System.Drawing.Point(64, 4);
+            this.lbPin_16.Location = new System.Drawing.Point(64, 27);
             this.lbPin_16.Name = "lbPin_16";
             this.lbPin_16.Size = new System.Drawing.Size(15, 15);
             this.lbPin_16.TabIndex = 101;
@@ -950,7 +947,7 @@
             // label116
             // 
             this.label116.AutoSize = true;
-            this.label116.Location = new System.Drawing.Point(3, 64);
+            this.label116.Location = new System.Drawing.Point(3, 49);
             this.label116.Name = "label116";
             this.label116.Size = new System.Drawing.Size(17, 12);
             this.label116.TabIndex = 120;
@@ -959,7 +956,7 @@
             // label134
             // 
             this.label134.AutoSize = true;
-            this.label134.Location = new System.Drawing.Point(41, 4);
+            this.label134.Location = new System.Drawing.Point(41, 29);
             this.label134.Name = "label134";
             this.label134.Size = new System.Drawing.Size(17, 12);
             this.label134.TabIndex = 138;
@@ -969,7 +966,7 @@
             // 
             this.lbPin_12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_12.BackColor = System.Drawing.Color.Green;
-            this.lbPin_12.Location = new System.Drawing.Point(20, 63);
+            this.lbPin_12.Location = new System.Drawing.Point(21, 49);
             this.lbPin_12.Name = "lbPin_12";
             this.lbPin_12.Size = new System.Drawing.Size(15, 15);
             this.lbPin_12.TabIndex = 83;
@@ -978,7 +975,7 @@
             // 
             this.lbPin_15.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_15.BackColor = System.Drawing.Color.Green;
-            this.lbPin_15.Location = new System.Drawing.Point(20, 4);
+            this.lbPin_15.Location = new System.Drawing.Point(64, 5);
             this.lbPin_15.Name = "lbPin_15";
             this.lbPin_15.Size = new System.Drawing.Size(15, 15);
             this.lbPin_15.TabIndex = 86;
@@ -986,7 +983,7 @@
             // label119
             // 
             this.label119.AutoSize = true;
-            this.label119.Location = new System.Drawing.Point(3, 4);
+            this.label119.Location = new System.Drawing.Point(41, 5);
             this.label119.Name = "label119";
             this.label119.Size = new System.Drawing.Size(17, 12);
             this.label119.TabIndex = 123;
@@ -996,7 +993,7 @@
             // 
             this.lbPin_17.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_17.BackColor = System.Drawing.Color.Green;
-            this.lbPin_17.Location = new System.Drawing.Point(64, 24);
+            this.lbPin_17.Location = new System.Drawing.Point(64, 49);
             this.lbPin_17.Name = "lbPin_17";
             this.lbPin_17.Size = new System.Drawing.Size(15, 15);
             this.lbPin_17.TabIndex = 100;
@@ -1004,7 +1001,7 @@
             // label133
             // 
             this.label133.AutoSize = true;
-            this.label133.Location = new System.Drawing.Point(41, 25);
+            this.label133.Location = new System.Drawing.Point(41, 49);
             this.label133.Name = "label133";
             this.label133.Size = new System.Drawing.Size(17, 12);
             this.label133.TabIndex = 137;
@@ -1013,7 +1010,7 @@
             // label131
             // 
             this.label131.AutoSize = true;
-            this.label131.Location = new System.Drawing.Point(41, 64);
+            this.label131.Location = new System.Drawing.Point(41, 94);
             this.label131.Name = "label131";
             this.label131.Size = new System.Drawing.Size(17, 12);
             this.label131.TabIndex = 135;
@@ -1023,7 +1020,7 @@
             // 
             this.lbPin_19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_19.BackColor = System.Drawing.Color.Green;
-            this.lbPin_19.Location = new System.Drawing.Point(64, 64);
+            this.lbPin_19.Location = new System.Drawing.Point(64, 91);
             this.lbPin_19.Name = "lbPin_19";
             this.lbPin_19.Size = new System.Drawing.Size(15, 15);
             this.lbPin_19.TabIndex = 98;
@@ -1032,7 +1029,7 @@
             // 
             this.lbPin_18.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_18.BackColor = System.Drawing.Color.Green;
-            this.lbPin_18.Location = new System.Drawing.Point(64, 44);
+            this.lbPin_18.Location = new System.Drawing.Point(64, 69);
             this.lbPin_18.Name = "lbPin_18";
             this.lbPin_18.Size = new System.Drawing.Size(15, 15);
             this.lbPin_18.TabIndex = 99;
@@ -1041,7 +1038,7 @@
             // 
             this.lbPin_14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_14.BackColor = System.Drawing.Color.Green;
-            this.lbPin_14.Location = new System.Drawing.Point(20, 24);
+            this.lbPin_14.Location = new System.Drawing.Point(21, 5);
             this.lbPin_14.Name = "lbPin_14";
             this.lbPin_14.Size = new System.Drawing.Size(15, 15);
             this.lbPin_14.TabIndex = 85;
@@ -1049,7 +1046,7 @@
             // label118
             // 
             this.label118.AutoSize = true;
-            this.label118.Location = new System.Drawing.Point(3, 25);
+            this.label118.Location = new System.Drawing.Point(3, 5);
             this.label118.Name = "label118";
             this.label118.Size = new System.Drawing.Size(17, 12);
             this.label118.TabIndex = 122;
@@ -1058,7 +1055,7 @@
             // label132
             // 
             this.label132.AutoSize = true;
-            this.label132.Location = new System.Drawing.Point(41, 47);
+            this.label132.Location = new System.Drawing.Point(41, 69);
             this.label132.Name = "label132";
             this.label132.Size = new System.Drawing.Size(17, 12);
             this.label132.TabIndex = 136;
@@ -1067,7 +1064,7 @@
             // label117
             // 
             this.label117.AutoSize = true;
-            this.label117.Location = new System.Drawing.Point(3, 47);
+            this.label117.Location = new System.Drawing.Point(3, 27);
             this.label117.Name = "label117";
             this.label117.Size = new System.Drawing.Size(17, 12);
             this.label117.TabIndex = 121;
@@ -1077,7 +1074,7 @@
             // 
             this.lbPin_13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_13.BackColor = System.Drawing.Color.Green;
-            this.lbPin_13.Location = new System.Drawing.Point(20, 43);
+            this.lbPin_13.Location = new System.Drawing.Point(21, 27);
             this.lbPin_13.Name = "lbPin_13";
             this.lbPin_13.Size = new System.Drawing.Size(15, 15);
             this.lbPin_13.TabIndex = 84;
@@ -1100,27 +1097,10 @@
             this.label6.TabIndex = 15;
             this.label6.Text = "遥  控";
             // 
-            // panel7
-            // 
-            this.panel7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel7.Controls.Add(this.label114);
-            this.panel7.Controls.Add(this.lbPin_10);
-            this.panel7.Controls.Add(this.label129);
-            this.panel7.Controls.Add(this.lbPin_21);
-            this.panel7.Controls.Add(this.label115);
-            this.panel7.Controls.Add(this.lbPin_11);
-            this.panel7.Controls.Add(this.label130);
-            this.panel7.Controls.Add(this.lbPin_20);
-            this.panel7.Location = new System.Drawing.Point(381, 91);
-            this.panel7.Name = "panel7";
-            this.panel7.Size = new System.Drawing.Size(88, 46);
-            this.panel7.TabIndex = 10;
-            // 
             // label114
             // 
             this.label114.AutoSize = true;
-            this.label114.Location = new System.Drawing.Point(3, 25);
+            this.label114.Location = new System.Drawing.Point(3, 94);
             this.label114.Name = "label114";
             this.label114.Size = new System.Drawing.Size(17, 12);
             this.label114.TabIndex = 118;
@@ -1130,7 +1110,7 @@
             // 
             this.lbPin_10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_10.BackColor = System.Drawing.Color.Green;
-            this.lbPin_10.Location = new System.Drawing.Point(20, 25);
+            this.lbPin_10.Location = new System.Drawing.Point(21, 91);
             this.lbPin_10.Name = "lbPin_10";
             this.lbPin_10.Size = new System.Drawing.Size(15, 15);
             this.lbPin_10.TabIndex = 81;
@@ -1138,7 +1118,7 @@
             // label129
             // 
             this.label129.AutoSize = true;
-            this.label129.Location = new System.Drawing.Point(41, 25);
+            this.label129.Location = new System.Drawing.Point(41, 28);
             this.label129.Name = "label129";
             this.label129.Size = new System.Drawing.Size(17, 12);
             this.label129.TabIndex = 133;
@@ -1148,7 +1128,7 @@
             // 
             this.lbPin_21.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_21.BackColor = System.Drawing.Color.Green;
-            this.lbPin_21.Location = new System.Drawing.Point(64, 25);
+            this.lbPin_21.Location = new System.Drawing.Point(64, 28);
             this.lbPin_21.Name = "lbPin_21";
             this.lbPin_21.Size = new System.Drawing.Size(15, 15);
             this.lbPin_21.TabIndex = 96;
@@ -1156,7 +1136,7 @@
             // label115
             // 
             this.label115.AutoSize = true;
-            this.label115.Location = new System.Drawing.Point(3, 5);
+            this.label115.Location = new System.Drawing.Point(3, 69);
             this.label115.Name = "label115";
             this.label115.Size = new System.Drawing.Size(17, 12);
             this.label115.TabIndex = 119;
@@ -1166,7 +1146,7 @@
             // 
             this.lbPin_11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_11.BackColor = System.Drawing.Color.Green;
-            this.lbPin_11.Location = new System.Drawing.Point(20, 5);
+            this.lbPin_11.Location = new System.Drawing.Point(21, 69);
             this.lbPin_11.Name = "lbPin_11";
             this.lbPin_11.Size = new System.Drawing.Size(15, 15);
             this.lbPin_11.TabIndex = 82;
@@ -1174,7 +1154,7 @@
             // label130
             // 
             this.label130.AutoSize = true;
-            this.label130.Location = new System.Drawing.Point(41, 5);
+            this.label130.Location = new System.Drawing.Point(41, 6);
             this.label130.Name = "label130";
             this.label130.Size = new System.Drawing.Size(17, 12);
             this.label130.TabIndex = 134;
@@ -1195,12 +1175,12 @@
             this.panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel6.Controls.Add(this.label108);
             this.panel6.Controls.Add(this.lbPin_4);
-            this.panel6.Controls.Add(this.label123);
-            this.panel6.Controls.Add(this.lbPin_27);
+            this.panel6.Controls.Add(this.lbPin_21);
+            this.panel6.Controls.Add(this.label129);
+            this.panel6.Controls.Add(this.lbPin_20);
             this.panel6.Controls.Add(this.label109);
             this.panel6.Controls.Add(this.lbPin_5);
-            this.panel6.Controls.Add(this.label124);
-            this.panel6.Controls.Add(this.lbPin_26);
+            this.panel6.Controls.Add(this.label130);
             this.panel6.Controls.Add(this.label110);
             this.panel6.Controls.Add(this.lbPin_6);
             this.panel6.Controls.Add(this.label125);
@@ -1217,15 +1197,15 @@
             this.panel6.Controls.Add(this.label113);
             this.panel6.Controls.Add(this.lbPin_8);
             this.panel6.Controls.Add(this.label112);
-            this.panel6.Location = new System.Drawing.Point(381, 142);
+            this.panel6.Location = new System.Drawing.Point(381, 122);
             this.panel6.Name = "panel6";
-            this.panel6.Size = new System.Drawing.Size(88, 129);
+            this.panel6.Size = new System.Drawing.Size(88, 146);
             this.panel6.TabIndex = 9;
             // 
             // label108
             // 
             this.label108.AutoSize = true;
-            this.label108.Location = new System.Drawing.Point(3, 107);
+            this.label108.Location = new System.Drawing.Point(3, 121);
             this.label108.Name = "label108";
             this.label108.Size = new System.Drawing.Size(11, 12);
             this.label108.TabIndex = 112;
@@ -1235,7 +1215,7 @@
             // 
             this.lbPin_4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_4.BackColor = System.Drawing.Color.Green;
-            this.lbPin_4.Location = new System.Drawing.Point(20, 107);
+            this.lbPin_4.Location = new System.Drawing.Point(20, 121);
             this.lbPin_4.Name = "lbPin_4";
             this.lbPin_4.Size = new System.Drawing.Size(15, 15);
             this.lbPin_4.TabIndex = 75;
@@ -1243,7 +1223,7 @@
             // label123
             // 
             this.label123.AutoSize = true;
-            this.label123.Location = new System.Drawing.Point(41, 107);
+            this.label123.Location = new System.Drawing.Point(41, 27);
             this.label123.Name = "label123";
             this.label123.Size = new System.Drawing.Size(17, 12);
             this.label123.TabIndex = 127;
@@ -1253,7 +1233,7 @@
             // 
             this.lbPin_27.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_27.BackColor = System.Drawing.Color.Green;
-            this.lbPin_27.Location = new System.Drawing.Point(64, 107);
+            this.lbPin_27.Location = new System.Drawing.Point(64, 26);
             this.lbPin_27.Name = "lbPin_27";
             this.lbPin_27.Size = new System.Drawing.Size(15, 15);
             this.lbPin_27.TabIndex = 90;
@@ -1261,7 +1241,7 @@
             // label109
             // 
             this.label109.AutoSize = true;
-            this.label109.Location = new System.Drawing.Point(3, 87);
+            this.label109.Location = new System.Drawing.Point(3, 97);
             this.label109.Name = "label109";
             this.label109.Size = new System.Drawing.Size(11, 12);
             this.label109.TabIndex = 113;
@@ -1271,7 +1251,7 @@
             // 
             this.lbPin_5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_5.BackColor = System.Drawing.Color.Green;
-            this.lbPin_5.Location = new System.Drawing.Point(20, 87);
+            this.lbPin_5.Location = new System.Drawing.Point(20, 97);
             this.lbPin_5.Name = "lbPin_5";
             this.lbPin_5.Size = new System.Drawing.Size(15, 15);
             this.lbPin_5.TabIndex = 76;
@@ -1279,7 +1259,7 @@
             // label124
             // 
             this.label124.AutoSize = true;
-            this.label124.Location = new System.Drawing.Point(41, 90);
+            this.label124.Location = new System.Drawing.Point(41, 4);
             this.label124.Name = "label124";
             this.label124.Size = new System.Drawing.Size(17, 12);
             this.label124.TabIndex = 128;
@@ -1289,7 +1269,7 @@
             // 
             this.lbPin_26.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_26.BackColor = System.Drawing.Color.Green;
-            this.lbPin_26.Location = new System.Drawing.Point(64, 87);
+            this.lbPin_26.Location = new System.Drawing.Point(64, 4);
             this.lbPin_26.Name = "lbPin_26";
             this.lbPin_26.Size = new System.Drawing.Size(15, 15);
             this.lbPin_26.TabIndex = 91;
@@ -1297,7 +1277,7 @@
             // label110
             // 
             this.label110.AutoSize = true;
-            this.label110.Location = new System.Drawing.Point(3, 67);
+            this.label110.Location = new System.Drawing.Point(3, 74);
             this.label110.Name = "label110";
             this.label110.Size = new System.Drawing.Size(11, 12);
             this.label110.TabIndex = 114;
@@ -1307,7 +1287,7 @@
             // 
             this.lbPin_6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_6.BackColor = System.Drawing.Color.Green;
-            this.lbPin_6.Location = new System.Drawing.Point(20, 66);
+            this.lbPin_6.Location = new System.Drawing.Point(20, 74);
             this.lbPin_6.Name = "lbPin_6";
             this.lbPin_6.Size = new System.Drawing.Size(15, 15);
             this.lbPin_6.TabIndex = 77;
@@ -1315,7 +1295,7 @@
             // label125
             // 
             this.label125.AutoSize = true;
-            this.label125.Location = new System.Drawing.Point(41, 67);
+            this.label125.Location = new System.Drawing.Point(41, 121);
             this.label125.Name = "label125";
             this.label125.Size = new System.Drawing.Size(17, 12);
             this.label125.TabIndex = 129;
@@ -1324,7 +1304,7 @@
             // label128
             // 
             this.label128.AutoSize = true;
-            this.label128.Location = new System.Drawing.Point(41, 6);
+            this.label128.Location = new System.Drawing.Point(41, 54);
             this.label128.Name = "label128";
             this.label128.Size = new System.Drawing.Size(17, 12);
             this.label128.TabIndex = 132;
@@ -1334,7 +1314,7 @@
             // 
             this.lbPin_22.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_22.BackColor = System.Drawing.Color.Green;
-            this.lbPin_22.Location = new System.Drawing.Point(64, 6);
+            this.lbPin_22.Location = new System.Drawing.Point(64, 51);
             this.lbPin_22.Name = "lbPin_22";
             this.lbPin_22.Size = new System.Drawing.Size(15, 15);
             this.lbPin_22.TabIndex = 95;
@@ -1343,7 +1323,7 @@
             // 
             this.lbPin_25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_25.BackColor = System.Drawing.Color.Green;
-            this.lbPin_25.Location = new System.Drawing.Point(64, 67);
+            this.lbPin_25.Location = new System.Drawing.Point(64, 121);
             this.lbPin_25.Name = "lbPin_25";
             this.lbPin_25.Size = new System.Drawing.Size(15, 15);
             this.lbPin_25.TabIndex = 92;
@@ -1351,7 +1331,7 @@
             // label127
             // 
             this.label127.AutoSize = true;
-            this.label127.Location = new System.Drawing.Point(41, 29);
+            this.label127.Location = new System.Drawing.Point(41, 74);
             this.label127.Name = "label127";
             this.label127.Size = new System.Drawing.Size(17, 12);
             this.label127.TabIndex = 131;
@@ -1360,7 +1340,7 @@
             // label111
             // 
             this.label111.AutoSize = true;
-            this.label111.Location = new System.Drawing.Point(3, 46);
+            this.label111.Location = new System.Drawing.Point(3, 54);
             this.label111.Name = "label111";
             this.label111.Size = new System.Drawing.Size(11, 12);
             this.label111.TabIndex = 115;
@@ -1370,7 +1350,7 @@
             // 
             this.lbPin_23.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_23.BackColor = System.Drawing.Color.Green;
-            this.lbPin_23.Location = new System.Drawing.Point(64, 26);
+            this.lbPin_23.Location = new System.Drawing.Point(64, 74);
             this.lbPin_23.Name = "lbPin_23";
             this.lbPin_23.Size = new System.Drawing.Size(15, 15);
             this.lbPin_23.TabIndex = 94;
@@ -1379,7 +1359,7 @@
             // 
             this.lbPin_7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_7.BackColor = System.Drawing.Color.Green;
-            this.lbPin_7.Location = new System.Drawing.Point(20, 46);
+            this.lbPin_7.Location = new System.Drawing.Point(20, 51);
             this.lbPin_7.Name = "lbPin_7";
             this.lbPin_7.Size = new System.Drawing.Size(15, 15);
             this.lbPin_7.TabIndex = 78;
@@ -1388,7 +1368,7 @@
             // 
             this.lbPin_9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_9.BackColor = System.Drawing.Color.Green;
-            this.lbPin_9.Location = new System.Drawing.Point(20, 6);
+            this.lbPin_9.Location = new System.Drawing.Point(20, 5);
             this.lbPin_9.Name = "lbPin_9";
             this.lbPin_9.Size = new System.Drawing.Size(15, 15);
             this.lbPin_9.TabIndex = 80;
@@ -1396,7 +1376,7 @@
             // label126
             // 
             this.label126.AutoSize = true;
-            this.label126.Location = new System.Drawing.Point(41, 47);
+            this.label126.Location = new System.Drawing.Point(41, 97);
             this.label126.Name = "label126";
             this.label126.Size = new System.Drawing.Size(17, 12);
             this.label126.TabIndex = 130;
@@ -1406,7 +1386,7 @@
             // 
             this.lbPin_24.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_24.BackColor = System.Drawing.Color.Green;
-            this.lbPin_24.Location = new System.Drawing.Point(64, 47);
+            this.lbPin_24.Location = new System.Drawing.Point(64, 97);
             this.lbPin_24.Name = "lbPin_24";
             this.lbPin_24.Size = new System.Drawing.Size(15, 15);
             this.lbPin_24.TabIndex = 93;
@@ -1424,7 +1404,7 @@
             // 
             this.lbPin_8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_8.BackColor = System.Drawing.Color.Green;
-            this.lbPin_8.Location = new System.Drawing.Point(20, 26);
+            this.lbPin_8.Location = new System.Drawing.Point(20, 28);
             this.lbPin_8.Name = "lbPin_8";
             this.lbPin_8.Size = new System.Drawing.Size(15, 15);
             this.lbPin_8.TabIndex = 79;
@@ -1432,7 +1412,7 @@
             // label112
             // 
             this.label112.AutoSize = true;
-            this.label112.Location = new System.Drawing.Point(3, 26);
+            this.label112.Location = new System.Drawing.Point(3, 31);
             this.label112.Name = "label112";
             this.label112.Size = new System.Drawing.Size(11, 12);
             this.label112.TabIndex = 116;
@@ -1465,25 +1445,25 @@
             this.panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel5.Controls.Add(this.label105);
             this.panel5.Controls.Add(this.lbPin_1);
-            this.panel5.Controls.Add(this.label120);
-            this.panel5.Controls.Add(this.lbPin_30);
+            this.panel5.Controls.Add(this.label123);
+            this.panel5.Controls.Add(this.lbPin_27);
+            this.panel5.Controls.Add(this.label124);
             this.panel5.Controls.Add(this.label106);
             this.panel5.Controls.Add(this.lbPin_2);
-            this.panel5.Controls.Add(this.label121);
-            this.panel5.Controls.Add(this.lbPin_29);
+            this.panel5.Controls.Add(this.lbPin_26);
             this.panel5.Controls.Add(this.label107);
             this.panel5.Controls.Add(this.lbPin_3);
             this.panel5.Controls.Add(this.label122);
             this.panel5.Controls.Add(this.lbPin_28);
-            this.panel5.Location = new System.Drawing.Point(381, 275);
+            this.panel5.Location = new System.Drawing.Point(381, 272);
             this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(88, 63);
+            this.panel5.Size = new System.Drawing.Size(88, 66);
             this.panel5.TabIndex = 8;
             // 
             // label105
             // 
             this.label105.AutoSize = true;
-            this.label105.Location = new System.Drawing.Point(3, 45);
+            this.label105.Location = new System.Drawing.Point(3, 49);
             this.label105.Name = "label105";
             this.label105.Size = new System.Drawing.Size(11, 12);
             this.label105.TabIndex = 109;
@@ -1493,28 +1473,10 @@
             // 
             this.lbPin_1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_1.BackColor = System.Drawing.Color.Green;
-            this.lbPin_1.Location = new System.Drawing.Point(20, 44);
+            this.lbPin_1.Location = new System.Drawing.Point(20, 47);
             this.lbPin_1.Name = "lbPin_1";
             this.lbPin_1.Size = new System.Drawing.Size(15, 15);
             this.lbPin_1.TabIndex = 72;
-            // 
-            // label120
-            // 
-            this.label120.AutoSize = true;
-            this.label120.Location = new System.Drawing.Point(41, 45);
-            this.label120.Name = "label120";
-            this.label120.Size = new System.Drawing.Size(17, 12);
-            this.label120.TabIndex = 124;
-            this.label120.Text = "30";
-            // 
-            // lbPin_30
-            // 
-            this.lbPin_30.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbPin_30.BackColor = System.Drawing.Color.Green;
-            this.lbPin_30.Location = new System.Drawing.Point(64, 44);
-            this.lbPin_30.Name = "lbPin_30";
-            this.lbPin_30.Size = new System.Drawing.Size(15, 15);
-            this.lbPin_30.TabIndex = 87;
             // 
             // label106
             // 
@@ -1529,28 +1491,10 @@
             // 
             this.lbPin_2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_2.BackColor = System.Drawing.Color.Green;
-            this.lbPin_2.Location = new System.Drawing.Point(20, 23);
+            this.lbPin_2.Location = new System.Drawing.Point(20, 26);
             this.lbPin_2.Name = "lbPin_2";
             this.lbPin_2.Size = new System.Drawing.Size(15, 15);
             this.lbPin_2.TabIndex = 73;
-            // 
-            // label121
-            // 
-            this.label121.AutoSize = true;
-            this.label121.Location = new System.Drawing.Point(41, 25);
-            this.label121.Name = "label121";
-            this.label121.Size = new System.Drawing.Size(17, 12);
-            this.label121.TabIndex = 125;
-            this.label121.Text = "29";
-            // 
-            // lbPin_29
-            // 
-            this.lbPin_29.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbPin_29.BackColor = System.Drawing.Color.Green;
-            this.lbPin_29.Location = new System.Drawing.Point(64, 23);
-            this.lbPin_29.Name = "lbPin_29";
-            this.lbPin_29.Size = new System.Drawing.Size(15, 15);
-            this.lbPin_29.TabIndex = 88;
             // 
             // label107
             // 
@@ -1565,7 +1509,7 @@
             // 
             this.lbPin_3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_3.BackColor = System.Drawing.Color.Green;
-            this.lbPin_3.Location = new System.Drawing.Point(20, 3);
+            this.lbPin_3.Location = new System.Drawing.Point(20, 4);
             this.lbPin_3.Name = "lbPin_3";
             this.lbPin_3.Size = new System.Drawing.Size(15, 15);
             this.lbPin_3.TabIndex = 74;
@@ -1573,7 +1517,7 @@
             // label122
             // 
             this.label122.AutoSize = true;
-            this.label122.Location = new System.Drawing.Point(41, 5);
+            this.label122.Location = new System.Drawing.Point(41, 48);
             this.label122.Name = "label122";
             this.label122.Size = new System.Drawing.Size(17, 12);
             this.label122.TabIndex = 126;
@@ -1583,7 +1527,7 @@
             // 
             this.lbPin_28.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPin_28.BackColor = System.Drawing.Color.Green;
-            this.lbPin_28.Location = new System.Drawing.Point(64, 3);
+            this.lbPin_28.Location = new System.Drawing.Point(64, 47);
             this.lbPin_28.Name = "lbPin_28";
             this.lbPin_28.Size = new System.Drawing.Size(15, 15);
             this.lbPin_28.TabIndex = 89;
@@ -1636,6 +1580,45 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(474, 392);
             this.panel3.TabIndex = 6;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.BackColor = System.Drawing.SystemColors.Info;
+            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label3.Font = new System.Drawing.Font("新宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(3, 203);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(471, 58);
+            this.label3.TabIndex = 1;
+            this.label3.Text = "RK7003测试列表";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lbItemValidSN
+            // 
+            this.lbItemValidSN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbItemValidSN.BackColor = System.Drawing.Color.Green;
+            this.lbItemValidSN.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lbItemValidSN.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lbItemValidSN.Location = new System.Drawing.Point(708, 4);
+            this.lbItemValidSN.Name = "lbItemValidSN";
+            this.lbItemValidSN.Size = new System.Drawing.Size(236, 35);
+            this.lbItemValidSN.TabIndex = 1;
+            this.lbItemValidSN.Text = "SN号合法性";
+            this.lbItemValidSN.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lbItemChkServer
+            // 
+            this.lbItemChkServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbItemChkServer.BackColor = System.Drawing.Color.Green;
+            this.lbItemChkServer.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lbItemChkServer.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lbItemChkServer.Location = new System.Drawing.Point(952, 4);
+            this.lbItemChkServer.Name = "lbItemChkServer";
+            this.lbItemChkServer.Size = new System.Drawing.Size(226, 35);
+            this.lbItemChkServer.TabIndex = 7;
+            this.lbItemChkServer.Text = "SERVER板检查";
+            this.lbItemChkServer.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lvRK4003ErrItem
             // 
@@ -1690,45 +1673,6 @@
             this.columnHeader7.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.columnHeader7.Width = 315;
             // 
-            // label3
-            // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.BackColor = System.Drawing.SystemColors.Info;
-            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label3.Font = new System.Drawing.Font("新宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(3, 203);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(471, 58);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "RK7003测试列表";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lbItemValidSN
-            // 
-            this.lbItemValidSN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbItemValidSN.BackColor = System.Drawing.Color.Green;
-            this.lbItemValidSN.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbItemValidSN.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbItemValidSN.Location = new System.Drawing.Point(708, 4);
-            this.lbItemValidSN.Name = "lbItemValidSN";
-            this.lbItemValidSN.Size = new System.Drawing.Size(236, 35);
-            this.lbItemValidSN.TabIndex = 1;
-            this.lbItemValidSN.Text = "SN号合法性";
-            this.lbItemValidSN.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lbItemChkServer
-            // 
-            this.lbItemChkServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbItemChkServer.BackColor = System.Drawing.Color.Green;
-            this.lbItemChkServer.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbItemChkServer.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbItemChkServer.Location = new System.Drawing.Point(952, 4);
-            this.lbItemChkServer.Name = "lbItemChkServer";
-            this.lbItemChkServer.Size = new System.Drawing.Size(226, 35);
-            this.lbItemChkServer.TabIndex = 7;
-            this.lbItemChkServer.Text = "SERVER板检查";
-            this.lbItemChkServer.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // lvSolutions
             // 
             this.lvSolutions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -1777,7 +1721,7 @@
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "新日RK7003板测 V1.1.2";
+            this.Text = "新日RK7003板测 V2.0.0";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_Closed);
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -1796,8 +1740,6 @@
             this.panel8.PerformLayout();
             this.panel_remoter.ResumeLayout(false);
             this.panel_remoter.PerformLayout();
-            this.panel7.ResumeLayout(false);
-            this.panel7.PerformLayout();
             this.panel6.ResumeLayout(false);
             this.panel6.PerformLayout();
             this.panel1.ResumeLayout(false);
@@ -1877,7 +1819,6 @@
         private System.Windows.Forms.Label lbPin_3;
         private System.Windows.Forms.Label lbPin_2;
         private System.Windows.Forms.Label lbPin_1;
-        private System.Windows.Forms.Label lbPin_30;
         private System.Windows.Forms.Label lbPin_16;
         private System.Windows.Forms.Label lbPin_17;
         private System.Windows.Forms.Label lbPin_18;
@@ -1891,7 +1832,6 @@
         private System.Windows.Forms.Label lbPin_26;
         private System.Windows.Forms.Label lbPin_27;
         private System.Windows.Forms.Label lbPin_28;
-        private System.Windows.Forms.Label lbPin_29;
         private System.Windows.Forms.Label label74;
         private System.Windows.Forms.Label label77;
         private System.Windows.Forms.Label label76;
@@ -1935,8 +1875,6 @@
         private System.Windows.Forms.Label label124;
         private System.Windows.Forms.Label label123;
         private System.Windows.Forms.Label label122;
-        private System.Windows.Forms.Label label121;
-        private System.Windows.Forms.Label label120;
         private System.Windows.Forms.Label label119;
         private System.Windows.Forms.Label label118;
         private System.Windows.Forms.Label label117;
@@ -1966,7 +1904,6 @@
         private System.Windows.Forms.Panel panel4;
         private System.Windows.Forms.Panel panel9;
         private System.Windows.Forms.Panel panel8;
-        private System.Windows.Forms.Panel panel7;
         private System.Windows.Forms.Label labelPos;
     }
 }

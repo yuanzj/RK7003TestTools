@@ -41,7 +41,7 @@ namespace RK7001Test
             
             mRK7001Pin = new Label[] { this.lbPin_1, this.lbPin_2, this.lbPin_3, this.lbPin_4, this.lbPin_5, this.lbPin_6, this.lbPin_7, this.lbPin_8, this.lbPin_9, this.lbPin_10,
                                         this.lbPin_11, this.lbPin_12, this.lbPin_13, this.lbPin_14, this.lbPin_15, this.lbPin_16, this.lbPin_17, this.lbPin_18, this.lbPin_19, this.lbPin_20,
-                                       this.lbPin_21, this.lbPin_22, this.lbPin_23, this.lbPin_24, this.lbPin_25, this.lbPin_26, this.lbPin_27, this.lbPin_28, this.lbPin_29, this.lbPin_30};
+                                       this.lbPin_21, this.lbPin_22, this.lbPin_23, this.lbPin_24, this.lbPin_25, this.lbPin_26, this.lbPin_27, this.lbPin_28};
             mRK4103Pin = new Label[] { this.rkPin_1, this.rkPin_2, this.rkPin_3, this.rkPin_4, this.rkPin_5, this.rkPin_6, this.rkPin_7, this.rkPin_8, this.rkPin_9, this.rkPin_10,
                                         this.rkPin_11, this.rkPin_12, this.rkPin_13, this.rkPin_14, this.rkPin_15, this.rkPin_16, this.rkPin_17, this.rkPin_18, this.rkPin_19, this.rkPin_20,
                                         this.rkPin_21, this.rkPin_22, this.rkPin_23, this.rkPin_24, this.rkPin_25, this.rkPin_26, this.rkPin_27, this.rkPin_28, this.rkPin_29, this.rkPin_30};        
@@ -99,7 +99,6 @@ namespace RK7001Test
                                             + "; User ID=" + ConfigurationManager.AppSettings["User"].ToString()
                                             + "; PassWord=" + ConfigurationManager.AppSettings["Password"].ToString();
             
-
             mCoreTask.bCruised = Convert.ToBoolean(ConfigurationManager.AppSettings["CruisedSwitch"].ToString());
             mCoreTask.bRepaired = Convert.ToBoolean(ConfigurationManager.AppSettings["RepairSwitch"].ToString());
             mCoreTask.bPushcar = Convert.ToBoolean(ConfigurationManager.AppSettings["PushSwitch"].ToString());
@@ -213,8 +212,7 @@ namespace RK7001Test
             this.tbInputSN.TabIndex = 0;
         }
         #endregion
-
-       
+     
         #region 启动任务
         private void StartTask()
         {
@@ -259,8 +257,6 @@ namespace RK7001Test
             }
         }
         #endregion
-
-
 
         #region 设置主界面
         delegate void setMainTextCallback(string msg, string submsg, INFO_LEVEL level);
@@ -318,41 +314,40 @@ namespace RK7001Test
         delegate void UpdateVddGpsPinCallback(INFO_LEVEL level);
         private void UpdateVddGpsPin(INFO_LEVEL level)
         {
-            if (this.rkPin_30.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            if (this.rkPin_1.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
             {
-                while (!this.rkPin_30.IsHandleCreated)
+                while (!this.rkPin_1.IsHandleCreated)
                 {
                     //解决窗体关闭时出现“访问已释放句柄“的异常
-                    if (this.rkPin_30.Disposing || this.rkPin_30.IsDisposed)
+                    if (this.rkPin_1.Disposing || this.rkPin_1.IsDisposed)
                         return;
                 }
                 UpdateVddGpsPinCallback d = new UpdateVddGpsPinCallback(UpdateVddGpsPin);
-                this.rkPin_30.Invoke(d, new object[] { level });
+                this.rkPin_1.Invoke(d, new object[] { level });
             }
             else
             {
                 switch(level)
                 {
                     case INFO_LEVEL.INIT:
-                        this.rkPin_30.BackColor = Color.White;
+                        this.rkPin_1.BackColor = Color.White;
                         break;
                     case INFO_LEVEL.FAIL:
-                        this.rkPin_30.BackColor = Color.Red;
+                        this.rkPin_1.BackColor = Color.Red;
                         break;
                     case INFO_LEVEL.PASS:
-                        this.rkPin_30.BackColor = Color.Green;
+                        this.rkPin_1.BackColor = Color.Green;
                         break;
                     case INFO_LEVEL.PROCESS:
-                        this.rkPin_30.BackColor = Color.Yellow;
+                        this.rkPin_1.BackColor = Color.Yellow;
                         break;
                     case INFO_LEVEL.GREY:
-                        this.rkPin_30.BackColor = Color.Gray;
+                        this.rkPin_1.BackColor = Color.Gray;
                         break;
                 }
             }
         }
         #endregion
-
 
         #region 设置ListView
         delegate void SetListViewCallback(string msg, string submsg);
@@ -704,9 +699,9 @@ namespace RK7001Test
         {
             if(level == INFO_LEVEL.INIT)
             {
-                for(int i = 1; i <=30; i++)
+                for(int i = 1; i <=28; i++)
                 {
-                    if(i == 1 || i == 7 || i == 24 || i == 13 || i == 15)
+                    if(i == 1 || i == 7 || i == 22 || i == 10 || i == 14)
                         Set7001Pin(i, INFO_LEVEL.GREY);
                     else
                         Set7001Pin(i, INFO_LEVEL.INIT);
@@ -715,9 +710,9 @@ namespace RK7001Test
             }
             else if (level == INFO_LEVEL.PROCESS)
             {
-                for (int i = 1; i <= 30; i++)
+                for (int i = 1; i <= 28; i++)
                 {
-                    if (i == 1 || i == 7 || i == 24 || i == 13 || i == 15)
+                    if (i == 1 || i == 7 || i == 22 || i == 10 || i == 14)
                         Set7001Pin(i, INFO_LEVEL.GREY);
                     else
                         Set7001Pin(i, INFO_LEVEL.PROCESS);
@@ -726,9 +721,9 @@ namespace RK7001Test
             }
             else if(level == INFO_LEVEL.PASS)
             {
-                for (int i = 1; i <= 30; i++)
+                for (int i = 1; i <= 28; i++)
                 {
-                    if (i == 1 || i == 7 || i == 24 || i == 13 || i == 15)
+                    if (i == 1 || i == 7 || i == 22 || i == 10 || i == 14)
                         Set7001Pin(i, INFO_LEVEL.GREY);
                     else
                         Set7001Pin(i, INFO_LEVEL.PASS);
@@ -777,10 +772,12 @@ namespace RK7001Test
                 Set7001Pin(9, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(9, INFO_LEVEL.PASS);
+            /*
             if (status.Pin10_Open || status.Pin10_Short)
                 Set7001Pin(10, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(10, INFO_LEVEL.PASS);
+            */
             if (status.Pin11_Open || status.Pin11_Short)
                 Set7001Pin(11, INFO_LEVEL.FAIL);
             else
@@ -789,22 +786,22 @@ namespace RK7001Test
                 Set7001Pin(12, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(12, INFO_LEVEL.PASS);
-            /*
+            
             if (status.Pin13_Open || status.Pin13_Short)
                 Set7001Pin(13, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(13, INFO_LEVEL.PASS);
-            */
+            /*
             if (status.Pin14_Open || status.Pin14_Short)
                 Set7001Pin(14, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(14, INFO_LEVEL.PASS);
-            /*
+            */
             if (status.Pin15_Open || status.Pin15_Short)
                 Set7001Pin(15, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(15, INFO_LEVEL.PASS);
-            */
+            
             if (status.Pin16_Open || status.Pin16_Short)
                 Set7001Pin(16, INFO_LEVEL.FAIL);
             else
@@ -830,20 +827,22 @@ namespace RK7001Test
                 Set7001Pin(21, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(21, INFO_LEVEL.PASS);
+            /*
             if (status.Pin22_Open || status.Pin22_Short)
                 Set7001Pin(22, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(22, INFO_LEVEL.PASS);
+            */
             if (status.Pin23_Open || status.Pin23_Short)
                 Set7001Pin(23, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(23, INFO_LEVEL.PASS);
-            /*
+            
             if (status.Pin24_Open || status.Pin24_Short)
                 Set7001Pin(24, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(24, INFO_LEVEL.PASS);
-            */
+            
             if (status.Pin25_Open || status.Pin25_Short)
                 Set7001Pin(25, INFO_LEVEL.FAIL);
             else
@@ -860,6 +859,7 @@ namespace RK7001Test
                 Set7001Pin(28, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(28, INFO_LEVEL.PASS);
+            /*
             if (status.Pin29_Open || status.Pin29_Short)
                 Set7001Pin(29, INFO_LEVEL.FAIL);
             else
@@ -868,6 +868,7 @@ namespace RK7001Test
                 Set7001Pin(30, INFO_LEVEL.FAIL);
             else
                 Set7001Pin(30, INFO_LEVEL.PASS);
+            */
         }
         #endregion
 
@@ -915,11 +916,11 @@ namespace RK7001Test
         {
             if (level == INFO_LEVEL.INIT)
             {
-                for (int i = 1; i <= 29; i++)
+                for (int i = 2; i <= 30; i++)
                 {
                    
                     if (i == 16 || i == 17 || i == 19 || i == 26 || i== 15 || i == 20 
-                        || i== 5 || i== 1 || i == 2 || i== 29 || i== 9)
+                        || i== 5 || i == 2 || i== 29 || i == 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);
                     else
                         SetRK4103Pin(i, INFO_LEVEL.INIT);
@@ -928,10 +929,10 @@ namespace RK7001Test
             }
             else if (level == INFO_LEVEL.PROCESS)
             {
-                for (int i = 1; i <= 29; i++)
+                for (int i = 2; i <= 30; i++)
                 {                    
                     if (i == 16 || i == 17 || i == 19 || i == 26 || i == 15 || i == 20 
-                        || i == 5 || i == 1 || i == 2 || i == 29 || i== 9)
+                        || i == 5 || i == 2 || i == 29 || i == 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);
                     else
                         SetRK4103Pin(i, INFO_LEVEL.PROCESS);
@@ -940,10 +941,10 @@ namespace RK7001Test
             }
             else if (level == INFO_LEVEL.PASS)
             {
-                for (int i = 1; i <= 29; i++)
+                for (int i = 2; i <= 30; i++)
                 {                    
                     if (i == 16 || i == 17 || i == 19 || i == 26 || i == 15 || i == 20 
-                        || i == 5 || i == 1 || i == 2 || i== 29 || i== 9)
+                        || i == 5 || i == 2 || i== 29 || i== 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);
                     else
                         SetRK4103Pin(i, INFO_LEVEL.PASS);
@@ -957,6 +958,8 @@ namespace RK7001Test
                 SetRK4103Pin(1, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(1, INFO_LEVEL.PASS);
+            */
+            /*
             if (status.Pin2_Open || status.Pin2_Short)
                 SetRK4103Pin(2, INFO_LEVEL.FAIL);
             else
@@ -976,10 +979,12 @@ namespace RK7001Test
             else
                 SetRK4103Pin(5, INFO_LEVEL.PASS);
             */
+            /*
             if (status.Pin6_Open || status.Pin6_Short)
                 SetRK4103Pin(6, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(6, INFO_LEVEL.PASS);
+            */
             if (status.Pin7_Open || status.Pin7_Short)
                 SetRK4103Pin(7, INFO_LEVEL.FAIL);
             else
@@ -988,12 +993,12 @@ namespace RK7001Test
                 SetRK4103Pin(8, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(8, INFO_LEVEL.PASS);
-            /*
+            
             if (status.Pin9_Open || status.Pin9_Short)
                 SetRK4103Pin(9, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(9, INFO_LEVEL.PASS);
-            */
+            
             if (status.Pin10_Open || status.Pin10_Short)
                 SetRK4103Pin(10, INFO_LEVEL.FAIL);
             else

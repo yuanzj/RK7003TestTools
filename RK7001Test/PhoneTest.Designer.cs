@@ -40,7 +40,6 @@
             this.labelItem_SN = new System.Windows.Forms.Label();
             this.labelItemKey1 = new System.Windows.Forms.Label();
             this.labelItemKey2 = new System.Windows.Forms.Label();
-            this.labelItemKey3 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -175,25 +174,11 @@
             this.labelItemKey2.Text = "绑定钥匙2";
             this.labelItemKey2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // labelItemKey3
-            // 
-            this.labelItemKey3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelItemKey3.BackColor = System.Drawing.Color.White;
-            this.labelItemKey3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.labelItemKey3.Font = new System.Drawing.Font("宋体", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.labelItemKey3.Location = new System.Drawing.Point(746, 262);
-            this.labelItemKey3.Name = "labelItemKey3";
-            this.labelItemKey3.Size = new System.Drawing.Size(300, 46);
-            this.labelItemKey3.TabIndex = 8;
-            this.labelItemKey3.Text = "绑定钥匙3";
-            this.labelItemKey3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // PhoneTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1050, 706);
-            this.Controls.Add(this.labelItemKey3);
             this.Controls.Add(this.labelItemKey2);
             this.Controls.Add(this.labelItemKey1);
             this.Controls.Add(this.labelItem_SN);
@@ -204,9 +189,11 @@
             this.Controls.Add(this.panel1);
             this.KeyPreview = true;
             this.Name = "PhoneTest";
-            this.Text = "RK7003整测工具V1.1.1";
+            this.Text = "RK7003整测工具V2.0.0";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.PhoneTest_Closed);
             this.Load += new System.EventHandler(this.PhoneTest_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_Start);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -224,7 +211,6 @@
         private System.Windows.Forms.Label labelItem_SN;
         private System.Windows.Forms.Label labelItemKey1;
         private System.Windows.Forms.Label labelItemKey2;
-        private System.Windows.Forms.Label labelItemKey3;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;

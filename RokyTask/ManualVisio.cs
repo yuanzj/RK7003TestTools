@@ -52,8 +52,6 @@ namespace RK7001Test
                 DynamicPotTicker.Enabled = false;
                 this.DialogResult = DialogResult.Cancel;
             });
-        }
-
-        
+        }        
     }
 }

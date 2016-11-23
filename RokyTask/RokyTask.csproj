@@ -74,6 +74,7 @@
     <Compile Include="ManualVisio.Designer.cs">
       <DependentUpon>ManualVisio.cs</DependentUpon>
     </Compile>
+    <Compile Include="PhoneTestTask.cs" />
     <Compile Include="SerialPortProtocoImpl.cs" />
     <Compile Include="SimpleSerialPortTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

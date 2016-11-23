@@ -120,7 +120,6 @@
             this.Name = "ManualVisio";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "目检";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainViso_Closed);
             this.Load += new System.EventHandler(this.MainViso_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDown_Checked);
             this.panel1.ResumeLayout(false);

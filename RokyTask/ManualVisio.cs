@@ -52,11 +52,6 @@ namespace RK7001Test
                 DynamicPotTicker.Enabled = false;
                 this.DialogResult = DialogResult.Cancel;
             });
-        }
-
-        private void MainViso_Closed(object sender, FormClosedEventArgs e)
-        {
-            this.DialogResult = DialogResult.Cancel;
-        }
+        }        
     }
 }

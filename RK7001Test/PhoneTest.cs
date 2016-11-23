@@ -26,6 +26,23 @@ namespace RK7001Test
         }
         #endregion
 
+        #region
+        private void PhoneTest_Closed(object sender, FormClosedEventArgs e)
+        {
+            this.DialogResult = DialogResult.OK;
+        }
+        #endregion
 
+        #region
+        private void KeyDown_Start(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                
+
+
+            }
+        }
+        #endregion
     }
 }

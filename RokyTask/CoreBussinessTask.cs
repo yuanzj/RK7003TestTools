@@ -852,8 +852,7 @@ namespace RokyTask
                                     mRK4103Pins.Pin17_Open = true;
                                     InputPinError = true;
                                     UpdateListView(sender, "4103 推车开关", "4103 推车开关脚异常或者其他原因");
-                                }
-                                    
+                                }                                    
                             }                   
                             if(bBackcar)
                             {
@@ -919,7 +918,7 @@ namespace RokyTask
                             }
                             if ((extensionOut >> 3 & 0x1) == 1) //LCM_PARK指示
                             {
-                                mRK4103Pins.Pin6_Open = true;
+                                mRK4103Pins.Pin23_Open = true;
                                 InputPinError = true;
                                 UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示异常或者其他原因");
                             }
@@ -937,7 +936,7 @@ namespace RokyTask
                             }
                             if ((extensionOut >> 6 & 0x1) == 1)//LCM_CLK
                             {
-                                mRK4103Pins.Pin23_Open = true;
+                                mRK4103Pins.Pin9_Open = true;
                                 InputPinError = true;
                                 UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK异常或者其他原因");
                             }
@@ -1098,8 +1097,8 @@ namespace RokyTask
                     if ((mDeviceFault >> 2 & 0x1) == 1)//dc使能控制
                     {
                         testResult = true;
-                        mRK7001Pins.Pin10_Open = true;
-                        mRK7001Pins.Pin21_Open = true;
+                        mRK7001Pins.Pin11_Open = true;
+                        mRK7001Pins.Pin19_Open = true;
                         UpdateListView(sender, "7003 DC故障", "ACC_DC或者12V有问题");
                     }
                     
@@ -1116,25 +1115,25 @@ namespace RokyTask
                     if ((mCutError1 >> 0 & 0x1) == 1)//前左转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin27_Open = true;
+                        mRK7001Pins.Pin25_Open = true;
                         UpdateListView(sender, "7003前左转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 1 & 0x1) == 1)//后左转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin30_Open = true;
+                        mRK7001Pins.Pin28_Open = true;
                         UpdateListView(sender, "7003后左转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 2 & 0x1) == 1)//前右转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin26_Open = true;
+                        mRK7001Pins.Pin24_Open = true;
                         UpdateListView(sender, "7003前右转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 3 & 0x1) == 1)//后右转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin29_Open = true;
+                        mRK7001Pins.Pin27_Open = true;
                         UpdateListView(sender, "7003后右转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 4 & 0x1) == 1)//近光
@@ -1166,14 +1165,14 @@ namespace RokyTask
                     if ((mCutError2 >> 0 & 0x1) == 1)//背景灯R
                     {
                         testResult = true;
-                        mRK7001Pins.Pin25_Open = true;
+                        mRK7001Pins.Pin23_Open = true;
                         UpdateListView(sender, "7003背景灯红断路", "该pin脚可能断路或其他原因");
                     }
                     /*
                     if ((mCutError2 >> 1 & 0x1) == 1)//背景灯G
                         mRK7001Pins.Pin7_Open = true;
                     if ((mCutError2 >> 2 & 0x1) == 1)//背景灯B
-                        mRK7001Pins.Pin24_Open = true;
+                        mRK7001Pins.Pin22_Open = true;
                     */
                     if ((mCutError2 >> 3 & 0x1) == 1)//喇叭
                     {
@@ -1193,25 +1192,25 @@ namespace RokyTask
                     if ((mShortError1 >> 0 & 0x1) == 1)//前左转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin27_Short = true;
+                        mRK7001Pins.Pin25_Short = true;
                         UpdateListView(sender, "7003前左转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 1 & 0x1) == 1)//后左转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin30_Short = true;
+                        mRK7001Pins.Pin28_Short = true;
                         UpdateListView(sender, "7003后左转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 2 & 0x1) == 1)//前右转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin26_Short = true;
+                        mRK7001Pins.Pin24_Short = true;
                         UpdateListView(sender, "7003前右转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 3 & 0x1) == 1)//后右转
                     {
                         testResult = true;
-                        mRK7001Pins.Pin29_Short = true;
+                        mRK7001Pins.Pin27_Short = true;
                         UpdateListView(sender, "7003后右转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 4 & 0x1) == 1)//近光
@@ -1241,14 +1240,14 @@ namespace RokyTask
                     if ((mShortError2 >> 0 & 0x1) == 1)//背景灯R
                     {
                         testResult = true;
-                        mRK7001Pins.Pin25_Short = true;
+                        mRK7001Pins.Pin23_Short = true;
                         UpdateListView(sender, "7003背景灯红短路", "该pin脚短路或者其他原因");
                     }
                     /*
                     if ((mShortError2 >> 1 & 0x1) == 1)//背景灯G
                         mRK7001Pins.Pin7_Short = true;
                     if ((mShortError2 >> 2 & 0x1) == 1)//背景灯B
-                        mRK7001Pins.Pin24_Short = true;
+                        mRK7001Pins.Pin22_Short = true;
                     */
                     if ((mShortError2 >> 3 & 0x1) == 1)//喇叭
                     {
@@ -1407,9 +1406,9 @@ namespace RokyTask
             byte mDcOUT = (byte)mArgs.DcVoltage;
             if (mAckDevice == Const.TESTSERVER)
             {                          
-                if (mAccStatus == 0 || mDcOUT == 0)
+                if (mAccStatus == 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
-                    mRK7001Pins.Pin14_Open = true;
+                    mRK7001Pins.Pin18_Open = true;
                     UpdateListView(sender, "7003 KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
                 }                
@@ -1429,9 +1428,9 @@ namespace RokyTask
             byte mDcOUT = (byte)mArgs.DcVoltage;
             if (mAckDevice == Const.TESTSERVER)
             {                     
-                if (mAccStatus != 0 || mDcOUT != 0)
+                if (mAccStatus != 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
-                    mRK7001Pins.Pin14_Open = true;
+                    mRK7001Pins.Pin18_Open = true;
                     UpdateListView(sender, "7003 KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
                 }                

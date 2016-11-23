@@ -10,7 +10,14 @@ namespace RokyTask
     public class PhoneTestTask : ITaskManager
     {
         #region 常量
+        public int KeyNumber { get; set; }
+        public bool bTaskRunning { get; set; }
+        #endregion
 
+        #region 注册事件
+        public event EventHandler UpdateValidSNHandler;
+        public event EventHandler BindKey1Handler;
+        public event EventHandler BindKey2Handler;
         #endregion
 
         #region 构造函数

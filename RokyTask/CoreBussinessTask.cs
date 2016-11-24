@@ -478,7 +478,7 @@ namespace RokyTask
                         case TaskSteps.Step8_RemoteTest:
                             level = Step8_RemoteTest(sender, mEventArgs.Data);
                             if (level == Task_Level.FALSE)
-                                mTaskSteps = TaskSteps.Step11_RetryRemote;
+                                bExcute = true;
                             else if(level == Task_Level.TRUE)
                             {
                                 UpdateRemoteStatus(sender, INFO_LEVEL.PASS);
@@ -1499,10 +1499,14 @@ namespace RokyTask
                 }
                 else if (mAckValue == Const.REMOTE_CHECK_FAIL)
                 {
+                    UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
                 else if (mAckValue == Const.REMOTE_NO_RECV)
                 {
+                    UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
                 else

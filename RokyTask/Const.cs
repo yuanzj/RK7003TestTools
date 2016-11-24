@@ -59,6 +59,9 @@ namespace RokyTask
 
         public const int RESET_ECU_RSP = 0X92;
 
+        public const int GET_DEVINFO_REQ = 0X2C;
+
+        public const int GET_DEVINFO_RSP = 0XAC;
 
         public const byte TESTSERVER_KEY_PRESS = 0X01;
 

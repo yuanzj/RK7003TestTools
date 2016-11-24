@@ -478,7 +478,7 @@ namespace RokyTask
                         case TaskSteps.Step8_RemoteTest:
                             level = Step8_RemoteTest(sender, mEventArgs.Data);
                             if (level == Task_Level.FALSE)
-                                bExcute = true;
+                                mTaskSteps = TaskSteps.Step11_RetryRemote;
                             else if(level == Task_Level.TRUE)
                             {
                                 UpdateRemoteStatus(sender, INFO_LEVEL.PASS);

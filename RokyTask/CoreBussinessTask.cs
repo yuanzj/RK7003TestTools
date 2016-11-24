@@ -732,7 +732,7 @@ namespace RokyTask
                     mParamSettingParam.sntemp = temp;
                     //等待接受结果
                     SetMainText(sender, "RK4103 测试中...", "", INFO_LEVEL.PROCESS);
-                    Thread.Sleep(100);
+                    Thread.Sleep(5);
                     mRecvTestResultTask.Excute();
                 }
                 else
@@ -764,6 +764,7 @@ namespace RokyTask
                     {
                         UpdateRK4103Items(sender, RK4103ITEM.INIT, null, INFO_LEVEL.PASS);
                         UpdateRK4103Pins(sender, mRK4103Pins, INFO_LEVEL.PASS);
+                        Thread.Sleep(5);
                         mSaveNvReqTask.Excute();
                     }
                     else
@@ -977,6 +978,7 @@ namespace RokyTask
                         {
                             UpdateRK4103Items(sender, RK4103ITEM.INIT, null, INFO_LEVEL.PASS);
                             UpdateRK4103Pins(sender, mRK4103Pins, INFO_LEVEL.PASS);
+                            Thread.Sleep(5);
                             mSaveNvReqTask.Excute();
                         }
                         else
@@ -1011,7 +1013,7 @@ namespace RokyTask
                     mSaveNvRspParam.status = 0x00;                  
                     //启动蓝牙接受测试结果
                     SetMainText(sender, "蓝牙测试中...", "", INFO_LEVEL.PROCESS);
-                    Thread.Sleep(100);
+                    Thread.Sleep(5);
                     mBtTestReqTask.Excute();
                 }
                 else
@@ -1027,7 +1029,7 @@ namespace RokyTask
             mBtTestReqTask = new SimpleSerialPortTask<SaveNvRsp, btTestReq>();
             mSaveNvRspParam = mBtTestReqTask.GetRequestEntity();
             mBtTestReqTask.RetryMaxCnts = 0;
-            mBtTestReqTask.Timerout = 50*1000;
+            mBtTestReqTask.Timerout = 30*1000;
             mBtTestReqTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<btTestReq> mEventArgs = e as SerialPortEventArgs<btTestReq>;
@@ -1063,6 +1065,7 @@ namespace RokyTask
                     else
                     {                        
                         SetMainText(sender, "获取RK7003版本号...", "", INFO_LEVEL.PROCESS);
+                        Thread.Sleep(5);
                         mGet7001VersionTask.Excute();
                     }          
                 }

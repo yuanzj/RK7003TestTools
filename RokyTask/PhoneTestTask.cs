@@ -260,12 +260,58 @@ namespace RokyTask
                             {
                                 case BindSteps.KEYS_CLEAR:
                                     level = KEYS_CLEAR(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+                                        SetMainText(sender, "请按要绑定的钥匙...", "", INFO_LEVEL.PROCESS);
+                                        mBindSteps = BindSteps.KEY1_BIND;
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+                                        bExcuted = true;
+                                        SetMainText(sender, "异常操作！", "", INFO_LEVEL.FAIL);
+                                    }
+                                    else if(level == Task_Level.REPEAT)
+                                    {
+                                        mBindSteps = BindSteps.KEYS_CLEAR;
+                                    }
                                     break;
                                 case BindSteps.KEY1_BIND:
                                     level = KEY1_BIND(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+                                        SetMainText(sender, "请再按一次绑定钥匙，进行确认绑定...", "", INFO_LEVEL.PROCESS);
+                                        mCheckKeyParam.ack_device = Const.CCU;
+                                        mCheckKeyParam.server_mode = 0x10;//检查钥匙
+                                        mBindSteps = BindSteps.KEY1_CHECK;
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+                                        SetMainText(sender, "此钥匙已绑定，请按另一个把...", "", INFO_LEVEL.PROCESS);
+                                        mBindSteps = BindSteps.KEY1_BIND;
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                    }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+
+                                    }
                                     break;
                             }
                             break;
@@ -274,18 +320,78 @@ namespace RokyTask
                             {
                                 case BindSteps.KEYS_CLEAR:
                                     level = KEYS_CLEAR(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+
+                                    }
                                     break;
                                 case BindSteps.KEY1_BIND:
                                     level = KEY1_BIND(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+
+                                    }
                                     break;
                                 case BindSteps.KEY2_BIND:
                                     level = KEY2_BIND(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+
+                                    }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+
+                                    }
                                     break;
                                 case BindSteps.KEY2_CHECK:
                                     level = KEY2_CHECK(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.FALSE)
+                                    {
+
+                                    }
+                                    else if (level == Task_Level.REPEAT)
+                                    {
+
+                                    }
                                     break;
                             }
                             break;
@@ -389,11 +495,11 @@ namespace RokyTask
             {
                 if (mAskResult == 0x21)//绑定成功)
                 {
-                    
+                    return Task_Level.TRUE;
                 }
                 else if(mAskResult == 0x24)
                 {
-
+                    return Task_Level.REPEAT;
                 }
             }
             
@@ -410,11 +516,11 @@ namespace RokyTask
             {
                 if(mAskResult == 0x21)
                 {
-
+                    return Task_Level.TRUE;
                 }
                 else if(mAskResult == 0x24)
                 {
-
+                    return Task_Level.REPEAT;
                 }
             }
 
@@ -431,12 +537,10 @@ namespace RokyTask
             {
                 if (mAskResult == 0x21)//确认成功
                 {
-                    SetMainText(sender, "请按第二把钥匙，进行确认...", "", INFO_LEVEL.PROCESS);
                     return Task_Level.TRUE;
                 }
                 else if (mAskResult == 0x23)
                 {
-                    SetMainText(sender, "第一把钥匙确认失败！", "", INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
             }
@@ -452,13 +556,13 @@ namespace RokyTask
             byte mAskResult = (byte)mArgs.ack_value;//响应
             if (mAskDevice == Const.CCU)
             {
-                if (mAskResult == 0x21)//绑定成功)
+                if (mAskResult == 0x21)//绑定成功
                 {
-                    
+                    return Task_Level.TRUE;
                 }
-                else if (mAskResult == 0x23)
+                else if (mAskResult == 0x23)//绑定失败
                 {
-
+                    return Task_Level.FALSE;
                 }
             }
 

@@ -292,7 +292,7 @@ namespace RokyTask
         #region 构造任务
         private void TaskBuilder()
         {
-            #region 显示POS
+#region 显示POS
             DynamicPotTicker = new System.Timers.Timer(1000);
             PotTickCnt = 0;
             DynamicPotTicker.Enabled = false;
@@ -317,7 +317,7 @@ namespace RokyTask
             });
             #endregion
 
-            #region 自检报文
+#region 自检报文
             mGet7001ResultTask = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
             mGet700ResultParam = mGet7001ResultTask.GetRequestEntity();
             mGet7001ResultTask.RetryMaxCnts = 10;
@@ -723,7 +723,10 @@ namespace RokyTask
                     mParamSettingParam.deviceType = 0x03;
                     mParamSettingParam.testItem = 0x7F;
                     mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
-                    mParamSettingParam.edrAddr = ByteProcess.stringToByteArrayNoColon(mBTaddr);
+                    byte[] aArray = new byte[6];
+                    aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
+                    Array.Reverse(aArray);
+                    mParamSettingParam.edrAddr = aArray;                    
                     mParamSettingParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
                     mParamSettingParam.key = ByteProcess.stringToByteArray(mKeyt);
                     byte[] temp = new byte[4];

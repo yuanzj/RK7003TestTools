@@ -723,7 +723,16 @@ namespace RokyTask
                     mParamSettingParam.deviceType = 0x03;
                     mParamSettingParam.testItem = 0x7F;
                     mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
-                    mParamSettingParam.edrAddr = ByteProcess.stringToByteArrayNoColon(mBTaddr);
+
+                    byte[] aArray = new byte[6];
+                    aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
+                    mParamSettingParam.edrAddr[0] = aArray[5];//倒序
+                    mParamSettingParam.edrAddr[1] = aArray[4];
+                    mParamSettingParam.edrAddr[2] = aArray[3];
+                    mParamSettingParam.edrAddr[3] = aArray[2];
+                    mParamSettingParam.edrAddr[4] = aArray[1];
+                    mParamSettingParam.edrAddr[5] = aArray[0];
+
                     mParamSettingParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
                     mParamSettingParam.key = ByteProcess.stringToByteArray(mKeyt);
                     byte[] temp = new byte[4];

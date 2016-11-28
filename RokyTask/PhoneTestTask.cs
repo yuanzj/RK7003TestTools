@@ -429,21 +429,21 @@ namespace RokyTask
             byte mAskResult = (byte)mArgs.ack_value;//响应
             if (mAskDevice == Const.CCU)
             {
-                if (mAskResult == 0x21)//绑定成功)
+                if (mAskResult == 0x21)//确认成功
                 {
-
+                    SetMainText(sender, "请按第二把钥匙，进行确认...", "", INFO_LEVEL.PROCESS);
+                    return Task_Level.TRUE;
                 }
                 else if (mAskResult == 0x23)
                 {
-
+                    SetMainText(sender, "第一把钥匙确认失败！", "", INFO_LEVEL.FAIL);
+                    return Task_Level.FALSE;
                 }
             }
-
 
             return Task_Level.FALSE;
         }
         #endregion
-
 
         #region Key2 check确认
         private Task_Level KEY2_CHECK(object sender, get7001ResultRsp mArgs)
@@ -454,7 +454,7 @@ namespace RokyTask
             {
                 if (mAskResult == 0x21)//绑定成功)
                 {
-
+                    
                 }
                 else if (mAskResult == 0x23)
                 {
@@ -465,10 +465,6 @@ namespace RokyTask
             return Task_Level.FALSE;
         }
         #endregion
-
-
-
-
 
         #region 更新主页显示状态
         private void SetMainText(object sender, string _msg, string _submsg, INFO_LEVEL _level)

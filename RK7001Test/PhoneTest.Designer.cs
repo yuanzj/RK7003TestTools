@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panelWorkStatus = new System.Windows.Forms.Panel();
+            this.label_Tip = new System.Windows.Forms.Label();
             this.labelWorkStatus = new System.Windows.Forms.Label();
             this.textBox_SN = new System.Windows.Forms.TextBox();
             this.labelSN = new System.Windows.Forms.Label();
@@ -40,7 +41,6 @@
             this.labelItem_SN = new System.Windows.Forms.Label();
             this.labelItemKey1 = new System.Windows.Forms.Label();
             this.labelItemKey2 = new System.Windows.Forms.Label();
-            this.label_Tip = new System.Windows.Forms.Label();
             this.panelWorkStatus.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,6 +56,17 @@
             this.panelWorkStatus.Name = "panelWorkStatus";
             this.panelWorkStatus.Size = new System.Drawing.Size(739, 418);
             this.panelWorkStatus.TabIndex = 0;
+            // 
+            // label_Tip
+            // 
+            this.label_Tip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label_Tip.Font = new System.Drawing.Font("新宋体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_Tip.Location = new System.Drawing.Point(3, 241);
+            this.label_Tip.Name = "label_Tip";
+            this.label_Tip.Size = new System.Drawing.Size(733, 70);
+            this.label_Tip.TabIndex = 1;
+            this.label_Tip.Text = "请扫描SN号，进行下一次测试！";
+            this.label_Tip.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // labelWorkStatus
             // 
@@ -175,17 +186,6 @@
             this.labelItemKey2.Text = "绑定钥匙2";
             this.labelItemKey2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label_Tip
-            // 
-            this.label_Tip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_Tip.Font = new System.Drawing.Font("新宋体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label_Tip.Location = new System.Drawing.Point(3, 241);
-            this.label_Tip.Name = "label_Tip";
-            this.label_Tip.Size = new System.Drawing.Size(733, 70);
-            this.label_Tip.TabIndex = 1;
-            this.label_Tip.Text = "请扫描SN号，进行下一次测试！";
-            this.label_Tip.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // PhoneTest
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -201,7 +201,7 @@
             this.Controls.Add(this.panelWorkStatus);
             this.KeyPreview = true;
             this.Name = "PhoneTest";
-            this.Text = "RK7003整测工具V2.0.0";
+            this.Text = "RK7003整测工具V2.0.3";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.PhoneTest_Closed);
             this.Load += new System.EventHandler(this.PhoneTest_Load);

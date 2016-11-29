@@ -14,10 +14,11 @@ namespace RokyTask
     public enum BindSteps
     {
         KEYS_CLEAR = 0,
-        KEY1_BIND = 1,
-        KEY2_BIND = 2,
-        KEY1_CHECK =3,
-        KEY2_CHECK = 4,
+        KEY_PCU_INIT = 1,
+        KEY1_BIND = 2,
+        KEY2_BIND = 3,
+        KEY1_CHECK =4,
+        KEY2_CHECK = 5,
     }
 
     public class PhoneTestTask : ITaskManager
@@ -26,7 +27,6 @@ namespace RokyTask
         public int KeyNumber { get; set; }
         public bool bTaskRunning { get; set; }
         public string mSN { get; set; }
-        private int nCurrentKey { get; set; }
         private BindSteps mBindSteps;
         #endregion
 
@@ -43,16 +43,7 @@ namespace RokyTask
         getDevinfoReq mDevInfoParam;
         //CCU 绑定
         SimpleSerialPortTask<get7001Result, get7001ResultRsp> mBindKeyTask;
-        get7001Result mBindKeyParam;
-
-        SimpleSerialPortTask<get7001Result, get7001ResultRsp> mClearKeysTask;
-        get7001Result mClearKeysParam;
-        //CCU check
-        SimpleSerialPortTask<get7001Result, get7001ResultRsp> mCheckKeyTask;
-        get7001Result mCheckKeyParam;
-        //PCU Init
-        SimpleSerialPortTask<get7001Result, NullEntity> mPcuInitTask;
-        get7001Result mPcuInitParam;
+        get7001Result mBindKeyParam;       
         //同步报文
         SimpleSerialPortTask<NullEntity, pcTakeoverReq> mBroadCastTask;
         //停止同步报文
@@ -142,35 +133,8 @@ namespace RokyTask
                     }
                     else
                     {
-                        SetMainText(sender, "清空已配对钥匙...", "", INFO_LEVEL.PROCESS);
-                        mClearKeysTask.Excute();
-                    }
-                }
-                else
-                {
-                    SetMainText(sender, "未收到设备信息！", "", INFO_LEVEL.FAIL);
-                    StopTask();
-                }
-            };
-
-            //PCU进入绑定模式
-            mPcuInitTask = new SimpleSerialPortTask<get7001Result, NullEntity>();
-            mPcuInitParam = mPcuInitTask.GetRequestEntity();
-            mPcuInitTask.RetryMaxCnts = 0;
-            mPcuInitTask.Timerout = 1000;
-            mPcuInitParam.ack_device = Const.PCU;//PCU
-            mPcuInitParam.server_mode = 0x08;
-            mClearKeysTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
-            {
-                SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
-                if (mEventArgs.Data != null)
-                {
-                    byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
-                    byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
-                    if (mAskDevice == Const.PCU)
-                    {
-                        string msg = String.Format("请按第{0}把钥匙的任意键进行绑定...", nCurrentKey);
-                        SetMainText(sender, msg, "", INFO_LEVEL.PROCESS);
+                        SetValidSN(sender, INFO_LEVEL.PASS);
+                        SetMainText(sender, "清除已绑定钥匙...", "", INFO_LEVEL.PROCESS);
                         mBindKeyParam.ack_device = Const.CCU;
                         mBindKeyParam.server_mode = 0x20;//先清除钥匙
                         mBindSteps = BindSteps.KEYS_CLEAR;
@@ -183,73 +147,18 @@ namespace RokyTask
                     StopTask();
                 }
             };
-
-            mClearKeysTask = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
-            mClearKeysParam = mClearKeysTask.GetRequestEntity();
-            mClearKeysParam.ack_device = Const.CCU;
-            mClearKeysParam.server_mode = 0x20;//清空所有已配对钥匙
-            mClearKeysTask.RetryMaxCnts = 0;
-            mClearKeysTask.Timerout = 20 * 1000;
-            mClearKeysTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
-            {
-                SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
-                if (mEventArgs.Data != null)
-                {
-                    byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
-                    byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
-                    if(mAskDevice == Const.CCU && mAskResult == 0x25)
-                    {                        
-                        mPcuInitTask.Excute();                        
-                    }
-                }
-                else
-                {
-                    SetMainText(sender, "清空钥匙失败", "", INFO_LEVEL.FAIL);
-                    StopTask();
-                }
-            };
-
+           
             mBindKeyTask = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
             mBindKeyParam = mBindKeyTask.GetRequestEntity();
             mBindKeyParam.ack_device = Const.CCU;
-            mBindKeyParam.server_mode = 0x08;//绑定钥匙
+            mBindKeyParam.server_mode = 0x20;//绑定钥匙
             mBindKeyTask.RetryMaxCnts = 0;
             mBindKeyTask.Timerout = 20*1000;
             mBindKeyTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
                 if (mEventArgs.Data != null)
-                {
-                    /*
-                    byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
-                    byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
-                    if (mAskDevice == Const.CCU)
-                    {
-                        if (mAskResult == 0x21)//绑定成功
-                        {
-                            if (nCurrentKey < KeyNumber)
-                            {
-                                nCurrentKey++;//绑定下一把
-                                string msg = String.Format("请按第{0}把钥匙的任意键进行绑定...", nCurrentKey);
-                                SetMainText(sender, msg, "", INFO_LEVEL.PROCESS);
-                                mBindKeyTask.Excute();
-                            }
-                            else
-                            {
-                                //开始Check是否绑定成功
-                                nCurrentKey = 1;
-                                string msg = String.Format("请确认第{0}把钥匙是否绑定成功...", nCurrentKey);
-                                SetMainText(sender, msg, "", INFO_LEVEL.PROCESS);
-                                mCheckKeyTask.Excute();
-                            }
-                        }
-                        else if (mAskResult == 0x24)//绑定重复
-                        {
-                            SetMainText(sender, "此钥匙已绑定过，重新绑定...", "", INFO_LEVEL.PROCESS);
-                            mBindKeyTask.Excute();
-                        }
-                    }
-                    */
+                {                    
                     bool bExcuted = false;
                     Task_Level level = Task_Level.FALSE;
                     //根据绑定钥匙数量来
@@ -262,9 +171,8 @@ namespace RokyTask
                                     level = KEYS_CLEAR(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-                                        SetMainText(sender, "请按要绑定的钥匙...", "", INFO_LEVEL.PROCESS);
-                                        mBindSteps = BindSteps.KEY1_BIND;
-                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindSteps = BindSteps.KEY_PCU_INIT;
+                                        mBindKeyParam.ack_device = Const.PCU;
                                         mBindKeyParam.server_mode = 0x08;//绑定钥匙
                                     }
                                     else if (level == Task_Level.FALSE)
@@ -277,13 +185,28 @@ namespace RokyTask
                                         mBindSteps = BindSteps.KEYS_CLEAR;
                                     }
                                     break;
+                                case BindSteps.KEY_PCU_INIT:
+                                    level = KEY_PCU_INIT(sender, mEventArgs.Data);
+                                    if(level == Task_Level.TRUE)
+                                    {
+                                        SetMainText(sender, "请按要绑定的钥匙...", "", INFO_LEVEL.PROCESS);
+                                        mBindSteps = BindSteps.KEY1_BIND;
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                    }
+                                    else if(level == Task_Level.FALSE)
+                                    {
+                                        bExcuted = true;
+                                        SetMainText(sender, "PCU遥控初始化失败!", "", INFO_LEVEL.PROCESS);
+                                    }                                    
+                                    break;
                                 case BindSteps.KEY1_BIND:
                                     level = KEY1_BIND(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
                                         SetMainText(sender, "请再按一次绑定钥匙，进行确认绑定...", "", INFO_LEVEL.PROCESS);
-                                        mCheckKeyParam.ack_device = Const.CCU;
-                                        mCheckKeyParam.server_mode = 0x10;//检查钥匙
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x10;//检查钥匙
                                         mBindSteps = BindSteps.KEY1_CHECK;
                                     }
                                     else if (level == Task_Level.FALSE)
@@ -292,7 +215,7 @@ namespace RokyTask
                                     }
                                     else if (level == Task_Level.REPEAT)
                                     {
-                                        SetMainText(sender, "此钥匙已绑定，请按另一个把...", "", INFO_LEVEL.PROCESS);
+                                        SetMainText(sender, "此钥匙已绑定，请按另一个把钥匙...", "", INFO_LEVEL.PROCESS);
                                         mBindSteps = BindSteps.KEY1_BIND;
                                         mBindKeyParam.ack_device = Const.CCU;
                                         mBindKeyParam.server_mode = 0x08;//绑定钥匙
@@ -302,16 +225,15 @@ namespace RokyTask
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-
+                                        SetBindKey1(sender, INFO_LEVEL.PASS);
+                                        SetMainText(sender, "此钥匙绑定成功！", "", INFO_LEVEL.PASS);
+                                        bExcuted = true;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {
-
-                                    }
+                                        SetMainText(sender, "此钥匙绑定失败！", "", INFO_LEVEL.FAIL);
+                                        bExcuted = true;
+                                    }                                    
                                     break;
                             }
                             break;
@@ -321,14 +243,31 @@ namespace RokyTask
                                 case BindSteps.KEYS_CLEAR:
                                     level = KEYS_CLEAR(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
-                                    {
-
+                                    {                   
+                                        mBindSteps = BindSteps.KEY_PCU_INIT;
+                                        mBindKeyParam.ack_device = Const.PCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-
+                                        bExcuted = true;
+                                        SetMainText(sender, "异常操作！", "", INFO_LEVEL.FAIL);
                                     }
                                     else if (level == Task_Level.REPEAT)
+                                    {
+                                        mBindSteps = BindSteps.KEYS_CLEAR;
+                                    }
+                                    break;
+                                case BindSteps.KEY_PCU_INIT:
+                                    level = KEY_PCU_INIT(sender, mEventArgs.Data);
+                                    if (level == Task_Level.TRUE)
+                                    {
+                                        SetMainText(sender, "请按要绑定的钥匙...", "", INFO_LEVEL.PROCESS);
+                                        mBindSteps = BindSteps.KEY1_BIND;
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                    }
+                                    else if (level == Task_Level.FALSE)
                                     {
 
                                     }
@@ -337,7 +276,10 @@ namespace RokyTask
                                     level = KEY1_BIND(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-
+                                        SetMainText(sender, "请按第二把要绑定的钥匙...", "", INFO_LEVEL.PROCESS);
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                        mBindSteps = BindSteps.KEY2_BIND;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
@@ -345,128 +287,91 @@ namespace RokyTask
                                     }
                                     else if (level == Task_Level.REPEAT)
                                     {
-
+                                        SetMainText(sender, "此钥匙重复绑定，请按另一把...", "", INFO_LEVEL.PROCESS);
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                        mBindSteps = BindSteps.KEY1_BIND;
                                     }
                                     break;
                                 case BindSteps.KEY2_BIND:
                                     level = KEY2_BIND(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-
+                                        SetMainText(sender, "按任意键，进行确认绑定 第一把 钥匙...", "", INFO_LEVEL.PROCESS);
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x10;//检查钥匙
+                                        mBindSteps = BindSteps.KEY1_CHECK;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-
+                                        
                                     }
                                     else if (level == Task_Level.REPEAT)
                                     {
-
+                                        SetMainText(sender, "此钥匙重复绑定，请按另一把...", "", INFO_LEVEL.PROCESS);
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                        mBindSteps = BindSteps.KEY2_BIND;
                                     }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-
+                                        SetBindKey1(sender, INFO_LEVEL.PASS);
+                                        SetMainText(sender, "按任意键，进行确认绑定 第二把 钥匙...", "", INFO_LEVEL.PROCESS);
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x10;//检查钥匙
+                                        mBindSteps = BindSteps.KEY2_CHECK;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {
-
+                                        SetBindKey1(sender, INFO_LEVEL.FAIL);
+                                        SetMainText(sender, "此钥匙绑定确认失败！", "", INFO_LEVEL.FAIL);
+                                        bExcuted = true;
                                     }
                                     break;
                                 case BindSteps.KEY2_CHECK:
                                     level = KEY2_CHECK(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-
+                                        SetBindKey2(sender, INFO_LEVEL.PASS);
+                                        SetMainText(sender, "此钥匙绑定成功！", "", INFO_LEVEL.PASS);
+                                        bExcuted = true;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {
-
-                                    }
+                                        SetBindKey2(sender, INFO_LEVEL.FAIL);
+                                        SetMainText(sender, "此钥匙绑定确认失败！", "", INFO_LEVEL.FAIL);
+                                        bExcuted = true;
+                                    }                                    
                                     break;
                             }
                             break;
                         default:
                             bExcuted = true;
+                            SetMainText(sender, "只能绑定一把或两把钥匙！", "", INFO_LEVEL.FAIL);
                             break;
                     }
 
                     //判断
-                    if(bExcuted)
+                    if(!bExcuted)
                     {
-
+                        Thread.Sleep(500);
+                        mBindKeyTask.Excute();
                     }
                     else
                     {
-
+                        StopTask();
+                        return;
                     }
                 }
                 else
                 {
-                    SetMainText(sender, "绑定钥匙失败！", "", INFO_LEVEL.FAIL);
+                    SetMainText(sender, "未收到绑定钥匙指令或异常操作！", "", INFO_LEVEL.FAIL);
                     StopTask();
                 }
-            };
-
-            mCheckKeyTask = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
-            mCheckKeyParam = mCheckKeyTask.GetRequestEntity();
-            mCheckKeyParam.ack_device = Const.CCU;
-            mCheckKeyParam.server_mode = 0x10;//检查钥匙
-            mCheckKeyTask.RetryMaxCnts = 0;
-            mCheckKeyTask.Timerout = 20*1000;
-            mCheckKeyTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
-            {
-                SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
-                if (mEventArgs.Data != null)
-                {
-                    if (mEventArgs.Data != null)
-                    {
-                        byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
-                        byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
-                        if (mAskDevice == Const.CCU)
-                        {                           
-                            if(mAskResult == 0x21)
-                            {
-                                if (nCurrentKey < KeyNumber)
-                                {
-                                    string msg = String.Format("请确认第{0}把钥匙是否绑定成功...", nCurrentKey);
-                                    SetMainText(sender, msg, "", INFO_LEVEL.PROCESS);
-                                    SetBindKey1(sender, INFO_LEVEL.PASS);
-                                    mCheckKeyTask.Excute();
-                                }
-                                else
-                                {
-                                    SetBindKey2(sender, INFO_LEVEL.PASS);
-                                    string msg = String.Format("此设备成功绑定{0}把钥匙", KeyNumber);
-                                    SetMainText(sender, msg, "", INFO_LEVEL.PASS);
-                                }
-                            }
-                            else if(mAskResult == 0x23)
-                            {
-                                SetBindKey1(sender, INFO_LEVEL.FAIL);
-                                SetBindKey2(sender, INFO_LEVEL.FAIL);
-                                SetMainText(sender, "绑定失败！", "", INFO_LEVEL.FAIL);
-                                StopTask();
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        SetMainText(sender, "绑定钥匙失败！", "", INFO_LEVEL.FAIL);
-                        StopTask();
-                    }
-                }
-            };
+            };            
         }
         #endregion
 
@@ -482,6 +387,19 @@ namespace RokyTask
             else if(mAskDevice == Const.PCU || mAskDevice == Const.TESTSERVER)
                 return Task_Level.REPEAT;
 
+            return Task_Level.FALSE;
+        }
+        #endregion
+
+        #region PCU初始化
+        private Task_Level KEY_PCU_INIT(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
+            byte mAskResult = (byte)mArgs.ack_value;//响应
+            if(mAskDevice == Const.PCU)
+            {
+                return Task_Level.TRUE;
+            }
             return Task_Level.FALSE;
         }
         #endregion
@@ -641,16 +559,12 @@ namespace RokyTask
         {
             mGetDevInfoTask.ClearAllEvent();
             mBindKeyTask.ClearAllEvent();
-            mCheckKeyTask.ClearAllEvent();
-            mPcuInitTask.ClearAllEvent();
             mBroadCastTask.ClearAllEvent();
             mStopSyncTask.ClearAllEvent();
             mMonitorTask.ClearAllEvent();
 
             mGetDevInfoTask.EnableTimeOutHandler = false;
             mBindKeyTask.EnableTimeOutHandler = false;
-            mCheckKeyTask.EnableTimeOutHandler = false;
-            mPcuInitTask.EnableTimeOutHandler = false;
             mBroadCastTask.EnableTimeOutHandler = false;
             mStopSyncTask.EnableTimeOutHandler = false;
             mMonitorTask.EnableTimeOutHandler = false;
@@ -660,19 +574,14 @@ namespace RokyTask
         #region 初始化参数
         private void InitTask()
         {
-            nCurrentKey = 1;
+            
             mGetDevInfoTask.ClearAllEvent();
             mBindKeyTask.ClearAllEvent();
-            mCheckKeyTask.ClearAllEvent();
-            mPcuInitTask.ClearAllEvent();
             mBroadCastTask.ClearAllEvent();
             mStopSyncTask.ClearAllEvent();
             mMonitorTask.ClearAllEvent();
-
             mGetDevInfoTask.EnableTimeOutHandler = true;
             mBindKeyTask.EnableTimeOutHandler = true;
-            mCheckKeyTask.EnableTimeOutHandler = true;
-            mPcuInitTask.EnableTimeOutHandler = true;
             mBroadCastTask.EnableTimeOutHandler = true;
             mStopSyncTask.EnableTimeOutHandler = true;
             mMonitorTask.EnableTimeOutHandler = true;
@@ -682,6 +591,18 @@ namespace RokyTask
         //执行任务
         public void ExcuteTask()
         {
+            if(KeyNumber == 0)
+            {
+                SetMainText(this, "选择至少绑定一把钥匙！", "", INFO_LEVEL.FAIL);
+                return;
+            }
+            else if(KeyNumber > 2)
+            {
+                SetMainText(this, "绑定钥匙不能多于2把！", "", INFO_LEVEL.FAIL);
+                return;
+            }
+            
+
             InitTask();
             bTaskRunning = true;
             SetMainText(this, "等待设备上电中...", "", INFO_LEVEL.PROCESS);

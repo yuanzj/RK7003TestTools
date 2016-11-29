@@ -269,8 +269,16 @@ namespace RK7001Test
         {
             this.listView_Data.Items.Clear();
             SetValidSN(INFO_LEVEL.PROCESS);
-            SetBindKey1(INFO_LEVEL.PROCESS);
-            SetBindKey2(INFO_LEVEL.PROCESS);
+            if(mPhoneTask.KeyNumber == 1)
+            {
+                SetBindKey1(INFO_LEVEL.PROCESS);
+                SetBindKey2(INFO_LEVEL.GREY);
+            }
+            else if(mPhoneTask.KeyNumber == 2)
+            {
+                SetBindKey1(INFO_LEVEL.PROCESS);
+                SetBindKey2(INFO_LEVEL.PROCESS);
+            }
             mPhoneTask.mSN = this.textBox_SN.Text;
             this.textBox_SN.Enabled = false;
             mPhoneTask.ExcuteTask();

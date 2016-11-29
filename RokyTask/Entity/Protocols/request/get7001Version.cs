@@ -17,7 +17,7 @@ namespace RokyTask.Entity.Protocols.request
         [ProtocolAttribute("battCurrent", 2, 1)]
         public int battCurrent { get; set; }
 
-        [ProtocolAttribute("underVoltage", 3, 1)]
+        [ProtocolAttribute("underVoltage", 3, 2)]
         public int underVoltage { get; set; }
 
         public override int GetCommand()

@@ -51,7 +51,7 @@ namespace RokyTask
 
         public const int BT_TESTRESULT_RSP = 0XA6;
 
-        public const int PC_TAKEOVER_REQ = 0X06;
+        public const int PC_TAKEOVER_REQ = 0X12;
 
         public const int PC_TAKEOVER_RSP = 0X86;
 
@@ -59,6 +59,9 @@ namespace RokyTask
 
         public const int RESET_ECU_RSP = 0X92;
 
+        public const int GET_DEVINFO_REQ = 0X2C;
+
+        public const int GET_DEVINFO_RSP = 0XAC;
 
         public const byte TESTSERVER_KEY_PRESS = 0X01;
 
@@ -79,6 +82,8 @@ namespace RokyTask
         public const byte TESTSERVER = 0X01;
 
         public const byte PCU = 0X07;
+
+        public const byte CCU = 0X08;
 
     }
 }

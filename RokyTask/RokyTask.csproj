@@ -49,6 +49,7 @@
     <Compile Include="Entity\Protocols\ProtocolAttribute.cs" />
     <Compile Include="Entity\Protocols\request\boardTestResultReq.cs" />
     <Compile Include="Entity\Protocols\request\btTestReq.cs" />
+    <Compile Include="Entity\Protocols\request\getDevinfoReq.cs" />
     <Compile Include="Entity\Protocols\request\NullEntity.cs" />
     <Compile Include="Entity\Protocols\request\pcTakeoverReq.cs" />
     <Compile Include="Entity\Protocols\request\ResetEcuReq.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Entity\Protocols\response\get4103BroadcastRsp.cs" />
     <Compile Include="Entity\Protocols\response\get7001ResultRsp.cs" />
     <Compile Include="Entity\Protocols\response\get7001VersionRsp.cs" />
+    <Compile Include="Entity\Protocols\response\getDevinfoRsp.cs" />
     <Compile Include="Entity\Protocols\response\ParameterSettingRsp.cs" />
     <Compile Include="Entity\Protocols\response\pcTakeOverRsp.cs" />
     <Compile Include="Entity\Protocols\response\ResetEcuRsp.cs" />

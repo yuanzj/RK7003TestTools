@@ -8,14 +8,14 @@ namespace RokyTask.Entity.Protocols.response
 {
     class pcTakeOverRsp : BaseProtocolImpl<pcTakeOverRsp>
     {
-        [ProtocolAttribute("deviceType", 0, 1)]
-        public int deviceType { get; set; }
+        [ProtocolAttribute("DeviceType", 0, 1)]
+        public int DeviceType { get; set; }
 
-        [ProtocolAttribute("hardVare", 1, 1)]
-        public int hardVare { get; set; }
+        [ProtocolAttribute("HardWareID", 1, 1)]
+        public int HardWareID { get; set; }
 
-        [ProtocolAttribute("firmVer", 2, 3)]
-        public int firmVer { get; set; }
+        [ProtocolAttribute("FirmID", 2, 3)]
+        public int FirmID { get; set; }
 
         public override int GetCommand()
         {

@@ -125,7 +125,7 @@ namespace RK7001Test
         #region 整机测试
         private void PhoneTest()
         {
-            PhoneTest mForm = new PhoneTest((String)this.ccb_Port.SelectedItem);
+            KeysBinding mForm = new KeysBinding((String)this.ccb_Port.SelectedItem);
             this.Hide();
             if (mForm.ShowDialog() == DialogResult.OK)
             {

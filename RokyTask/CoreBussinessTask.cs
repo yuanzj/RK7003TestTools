@@ -23,7 +23,7 @@ namespace RokyTask
         FAIL = 3,
         PASS = 4,
         ONLY_TIP = 5,
-        GREY = 6
+        GREY = 6,
     }
 
     public enum RK7001ITEM

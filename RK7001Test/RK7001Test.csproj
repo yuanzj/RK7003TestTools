@@ -50,6 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeysBinding.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="KeysBinding.Designer.cs">
+      <DependentUpon>KeysBinding.cs</DependentUpon>
+    </Compile>
     <Compile Include="PhoneTest.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,6 +79,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="KeysBinding.resx">
+      <DependentUpon>KeysBinding.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="PhoneTest.resx">
       <DependentUpon>PhoneTest.cs</DependentUpon>
     </EmbeddedResource>
@@ -126,6 +135,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="logo_form.ico" />
+    <None Include="res\Shape.png" />
+    <None Include="res\OK.png" />
+    <None Include="res\ic_loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -89,7 +89,7 @@ namespace RK7001Test
                         return;
                 }
                 SetMainTextCallback d = new SetMainTextCallback(SetMainText);
-                this.labelWorkStatus.Invoke(d, new object[] { msg, submsg, level });
+                this.labelWorkStatus.Invoke(d, new object[] { msg, level });
             }
             else
             {
@@ -99,17 +99,20 @@ namespace RK7001Test
                     case INFO_LEVEL.INIT:
                         this.panelWorkStatus.BackColor = Color.LightBlue;
                         this.label_Tip.Text = "";
+                        this.textBox_SN.Enabled = true;
+                        this.textBox_SN.Text = "";
+                        this.textBox_SN.Focus();
                         break;
                     case INFO_LEVEL.PASS:
                         this.panelWorkStatus.BackColor = Color.Green;
-                        this.label_Tip.Text = "再次扫描,进行下一次测试!";
+                        this.label_Tip.Text = "再次扫描,进行下次测试!";
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
                         this.textBox_SN.Focus();
                         break;
                     case INFO_LEVEL.FAIL:
                         this.panelWorkStatus.BackColor = Color.Red;
-                        this.label_Tip.Text = "再次扫描,进行下一次测试!";
+                        this.label_Tip.Text = "再次扫描,进行下次测试!";
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
                         this.textBox_SN.Focus();

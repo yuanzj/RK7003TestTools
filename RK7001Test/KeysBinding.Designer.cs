@@ -87,7 +87,7 @@
             this.label_MainResult.Font = new System.Drawing.Font("宋体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label_MainResult.Location = new System.Drawing.Point(3, 63);
             this.label_MainResult.Name = "label_MainResult";
-            this.label_MainResult.Size = new System.Drawing.Size(456, 142);
+            this.label_MainResult.Size = new System.Drawing.Size(406, 127);
             this.label_MainResult.TabIndex = 4;
             this.label_MainResult.Text = "成功";
             this.label_MainResult.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -104,10 +104,12 @@
             // 
             // textBox_SN
             // 
+            this.textBox_SN.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textBox_SN.Font = new System.Drawing.Font("宋体", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.textBox_SN.Location = new System.Drawing.Point(167, 704);
+            this.textBox_SN.MaxLength = 10;
             this.textBox_SN.Name = "textBox_SN";
-            this.textBox_SN.Size = new System.Drawing.Size(468, 62);
+            this.textBox_SN.Size = new System.Drawing.Size(510, 62);
             this.textBox_SN.TabIndex = 7;
             // 
             // listView_Data
@@ -122,7 +124,7 @@
             this.listView_Data.GridLines = true;
             this.listView_Data.Location = new System.Drawing.Point(6, 508);
             this.listView_Data.Name = "listView_Data";
-            this.listView_Data.Size = new System.Drawing.Size(629, 190);
+            this.listView_Data.Size = new System.Drawing.Size(671, 190);
             this.listView_Data.TabIndex = 8;
             this.listView_Data.UseCompatibleStateImageBehavior = false;
             this.listView_Data.View = System.Windows.Forms.View.Details;
@@ -145,7 +147,7 @@
             // label9
             // 
             this.label9.Font = new System.Drawing.Font("微软雅黑", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label9.Location = new System.Drawing.Point(643, 315);
+            this.label9.Location = new System.Drawing.Point(683, 308);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(100, 44);
             this.label9.TabIndex = 10;
@@ -154,7 +156,7 @@
             // label10
             // 
             this.label10.Font = new System.Drawing.Font("微软雅黑", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label10.Location = new System.Drawing.Point(643, 377);
+            this.label10.Location = new System.Drawing.Point(683, 376);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(100, 44);
             this.label10.TabIndex = 11;
@@ -163,7 +165,7 @@
             // label11
             // 
             this.label11.Font = new System.Drawing.Font("微软雅黑", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label11.Location = new System.Drawing.Point(643, 437);
+            this.label11.Location = new System.Drawing.Point(683, 440);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(100, 44);
             this.label11.TabIndex = 12;
@@ -179,13 +181,13 @@
             this.panel_SN.Controls.Add(this.label2);
             this.panel_SN.Location = new System.Drawing.Point(6, 49);
             this.panel_SN.Name = "panel_SN";
-            this.panel_SN.Size = new System.Drawing.Size(629, 70);
+            this.panel_SN.Size = new System.Drawing.Size(676, 70);
             this.panel_SN.TabIndex = 13;
             // 
             // pictureBox_SN
             // 
             this.pictureBox_SN.Image = global::RK7001Test.Properties.Resources.ic_loading;
-            this.pictureBox_SN.Location = new System.Drawing.Point(543, 5);
+            this.pictureBox_SN.Location = new System.Drawing.Point(591, 5);
             this.pictureBox_SN.Name = "pictureBox_SN";
             this.pictureBox_SN.Size = new System.Drawing.Size(78, 58);
             this.pictureBox_SN.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -214,7 +216,7 @@
             this.panel_BindKey1.Controls.Add(this.label3);
             this.panel_BindKey1.Location = new System.Drawing.Point(5, 202);
             this.panel_BindKey1.Name = "panel_BindKey1";
-            this.panel_BindKey1.Size = new System.Drawing.Size(630, 70);
+            this.panel_BindKey1.Size = new System.Drawing.Size(677, 70);
             this.panel_BindKey1.TabIndex = 14;
             // 
             // label_Key1Value
@@ -231,7 +233,7 @@
             // pictureBox_BindKey1
             // 
             this.pictureBox_BindKey1.Image = global::RK7001Test.Properties.Resources.OK;
-            this.pictureBox_BindKey1.Location = new System.Drawing.Point(545, 3);
+            this.pictureBox_BindKey1.Location = new System.Drawing.Point(592, 3);
             this.pictureBox_BindKey1.Name = "pictureBox_BindKey1";
             this.pictureBox_BindKey1.Size = new System.Drawing.Size(78, 58);
             this.pictureBox_BindKey1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -260,7 +262,7 @@
             this.panel_CheckKey1.Controls.Add(this.label4);
             this.panel_CheckKey1.Location = new System.Drawing.Point(5, 355);
             this.panel_CheckKey1.Name = "panel_CheckKey1";
-            this.panel_CheckKey1.Size = new System.Drawing.Size(630, 70);
+            this.panel_CheckKey1.Size = new System.Drawing.Size(677, 70);
             this.panel_CheckKey1.TabIndex = 15;
             // 
             // label_Key1Check
@@ -277,7 +279,7 @@
             // pictureBox_CheckKey1
             // 
             this.pictureBox_CheckKey1.Image = global::RK7001Test.Properties.Resources.Shape;
-            this.pictureBox_CheckKey1.Location = new System.Drawing.Point(544, 6);
+            this.pictureBox_CheckKey1.Location = new System.Drawing.Point(592, 6);
             this.pictureBox_CheckKey1.Name = "pictureBox_CheckKey1";
             this.pictureBox_CheckKey1.Size = new System.Drawing.Size(78, 57);
             this.pictureBox_CheckKey1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -306,7 +308,7 @@
             this.panel_BindKey2.Controls.Add(this.label7);
             this.panel_BindKey2.Location = new System.Drawing.Point(5, 278);
             this.panel_BindKey2.Name = "panel_BindKey2";
-            this.panel_BindKey2.Size = new System.Drawing.Size(630, 70);
+            this.panel_BindKey2.Size = new System.Drawing.Size(677, 70);
             this.panel_BindKey2.TabIndex = 16;
             // 
             // label_Key2Value
@@ -323,7 +325,7 @@
             // pictureBox_BindKey2
             // 
             this.pictureBox_BindKey2.Image = global::RK7001Test.Properties.Resources.ic_loading;
-            this.pictureBox_BindKey2.Location = new System.Drawing.Point(545, 7);
+            this.pictureBox_BindKey2.Location = new System.Drawing.Point(592, 4);
             this.pictureBox_BindKey2.Name = "pictureBox_BindKey2";
             this.pictureBox_BindKey2.Size = new System.Drawing.Size(78, 59);
             this.pictureBox_BindKey2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -350,16 +352,16 @@
             this.panel_CheckKey2.Controls.Add(this.label_Key2Check);
             this.panel_CheckKey2.Controls.Add(this.pictureBox_CheckKey2);
             this.panel_CheckKey2.Controls.Add(this.label8);
-            this.panel_CheckKey2.Location = new System.Drawing.Point(6, 432);
+            this.panel_CheckKey2.Location = new System.Drawing.Point(5, 434);
             this.panel_CheckKey2.Name = "panel_CheckKey2";
-            this.panel_CheckKey2.Size = new System.Drawing.Size(629, 70);
+            this.panel_CheckKey2.Size = new System.Drawing.Size(677, 70);
             this.panel_CheckKey2.TabIndex = 17;
             // 
             // label_Key2Check
             // 
             this.label_Key2Check.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label_Key2Check.ForeColor = System.Drawing.SystemColors.AppWorkspace;
-            this.label_Key2Check.Location = new System.Drawing.Point(406, 25);
+            this.label_Key2Check.Location = new System.Drawing.Point(407, 25);
             this.label_Key2Check.Name = "label_Key2Check";
             this.label_Key2Check.Size = new System.Drawing.Size(117, 23);
             this.label_Key2Check.TabIndex = 5;
@@ -369,7 +371,7 @@
             // pictureBox_CheckKey2
             // 
             this.pictureBox_CheckKey2.Image = global::RK7001Test.Properties.Resources.OK;
-            this.pictureBox_CheckKey2.Location = new System.Drawing.Point(543, 5);
+            this.pictureBox_CheckKey2.Location = new System.Drawing.Point(592, 3);
             this.pictureBox_CheckKey2.Name = "pictureBox_CheckKey2";
             this.pictureBox_CheckKey2.Size = new System.Drawing.Size(78, 58);
             this.pictureBox_CheckKey2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -392,16 +394,16 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(5, 13);
+            this.label1.Location = new System.Drawing.Point(5, 10);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(630, 24);
+            this.label1.Size = new System.Drawing.Size(669, 24);
             this.label1.TabIndex = 18;
-            this.label1.Text = "--------------------执行步骤--------------------";
+            this.label1.Text = "-----------------------执行步骤--------------------";
             // 
             // label12
             // 
             this.label12.Font = new System.Drawing.Font("微软雅黑", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label12.Location = new System.Drawing.Point(643, 502);
+            this.label12.Location = new System.Drawing.Point(683, 502);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(142, 44);
             this.label12.TabIndex = 19;
@@ -412,17 +414,17 @@
             this.panel_MainResult.BackColor = System.Drawing.Color.Green;
             this.panel_MainResult.Controls.Add(this.label_MainTip);
             this.panel_MainResult.Controls.Add(this.label_MainResult);
-            this.panel_MainResult.Location = new System.Drawing.Point(638, 13);
+            this.panel_MainResult.Location = new System.Drawing.Point(683, 12);
             this.panel_MainResult.Name = "panel_MainResult";
-            this.panel_MainResult.Size = new System.Drawing.Size(462, 280);
+            this.panel_MainResult.Size = new System.Drawing.Size(417, 281);
             this.panel_MainResult.TabIndex = 21;
             // 
             // label_MainTip
             // 
             this.label_MainTip.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label_MainTip.Location = new System.Drawing.Point(3, 210);
+            this.label_MainTip.Location = new System.Drawing.Point(3, 190);
             this.label_MainTip.Name = "label_MainTip";
-            this.label_MainTip.Size = new System.Drawing.Size(449, 61);
+            this.label_MainTip.Size = new System.Drawing.Size(406, 46);
             this.label_MainTip.TabIndex = 5;
             this.label_MainTip.Text = "再次扫描,进行下次测试!";
             this.label_MainTip.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -431,7 +433,7 @@
             // 
             this.label_TimeCount.Font = new System.Drawing.Font("宋体", 21.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label_TimeCount.ForeColor = System.Drawing.Color.Maroon;
-            this.label_TimeCount.Location = new System.Drawing.Point(788, 505);
+            this.label_TimeCount.Location = new System.Drawing.Point(835, 505);
             this.label_TimeCount.Name = "label_TimeCount";
             this.label_TimeCount.Size = new System.Drawing.Size(69, 35);
             this.label_TimeCount.TabIndex = 22;
@@ -441,7 +443,7 @@
             // 
             this.label13.AutoSize = true;
             this.label13.Font = new System.Drawing.Font("新宋体", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label13.Location = new System.Drawing.Point(854, 508);
+            this.label13.Location = new System.Drawing.Point(910, 508);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(44, 29);
             this.label13.TabIndex = 23;
@@ -457,13 +459,13 @@
             this.panel_ClearSN.Controls.Add(this.label5);
             this.panel_ClearSN.Location = new System.Drawing.Point(5, 125);
             this.panel_ClearSN.Name = "panel_ClearSN";
-            this.panel_ClearSN.Size = new System.Drawing.Size(629, 70);
+            this.panel_ClearSN.Size = new System.Drawing.Size(677, 70);
             this.panel_ClearSN.TabIndex = 14;
             // 
             // pictureBox_ClearKey
             // 
             this.pictureBox_ClearKey.Image = global::RK7001Test.Properties.Resources.ic_loading;
-            this.pictureBox_ClearKey.Location = new System.Drawing.Point(544, 5);
+            this.pictureBox_ClearKey.Location = new System.Drawing.Point(592, 5);
             this.pictureBox_ClearKey.Name = "pictureBox_ClearKey";
             this.pictureBox_ClearKey.Size = new System.Drawing.Size(78, 58);
             this.pictureBox_ClearKey.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -507,7 +509,7 @@
             this.MaximizeBox = false;
             this.Name = "KeysBinding";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "KeysBinding";
+            this.Text = "RK7003整测工具V2.0.4";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.KeyBindForm_Closed);
             this.Load += new System.EventHandler(this.KeyBindForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyBindForm_Start);

@@ -51,7 +51,7 @@ namespace RokyTask
     public class KeyValueArgs : EventArgs
     {
         public KeyType type { get; set; }
-        public string value { get; set; }
+        public int value { get; set; }
     }
 
     public class KeyManager
@@ -69,9 +69,7 @@ namespace RokyTask
         public bool bTaskRunning { get; set; }
         public string mSN { get; set; }
         private BindSteps mBindSteps;
-        private int nKey1Value { get; set; }
-        private int nKey2Value { get; set; }
-        KeyManager mKeyManager;
+        private int mKey1Value { get; set; }
         #endregion
 
         #region 注册事件
@@ -99,12 +97,14 @@ namespace RokyTask
         pcTakeOverRsp mStopSyncParam;
         //监控报文
         SimpleSerialPortTask<NullEntity, pcTakeoverReq> mMonitorTask;
+        //恢复同步报文
+        SimpleSerialPortTask<ResetEcuReq, NullEntity> mRecoverTask;
+        ResetEcuReq mRecoverParam;
         #endregion
 
         #region 构造函数
         public PhoneTestTask()
         {
-            mKeyManager = new KeyManager();
             TaskBuilder();
         }
         #endregion
@@ -112,7 +112,15 @@ namespace RokyTask
         #region 构造任务
         private void TaskBuilder()
         {
-            
+            //回复同步
+            mRecoverTask = new SimpleSerialPortTask<ResetEcuReq, NullEntity>();
+            mRecoverParam = mRecoverTask.GetRequestEntity();
+            mRecoverTask.RetryMaxCnts = 1;
+            mRecoverTask.Timerout = 1000;
+            mRecoverParam.deviceType = 0XF1;
+            mRecoverParam.cmdCode = 0x02;
+            mRecoverParam.param1 = 0;
+            mRecoverParam.param2 = 0;
             //等待同步报文
             //监听0x06
             mBroadCastTask = new SimpleSerialPortTask<NullEntity, pcTakeoverReq>();
@@ -177,6 +185,8 @@ namespace RokyTask
                     string devSN = ByteProcess.byteArrayToString(mEventArgs.Data.devSN);
                     if (mSN != devSN)
                     {
+                        string temp = String.Format("设备读取的SN号：{0}", devSN);
+                        SetListView(sender, "标签和设备SN号不匹配", temp);
                         SetMainText(sender, STEP_LEVEL.FAIL);
                         SetValidSN(sender, INFO_LEVEL.FAIL);
                         StopTask();
@@ -192,6 +202,7 @@ namespace RokyTask
                 }
                 else
                 {
+                    SetListView(sender, "未收到读取设备信息", "设备未上电或通讯有异常");
                     SetMainText(sender,  STEP_LEVEL.FAIL);
                     StopTask();
                 }
@@ -246,7 +257,8 @@ namespace RokyTask
                                     }
                                     else if(level == Task_Level.FALSE)
                                     {
-                                        bExcuted = true;                                        
+                                        bExcuted = true;
+                                        SetMainText(sender, STEP_LEVEL.FAIL);                                      
                                     }                                    
                                     break;
                                 case BindSteps.KEY1_BIND:
@@ -256,29 +268,30 @@ namespace RokyTask
                                         mBindKeyParam.ack_device = Const.CCU;
                                         mBindKeyParam.server_mode = 0x10;//检查
                                         mBindSteps = BindSteps.KEY1_CHECK;
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-
-                                    }
+                                    }                                    
                                     else if (level == Task_Level.REPEAT)
                                     {              
-                                        mBindSteps = BindSteps.KEY1_BIND;
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
+                                        mBindSteps = BindSteps.KEY1_BIND;                                        
                                     }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-                                        SetBindKey1(sender, INFO_LEVEL.PASS);                                      
+                                        SetMainText(sender, STEP_LEVEL.PASS);                                   
                                         bExcuted = true;
                                     }
                                     else if (level == Task_Level.FALSE)
-                                    {                                     
+                                    {
+                                        SetMainText(sender, STEP_LEVEL.FAIL);                 
                                         bExcuted = true;
-                                    }                                    
+                                    }  
+                                    else if(level == Task_Level.REPEAT)
+                                    {
+                                        mBindKeyParam.ack_device = Const.CCU;
+                                        mBindKeyParam.server_mode = 0x10;//检查
+                                        mBindSteps = BindSteps.KEY1_CHECK;
+                                    }                                  
                                     break;
                             }
                             break;
@@ -296,6 +309,7 @@ namespace RokyTask
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
+                                        SetMainText(sender, STEP_LEVEL.FAIL);
                                         bExcuted = true;                                       
                                     }
                                     else if (level == Task_Level.REPEAT)
@@ -325,14 +339,8 @@ namespace RokyTask
                                         mBindKeyParam.server_mode = 0x08;//绑定钥匙
                                         mBindSteps = BindSteps.KEY2_BIND;
                                     }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-
-                                    }
                                     else if (level == Task_Level.REPEAT)
                                     {                  
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
                                         mBindSteps = BindSteps.KEY1_BIND;
                                     }
                                     break;
@@ -345,46 +353,45 @@ namespace RokyTask
                                         mBindKeyParam.server_mode = 0x10;//检查钥匙
                                         mBindSteps = BindSteps.KEY1_CHECK;
                                     }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        
-                                    }
                                     else if (level == Task_Level.REPEAT)
                                     {                
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
                                         mBindSteps = BindSteps.KEY2_BIND;
                                     }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
-                                    {
-                                        SetBindKey1(sender, INFO_LEVEL.PASS);              
+                                    {            
                                         mBindKeyParam.ack_device = Const.CCU;
                                         mBindKeyParam.server_mode = 0x10;//检查钥匙
                                         mBindSteps = BindSteps.KEY2_CHECK;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-                                        SetBindKey1(sender, INFO_LEVEL.FAIL);
+                                        SetMainText(sender, STEP_LEVEL.FAIL);                  
                                         bExcuted = true;
+                                    }
+                                    else if(level == Task_Level.REPEAT)
+                                    {
+                                        mBindSteps = BindSteps.KEY1_CHECK;
                                     }
                                     break;
                                 case BindSteps.KEY2_CHECK:
                                     level = KEY2_CHECK(sender, mEventArgs.Data);
                                     if (level == Task_Level.TRUE)
                                     {
-                                        SetBindKey2(sender, INFO_LEVEL.PASS);
                                         SetMainText(sender, STEP_LEVEL.PASS);
                                         bExcuted = true;
                                     }
                                     else if (level == Task_Level.FALSE)
                                     {
-                                        SetBindKey2(sender, INFO_LEVEL.FAIL);
                                         SetMainText(sender, STEP_LEVEL.FAIL);
                                         bExcuted = true;
-                                    }                                    
+                                    } 
+                                    else if(level == Task_Level.REPEAT)
+                                    {
+                                        mBindSteps = BindSteps.KEY2_CHECK;
+                                    }                                   
                                     break;
                             }
                             break;
@@ -401,12 +408,14 @@ namespace RokyTask
                     }
                     else
                     {
+                        mRecoverTask.Excute();
                         StopTask();
                         return;
                     }
                 }
                 else
                 {
+                    SetListView(sender, "未收到钥匙的绑定和检查的响应", "设备未上电或通讯有异常");
                     SetMainText(sender, STEP_LEVEL.FAIL);
                     StopTask();
                 }
@@ -453,12 +462,16 @@ namespace RokyTask
             byte mAddr_3 = (byte)mArgs.ShortError_1;
             byte mAddr_4 = (byte)mArgs.ShortError_2;
 
-            mKeyManager.Key1Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-
             if (mAskDevice == Const.CCU)
             {
+                int key1Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
+                SetKeyValue(sender, KeyType.BIND_KEY1, key1Value);
+                if (key1Value == 0)
+                    return Task_Level.REPEAT;
+
                 if (mAskResult == 0x21)//绑定成功)
-                {
+                {                
+                    SetBindKey1(sender, INFO_LEVEL.PASS);
                     return Task_Level.TRUE;
                 }
                 else if(mAskResult == 0x24)
@@ -481,12 +494,15 @@ namespace RokyTask
             byte mAddr_3 = (byte)mArgs.ShortError_1;
             byte mAddr_4 = (byte)mArgs.ShortError_2;
 
-            mKeyManager.Key2Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-
             if (mAskDevice == Const.CCU)
             {
-                if(mAskResult == 0x21)
-                {
+                int key2Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
+                SetKeyValue(sender, KeyType.BIND_KEY2, key2Value);
+                if (key2Value == 0)
+                    return Task_Level.REPEAT;
+                if (mAskResult == 0x21)
+                {             
+                    SetBindKey2(sender, INFO_LEVEL.PASS);
                     return Task_Level.TRUE;
                 }
                 else if(mAskResult == 0x24)
@@ -499,7 +515,7 @@ namespace RokyTask
         }
         #endregion
 
-        private void SetKeyValue(object sender, KeyType type, string value)
+        private void SetKeyValue(object sender, KeyType type, int value)
         {
             if(KeyValueHandler != null)
             {
@@ -520,29 +536,24 @@ namespace RokyTask
             byte mAddr_3 = (byte)mArgs.ShortError_1;
             byte mAddr_4 = (byte)mArgs.ShortError_2;
 
-            int keyValue = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-
             if (mAskDevice == Const.CCU)
             {
-                if (mKeyManager.Key1Value == keyValue)//如果确认的是第一把钥匙
-                {
-                    mKeyManager.Key1Flag = true;
-                }
-
-
+                int keyValue = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
+                SetKeyValue(sender, KeyType.CHECK_KEY1, keyValue);
                 if (mAskResult == 0x21)//确认成功
                 {
-                    
-
+                    mKey1Value = keyValue;
+                    SetChkKey1(sender, INFO_LEVEL.PASS);
                     return Task_Level.TRUE;
                 }
                 else if (mAskResult == 0x23)
                 {
+                    SetChkKey1(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
             }
 
-            return Task_Level.FALSE;
+            return Task_Level.REPEAT;
         }
         #endregion
 
@@ -556,21 +567,26 @@ namespace RokyTask
             byte mAddr_3 = (byte)mArgs.ShortError_1;
             byte mAddr_4 = (byte)mArgs.ShortError_2;
 
-            int keyValue = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-
             if (mAskDevice == Const.CCU)
             {
+                int keyValue = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
+                SetKeyValue(sender, KeyType.CHECK_KEY2, keyValue);
                 if (mAskResult == 0x21)//绑定成功
-                {
+                {                    
+                    if (keyValue == mKey1Value)
+                        return Task_Level.REPEAT;
+
+                    SetChkKey2(sender, INFO_LEVEL.PASS);
                     return Task_Level.TRUE;
                 }
                 else if (mAskResult == 0x23)//绑定失败
                 {
+                    SetChkKey2(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
             }
 
-            return Task_Level.FALSE;
+            return Task_Level.REPEAT;
         }
         #endregion
 
@@ -682,29 +698,32 @@ namespace RokyTask
             mBroadCastTask.ClearAllEvent();
             mStopSyncTask.ClearAllEvent();
             mMonitorTask.ClearAllEvent();
+            mRecoverTask.ClearAllEvent();
 
             mGetDevInfoTask.EnableTimeOutHandler = false;
             mBindKeyTask.EnableTimeOutHandler = false;
             mBroadCastTask.EnableTimeOutHandler = false;
             mStopSyncTask.EnableTimeOutHandler = false;
             mMonitorTask.EnableTimeOutHandler = false;
+            mRecoverTask.EnableTimeOutHandler = false;
         }
         #endregion
 
         #region 初始化参数
         private void InitTask()
         {
-            mKeyManager = new KeyManager();
             mGetDevInfoTask.ClearAllEvent();
             mBindKeyTask.ClearAllEvent();
             mBroadCastTask.ClearAllEvent();
             mStopSyncTask.ClearAllEvent();
             mMonitorTask.ClearAllEvent();
+            mRecoverTask.ClearAllEvent();
             mGetDevInfoTask.EnableTimeOutHandler = true;
             mBindKeyTask.EnableTimeOutHandler = true;
             mBroadCastTask.EnableTimeOutHandler = true;
             mStopSyncTask.EnableTimeOutHandler = true;
             mMonitorTask.EnableTimeOutHandler = true;
+            mRecoverTask.EnableTimeOutHandler = true;
         }
         #endregion
 

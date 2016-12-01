@@ -135,7 +135,7 @@ namespace RK7001Test
             SetBindKey2(INFO_LEVEL.INIT);
             SetCheckKey2(INFO_LEVEL.INIT);
             SetClearKey(INFO_LEVEL.INIT);
-            SetKeyValue(KeyType.NONE_KEY, "");
+            SetKeyValue(KeyType.NONE_KEY, 0);
         }
         #endregion
 
@@ -180,17 +180,17 @@ namespace RK7001Test
                     case STEP_LEVEL.CHECK_SN:
                         this.panel_MainResult.BackColor = Color.Yellow;
                         this.label_MainResult.Text = "SN号检查...";
-                        this.label_MainResult.Text = "";
+                        this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.BIND_KEY:
                         this.panel_MainResult.BackColor = Color.Yellow;
                         this.label_MainResult.Text = "绑定钥匙中...";
-                        this.label_MainResult.Text = "";
+                        this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.CHECK_KEY:
                         this.panel_MainResult.BackColor = Color.Yellow;
                         this.label_MainResult.Text = "检查钥匙中...";
-                        this.label_MainResult.Text = "";
+                        this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.FAIL:
                         this.TestTimeTicker.Enabled = false;
@@ -229,7 +229,6 @@ namespace RK7001Test
             }
         }
         #endregion
-
 
         #region SN号合法性
         delegate void SetValidSNCallback(INFO_LEVEL level);
@@ -321,7 +320,7 @@ namespace RK7001Test
                     if (this.pictureBox_CheckKey1.Disposing || this.pictureBox_CheckKey1.IsDisposed)
                         return;
                 }
-                SetBindKey2Callback d = new SetBindKey2Callback(SetBindKey2);
+                SetCheckKey1Callback d = new SetCheckKey1Callback(SetCheckKey1);
                 this.pictureBox_CheckKey1.Invoke(d, new object[] { level });
             }
             else
@@ -399,7 +398,7 @@ namespace RK7001Test
                     if (this.pictureBox_CheckKey2.Disposing || this.pictureBox_CheckKey2.IsDisposed)
                         return;
                 }
-                SetBindKey2Callback d = new SetBindKey2Callback(SetBindKey2);
+                SetCheckKey2Callback d = new SetCheckKey2Callback(SetCheckKey2);
                 this.pictureBox_CheckKey2.Invoke(d, new object[] { level });
             }
             else
@@ -496,8 +495,8 @@ namespace RK7001Test
         #endregion
 
         #region 钥匙地址码
-        delegate void SetKeyValueCallback(KeyType type, string msg);
-        private void SetKeyValue(KeyType type, string msg)
+        delegate void SetKeyValueCallback(KeyType type, int msg);
+        private void SetKeyValue(KeyType type, int msg)
         {
             if (this.label_Key1Value.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
             {
@@ -521,21 +520,23 @@ namespace RK7001Test
                         this.label_Key2Check.Text = "";
                         break;
                     case KeyType.BIND_KEY1:
-                        this.label_Key1Value.Text = msg;
+                        this.label_Key1Value.Text = msg.ToString();
                         break;
                     case KeyType.BIND_KEY2:
-                        this.label_Key2Value.Text = msg;
+                        this.label_Key2Value.Text = msg.ToString();
                         break;
                     case KeyType.CHECK_KEY1:
-                        this.label_Key1Check.Text = msg;
+                        this.label_Key1Check.Text = msg.ToString();
                         break;
                     case KeyType.CHECK_KEY2:
-                        this.label_Key2Check.Text = msg;
+                        this.label_Key2Check.Text = msg.ToString();
                         break;
                 }
             }
         }
         #endregion
+
+
 
         #region 执行任务
         private void StartTask()
@@ -562,7 +563,7 @@ namespace RK7001Test
                 SetCheckKey2(INFO_LEVEL.PROCESS);
             }
 
-            SetKeyValue(KeyType.NONE_KEY, "");
+            SetKeyValue(KeyType.NONE_KEY, 0);
             mPhoneTask.mSN = this.textBox_SN.Text;
             this.textBox_SN.Enabled = false;
             this.TestTimeTicker.Enabled = true;

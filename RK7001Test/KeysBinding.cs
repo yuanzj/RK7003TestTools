@@ -127,6 +127,19 @@ namespace RK7001Test
             {
                 MessageBox.Show("绑定钥匙至少1把，最多2把！");
             }
+            else
+            {
+                if(mPhoneTask.KeyNumber == 1)
+                {
+                    this.panel_BindKey2.Visible = false;
+                    this.panel_CheckKey2.Visible = false;
+                }
+                else if(mPhoneTask.KeyNumber == 2)
+                {
+                    this.panel_BindKey2.Visible = true;
+                    this.panel_CheckKey2.Visible = true;
+                }
+            }
 
             SetMainText(STEP_LEVEL.NONE);
             SetValidSN(INFO_LEVEL.INIT);
@@ -161,7 +174,7 @@ namespace RK7001Test
                     case STEP_LEVEL.NONE:
                         this.panel_MainResult.BackColor = Color.LightBlue;
                         this.label_MainTip.Text = "扫描设备,进行测试";
-                        this.label_MainResult.Text = "开始";
+                        this.label_MainResult.Text = "开  始  测  试";
                         break;
                     case STEP_LEVEL.WAIT_POWER:
                         this.panel_MainResult.BackColor = Color.Yellow;
@@ -171,7 +184,7 @@ namespace RK7001Test
                     case STEP_LEVEL.PASS:
                         this.TestTimeTicker.Enabled = false;
                         this.panel_MainResult.BackColor = Color.Green;
-                        this.label_MainResult.Text = "成功";
+                        this.label_MainResult.Text = String.Format("{0}\n成  功", mPhoneTask.mSN);
                         this.label_MainTip.Text = "再次扫描,进行下一次测试!";
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
@@ -182,20 +195,20 @@ namespace RK7001Test
                         this.label_MainResult.Text = "SN号检查...";
                         this.label_MainTip.Text = "";
                         break;
-                    case STEP_LEVEL.BIND_KEY:
+                    case STEP_LEVEL.BIND_KEY1:
                         this.panel_MainResult.BackColor = Color.Yellow;
-                        this.label_MainResult.Text = "绑定钥匙中...";
+                        this.label_MainResult.Text = "绑定第一把钥匙...";
                         this.label_MainTip.Text = "";
                         break;
-                    case STEP_LEVEL.CHECK_KEY:
+                    case STEP_LEVEL.BIND_KEY2:
                         this.panel_MainResult.BackColor = Color.Yellow;
-                        this.label_MainResult.Text = "检查钥匙中...";
+                        this.label_MainResult.Text = "绑定第二把钥匙...";
                         this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.FAIL:
                         this.TestTimeTicker.Enabled = false;
                         this.panel_MainResult.BackColor = Color.Red;
-                        this.label_MainResult.Text = "失败";
+                        this.label_MainResult.Text = String.Format("{0}\n失  败", mPhoneTask.mSN);
                         this.label_MainTip.Text = "再次扫描,进行下一次测试!";
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
@@ -381,6 +394,7 @@ namespace RK7001Test
                         this.pictureBox_BindKey2.Visible = true;
                         this.pictureBox_BindKey2.Image = global::RK7001Test.Properties.Resources.ic_loading;
                         break;
+
                 }
             }
         }
@@ -419,7 +433,7 @@ namespace RK7001Test
                     case INFO_LEVEL.PROCESS:
                         this.pictureBox_CheckKey2.Visible = true;
                         this.pictureBox_CheckKey2.Image = global::RK7001Test.Properties.Resources.ic_loading;
-                        break;
+                        break;                   
                 }
             }
         }

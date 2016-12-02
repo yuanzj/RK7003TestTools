@@ -153,7 +153,7 @@
             this.panel_SN.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel_SN.Controls.Add(this.pictureBox_SN);
             this.panel_SN.Controls.Add(this.label2);
-            this.panel_SN.Location = new System.Drawing.Point(603, 36);
+            this.panel_SN.Location = new System.Drawing.Point(603, 42);
             this.panel_SN.Name = "panel_SN";
             this.panel_SN.Size = new System.Drawing.Size(501, 70);
             this.panel_SN.TabIndex = 13;
@@ -188,7 +188,7 @@
             this.panel_BindKey1.Controls.Add(this.label_Key1Value);
             this.panel_BindKey1.Controls.Add(this.pictureBox_BindKey1);
             this.panel_BindKey1.Controls.Add(this.label3);
-            this.panel_BindKey1.Location = new System.Drawing.Point(603, 194);
+            this.panel_BindKey1.Location = new System.Drawing.Point(603, 210);
             this.panel_BindKey1.Name = "panel_BindKey1";
             this.panel_BindKey1.Size = new System.Drawing.Size(501, 70);
             this.panel_BindKey1.TabIndex = 14;
@@ -234,7 +234,7 @@
             this.panel_CheckKey1.Controls.Add(this.label_Key1Check);
             this.panel_CheckKey1.Controls.Add(this.pictureBox_CheckKey1);
             this.panel_CheckKey1.Controls.Add(this.label4);
-            this.panel_CheckKey1.Location = new System.Drawing.Point(603, 273);
+            this.panel_CheckKey1.Location = new System.Drawing.Point(603, 295);
             this.panel_CheckKey1.Name = "panel_CheckKey1";
             this.panel_CheckKey1.Size = new System.Drawing.Size(501, 70);
             this.panel_CheckKey1.TabIndex = 15;
@@ -279,7 +279,7 @@
             this.panel_BindKey2.Controls.Add(this.label_Key2Value);
             this.panel_BindKey2.Controls.Add(this.pictureBox_BindKey2);
             this.panel_BindKey2.Controls.Add(this.label7);
-            this.panel_BindKey2.Location = new System.Drawing.Point(603, 353);
+            this.panel_BindKey2.Location = new System.Drawing.Point(603, 379);
             this.panel_BindKey2.Name = "panel_BindKey2";
             this.panel_BindKey2.Size = new System.Drawing.Size(501, 70);
             this.panel_BindKey2.TabIndex = 16;
@@ -325,7 +325,7 @@
             this.panel_CheckKey2.Controls.Add(this.label_Key2Check);
             this.panel_CheckKey2.Controls.Add(this.pictureBox_CheckKey2);
             this.panel_CheckKey2.Controls.Add(this.label8);
-            this.panel_CheckKey2.Location = new System.Drawing.Point(604, 434);
+            this.panel_CheckKey2.Location = new System.Drawing.Point(604, 465);
             this.panel_CheckKey2.Name = "panel_CheckKey2";
             this.panel_CheckKey2.Size = new System.Drawing.Size(500, 70);
             this.panel_CheckKey2.TabIndex = 17;
@@ -369,7 +369,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(599, 9);
+            this.label1.Location = new System.Drawing.Point(599, 7);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(500, 24);
             this.label1.TabIndex = 18;
@@ -401,7 +401,7 @@
             // 
             this.label_MainTip.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_MainTip.Font = new System.Drawing.Font("新宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_MainTip.Font = new System.Drawing.Font("新宋体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label_MainTip.Location = new System.Drawing.Point(3, 310);
             this.label_MainTip.Name = "label_MainTip";
             this.label_MainTip.Size = new System.Drawing.Size(582, 89);
@@ -438,7 +438,7 @@
             this.panel_ClearSN.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel_ClearSN.Controls.Add(this.pictureBox_ClearKey);
             this.panel_ClearSN.Controls.Add(this.label5);
-            this.panel_ClearSN.Location = new System.Drawing.Point(603, 115);
+            this.panel_ClearSN.Location = new System.Drawing.Point(603, 126);
             this.panel_ClearSN.Name = "panel_ClearSN";
             this.panel_ClearSN.Size = new System.Drawing.Size(501, 70);
             this.panel_ClearSN.TabIndex = 14;

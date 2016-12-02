@@ -13,13 +13,14 @@ namespace RokyTask
 {
     public enum BindSteps
     {
-        SN_VALID = 0,
-        KEYS_CLEAR = 1,
-        KEY_PCU_INIT = 2,
-        KEY1_BIND = 3,
-        KEY2_BIND = 4,
-        KEY1_CHECK =5,
-        KEY2_CHECK = 6,
+        WAIT_POWER = 0,
+        SN_VALID = 1,
+        KEYS_CLEAR = 2,
+        KEY_PCU_INIT = 3,
+        KEY1_BIND = 4,
+        KEY2_BIND = 5,
+        KEY1_CHECK =6,
+        KEY2_CHECK = 7,
     }
 
     public enum KeyType
@@ -139,6 +140,8 @@ namespace RokyTask
                 }
                 else
                 {
+                    SetListView(sender, "上电超时！", "设备未上电或通讯有异常");
+                    SetItemFail(sender, BindSteps.WAIT_POWER);
                     SetMainText(sender,  STEP_LEVEL.FAIL);
                     StopTask();
                 }
@@ -278,6 +281,12 @@ namespace RokyTask
                                     {              
                                         mBindSteps = BindSteps.KEY1_BIND;                                        
                                     }
+                                    else if(level == Task_Level.FALSE)
+                                    {
+                                        SetItemFail(sender, BindSteps.KEY1_BIND);
+                                        SetMainText(sender, STEP_LEVEL.FAIL);
+                                        bExcuted = true;
+                                    }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
@@ -351,6 +360,12 @@ namespace RokyTask
                                     {                  
                                         mBindSteps = BindSteps.KEY1_BIND;
                                     }
+                                    else if(level == Task_Level.FALSE)
+                                    {
+                                        SetItemFail(sender, BindSteps.KEY1_BIND);
+                                        SetMainText(sender, STEP_LEVEL.FAIL);
+                                        bExcuted = true;
+                                    }
                                     break;
                                 case BindSteps.KEY1_CHECK:
                                     level = KEY1_CHECK(sender, mEventArgs.Data);
@@ -383,6 +398,12 @@ namespace RokyTask
                                     else if (level == Task_Level.REPEAT)
                                     {                
                                         mBindSteps = BindSteps.KEY2_BIND;
+                                    }
+                                    else if(level == Task_Level.FALSE)
+                                    {
+                                        SetItemFail(sender, BindSteps.KEY2_BIND);
+                                        SetMainText(sender, STEP_LEVEL.FAIL);
+                                        bExcuted = true;
                                     }
                                     break;                                
                                 case BindSteps.KEY2_CHECK:
@@ -479,7 +500,7 @@ namespace RokyTask
                 int key1Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
                 SetKeyValue(sender, KeyType.BIND_KEY1, key1Value);
                 if (key1Value == 0)
-                    return Task_Level.REPEAT;
+                    return Task_Level.FALSE;
 
                 if (mAskResult == 0x21)//绑定成功)
                 {                
@@ -510,7 +531,9 @@ namespace RokyTask
             {
                 int key2Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
                 SetKeyValue(sender, KeyType.BIND_KEY2, key2Value);
-                if (key2Value == 0 || mKey1Value == key2Value)
+                if (key2Value == 0)
+                    return Task_Level.FALSE;
+                if(mKey1Value == key2Value)
                     return Task_Level.REPEAT;
                 if (mAskResult == 0x21)
                 {             
@@ -612,6 +635,14 @@ namespace RokyTask
         {
             switch(step)
             {
+                case BindSteps.WAIT_POWER:
+                    SetValidSN(sender, INFO_LEVEL.INIT);
+                    SetClearKey(sender, INFO_LEVEL.INIT);
+                    SetBindKey1(sender, INFO_LEVEL.INIT);
+                    SetChkKey1(sender, INFO_LEVEL.INIT);
+                    SetBindKey2(sender, INFO_LEVEL.INIT);
+                    SetChkKey2(sender, INFO_LEVEL.INIT);
+                    break;
                 case BindSteps.SN_VALID:
                     SetValidSN(sender, INFO_LEVEL.FAIL);
                     SetClearKey(sender, INFO_LEVEL.INIT);

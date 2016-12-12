@@ -53,6 +53,7 @@
     <Compile Include="Entity\Protocols\request\NullEntity.cs" />
     <Compile Include="Entity\Protocols\request\pcTakeoverReq.cs" />
     <Compile Include="Entity\Protocols\request\ResetEcuReq.cs" />
+    <Compile Include="Entity\Protocols\request\writeKeyAddrReq.cs" />
     <Compile Include="Entity\Protocols\response\btTestRsp.cs" />
     <Compile Include="Entity\Protocols\request\chk4103Server.cs" />
     <Compile Include="Entity\Protocols\request\get4103BroadcastReq.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Entity\Protocols\response\pcTakeOverRsp.cs" />
     <Compile Include="Entity\Protocols\response\ResetEcuRsp.cs" />
     <Compile Include="Entity\Protocols\response\SaveNvRsp.cs" />
+    <Compile Include="Entity\Protocols\response\writeKeyAddrRsp.cs" />
     <Compile Include="ManualVisio.cs">
       <SubType>Form</SubType>
     </Compile>

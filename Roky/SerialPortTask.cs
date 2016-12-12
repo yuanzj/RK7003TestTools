@@ -40,7 +40,6 @@ namespace Roky
                 OnPostExecute(default(T), new Exception(mSerialPortEventArgs.ErrorMessage));
             }, (object sender, EventArgs e) =>
             {
-
                 SerialPortEventArgs mSerialPortEventArgs = e as SerialPortEventArgs;
                 recvByteArray = mSerialPortEventArgs.Data;
                 if (null != MyProtocol && null != mSerialPortEventArgs)

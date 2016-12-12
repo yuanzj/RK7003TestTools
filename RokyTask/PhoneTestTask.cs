@@ -3,6 +3,7 @@ using Roky;
 using RokyTask.Entity.Protocols.request;
 using RokyTask.Entity.Protocols.response;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,21 +16,17 @@ namespace RokyTask
     {
         WAIT_POWER = 0,
         SN_VALID = 1,
-        KEYS_CLEAR = 2,
-        KEY_PCU_INIT = 3,
-        KEY1_BIND = 4,
-        KEY2_BIND = 5,
-        KEY1_CHECK =6,
-        KEY2_CHECK = 7,
+        KEY1_BIND = 2,
+        KEY2_BIND = 3,
+        WRITE_NV = 4
     }
 
     public enum KeyType
     {
         NONE_KEY = 0,
         BIND_KEY1 = 1,
-        CHECK_KEY1 = 2,
-        BIND_KEY2 = 3,
-        CHECK_KEY2 = 4
+        BIND_KEY2 = 2,
+        WRITE_NV = 3,
     }
 
     public enum STEP_LEVEL
@@ -39,8 +36,9 @@ namespace RokyTask
         CHECK_SN = 2,
         BIND_KEY1 = 3,
         BIND_KEY2 = 4,
-        PASS = 5,
-        FAIL = 6,
+        WRITE_NV = 5,
+        PASS = 6,
+        FAIL = 7,
     }
 
     public class StepArgs : EventArgs
@@ -68,10 +66,15 @@ namespace RokyTask
     {
         #region 常量
         public int KeyNumber { get; set; }
+        public int TryCnts { get; set; }
+        public int keysNumber { get; set; }
         public bool bTaskRunning { get; set; }
         public string mSN { get; set; }
         private BindSteps mBindSteps;
         private int mKey1Value { get; set; }
+        private int mKey2Value { get; set; }
+        Hashtable ht;//存储钥匙的键和值
+
         #endregion
 
         #region 注册事件
@@ -79,9 +82,7 @@ namespace RokyTask
         public event EventHandler UpdateValidSNHandler;
         public event EventHandler BindKey1Handler;
         public event EventHandler BindKey2Handler;
-        public event EventHandler CheckKey1Handler;
-        public event EventHandler CheckKey2Handler;
-        public event EventHandler ClearKeyHandler;
+        public event EventHandler WriteNVHandler;
         public event EventHandler ListViewHandler;
         public event EventHandler KeyValueHandler;
         #endregion
@@ -90,8 +91,13 @@ namespace RokyTask
         SimpleSerialPortTask<getDevinfoReq, getDevinfoRsp> mGetDevInfoTask;
         getDevinfoReq mDevInfoParam;
         //CCU 绑定
-        SimpleSerialPortTask<get7001Result, get7001ResultRsp> mBindKeyTask;
-        get7001Result mBindKeyParam;       
+        SimpleSerialPortTask<get7001Result, get7001ResultRsp> mBindKey1Task;
+        get7001Result mBindKey1Param;
+        SimpleSerialPortTask<get7001Result, get7001ResultRsp> mBindKey2Task;
+        get7001Result mBindKey2Param;
+
+        SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp> mWriteKeyTask;
+        writeKeyAddrReq mWriteKeyParam;
         //同步报文
         SimpleSerialPortTask<NullEntity, pcTakeoverReq> mBroadCastTask;
         //停止同步报文
@@ -113,7 +119,7 @@ namespace RokyTask
 
         #region 构造任务
         private void TaskBuilder()
-        {
+        {            
             //回复同步
             mRecoverTask = new SimpleSerialPortTask<ResetEcuReq, NullEntity>();
             mRecoverParam = mRecoverTask.GetRequestEntity();
@@ -198,11 +204,10 @@ namespace RokyTask
                     }
                     else
                     {
-                        SetValidSN(sender, INFO_LEVEL.PASS);                        
-                        mBindKeyParam.ack_device = Const.CCU;
-                        mBindKeyParam.server_mode = 0x20;//先清除钥匙
-                        mBindSteps = BindSteps.KEYS_CLEAR;
-                        mBindKeyTask.Excute();
+                        SetValidSN(sender, INFO_LEVEL.PASS);
+                        SetMainText(sender, STEP_LEVEL.BIND_KEY1);
+                        mBindKey1Param.ack_device = Const.PCU;
+                        mBindKey1Task.Excute();
                     }
                 }
                 else
@@ -215,234 +220,84 @@ namespace RokyTask
                 }
             };
            
-            mBindKeyTask = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
-            mBindKeyParam = mBindKeyTask.GetRequestEntity();
-            mBindKeyParam.ack_device = Const.CCU;
-            mBindKeyParam.server_mode = 0x20;//绑定钥匙
-            mBindKeyTask.RetryMaxCnts = 0;
-            mBindKeyTask.Timerout = 10*1000;
-            mBindKeyTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            mBindKey1Task = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
+            mBindKey1Param = mBindKey1Task.GetRequestEntity();
+            mBindKey1Param.ack_device = Const.PCU;
+            mBindKey1Param.server_mode = 0x08;//绑定钥匙
+            mBindKey1Task.RetryMaxCnts = 0;
+            mBindKey1Task.Timerout = 10*1000;
+            mBindKey1Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
                 if (mEventArgs.Data != null)
                 {         
-                    bool bExcuted = false;
-                    Task_Level level = Task_Level.FALSE;
-                    //根据绑定钥匙数量来
-                    switch (KeyNumber)
+                    byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
+                    byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
+                    int temp = (byte)mEventArgs.Data.CutError_1 |
+                                          mEventArgs.Data.CutError_2 << 8  |
+                                          mEventArgs.Data.ShortError_1 << 16;
+                    int iAddrCode = temp >> 4;
+                    if (mAskDevice == Const.PCU)
                     {
-                        case 1:
-                            switch(mBindSteps)
+                        // 如果不为0， 说明有按下，把地址码键值存入List
+                        if (iAddrCode != 0)
+                        {
+                            // 先判断是否含有某个Key
+                            if (ht.ContainsKey(iAddrCode))
                             {
-                                case BindSteps.KEYS_CLEAR:
-                                    level = KEYS_CLEAR(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        SetClearKey(sender, INFO_LEVEL.PASS);
-                                        mBindSteps = BindSteps.KEY_PCU_INIT;
-                                        mBindKeyParam.ack_device = Const.PCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        bExcuted = true;
-                                        SetItemFail(sender, BindSteps.KEYS_CLEAR);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                    }
-                                    else if(level == Task_Level.REPEAT)
-                                    {
-                                        mBindSteps = BindSteps.KEYS_CLEAR;
-                                    }
-                                    break;
-                                case BindSteps.KEY_PCU_INIT:
-                                    level = KEY_PCU_INIT(sender, mEventArgs.Data);
-                                    if(level == Task_Level.TRUE)
-                                    {
-                                        SetMainText(sender, STEP_LEVEL.BIND_KEY1); //开始绑定钥匙                                                                           
-                                        mBindSteps = BindSteps.KEY1_BIND;
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙1
-                                    }
-                                    else if(level == Task_Level.FALSE)
-                                    {
-                                        bExcuted = true;
-                                        SetMainText(sender, STEP_LEVEL.FAIL);                                      
-                                    }                                    
-                                    break;
-                                case BindSteps.KEY1_BIND:
-                                    level = KEY1_BIND(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {                
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x10;//检查
-                                        mBindSteps = BindSteps.KEY1_CHECK;
-                                    }                                    
-                                    else if (level == Task_Level.REPEAT)
-                                    {              
-                                        mBindSteps = BindSteps.KEY1_BIND;                                        
-                                    }
-                                    else if(level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEY1_BIND);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;
-                                    }
-                                    break;
-                                case BindSteps.KEY1_CHECK:
-                                    level = KEY1_CHECK(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        SetMainText(sender, STEP_LEVEL.PASS);                                   
-                                        bExcuted = true;
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEY1_CHECK);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;
-                                    }  
-                                    else if(level == Task_Level.REPEAT)
-                                    {
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x10;//检查
-                                        mBindSteps = BindSteps.KEY1_CHECK;
-                                    }                                  
-                                    break;
+                                int iCnt = (int)ht[iAddrCode];
+                                ht[iAddrCode] = iCnt + 1;
                             }
-                            break;
-                        case 2:
-                            switch(mBindSteps)
+                            else//如果不存在此KEY
                             {
-                                case BindSteps.KEYS_CLEAR:
-                                    level = KEYS_CLEAR(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        SetClearKey(sender, INFO_LEVEL.PASS);
-                                        mBindSteps = BindSteps.KEY_PCU_INIT;
-                                        mBindKeyParam.ack_device = Const.PCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEYS_CLEAR);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;                                       
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {
-                                        mBindSteps = BindSteps.KEYS_CLEAR;
-                                    }
-                                    break;
-                                case BindSteps.KEY_PCU_INIT:
-                                    level = KEY_PCU_INIT(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        SetMainText(sender, STEP_LEVEL.BIND_KEY1); //开始绑定钥匙
-                                        mBindSteps = BindSteps.KEY1_BIND;
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x08;//绑定钥匙
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        bExcuted = true;
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                    }
-                                    break;
-                                case BindSteps.KEY1_BIND:
-                                    level = KEY1_BIND(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x10;//绑定钥匙
-                                        mBindSteps = BindSteps.KEY1_CHECK;
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {                  
-                                        mBindSteps = BindSteps.KEY1_BIND;
-                                    }
-                                    else if(level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEY1_BIND);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;
-                                    }
-                                    break;
-                                case BindSteps.KEY1_CHECK:
-                                    level = KEY1_CHECK(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        SetMainText(sender, STEP_LEVEL.BIND_KEY2); //开始绑定钥匙
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x08;//检查钥匙
-                                        mBindSteps = BindSteps.KEY2_BIND;
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEY1_CHECK);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {
-                                        mBindSteps = BindSteps.KEY1_CHECK;
-                                    }
-                                    break;
-                                case BindSteps.KEY2_BIND:
-                                    level = KEY2_BIND(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {  
-                                        mBindKeyParam.ack_device = Const.CCU;
-                                        mBindKeyParam.server_mode = 0x10;//检查钥匙
-                                        mBindSteps = BindSteps.KEY2_CHECK;
-                                    }
-                                    else if (level == Task_Level.REPEAT)
-                                    {                
-                                        mBindSteps = BindSteps.KEY2_BIND;
-                                    }
-                                    else if(level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEY2_BIND);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;
-                                    }
-                                    break;                                
-                                case BindSteps.KEY2_CHECK:
-                                    level = KEY2_CHECK(sender, mEventArgs.Data);
-                                    if (level == Task_Level.TRUE)
-                                    {
-                                        SetMainText(sender, STEP_LEVEL.PASS);
-                                        bExcuted = true;
-                                    }
-                                    else if (level == Task_Level.FALSE)
-                                    {
-                                        SetItemFail(sender, BindSteps.KEY2_CHECK);
-                                        SetMainText(sender, STEP_LEVEL.FAIL);
-                                        bExcuted = true;
-                                    } 
-                                    else if(level == Task_Level.REPEAT)
-                                    {
-                                        mBindSteps = BindSteps.KEY2_CHECK;
-                                    }                                   
-                                    break;
+                                ht.Add(iAddrCode, 0);
                             }
-                            break;
-                        default:
-                            bExcuted = true;
-                            SetMainText(sender, STEP_LEVEL.FAIL);
-                            break;
+                        }
                     }
-                    //判断
-                    if(!bExcuted)
+                    //判断哈希的最大值
+                    int valueMax = 0;
+                    foreach (int value in ht.Values)
                     {
-                        Thread.Sleep(300);
-                        mBindKeyTask.Excute();
+                        if (value > valueMax)
+                            valueMax = value;
                     }
-                    else
+                    //判断次数是否超过某一值
+                    if(valueMax >= this.TryCnts)
                     {
-                        mRecoverTask.Excute();                       
-                        StopTask();
-                        return;
-                    }
+                        foreach(int key in ht.Keys)
+                        {
+                            if((int)ht[key] == valueMax)
+                            {
+                                SetBindKey1(sender, INFO_LEVEL.PASS);
+                                //保存Key1按键
+                                mKey1Value = key;
+                                byte[] temp1 = new byte[3];
+                                temp1[0] = (byte)(mKey1Value >> 16 & 0xFF);
+                                temp1[1] = (byte)(mKey1Value >> 8 & 0xFF);
+                                temp1[2] = (byte)(mKey1Value& 0xFF);
+                                mWriteKeyParam.Key1Value = temp1;
+                                SetKeyValue(sender, KeyType.BIND_KEY1, mKey1Value);
+                                ht.Clear();
+                                //写NV
+                                if (KeyNumber == 2)
+                                {
+                                    SetMainText(sender, STEP_LEVEL.BIND_KEY2);
+                                    mBindKey2Task.Excute();                                    
+                                }
+                                else
+                                {
+                                    //写NV
+                                    byte[] temp2 = new byte[3];
+                                    mWriteKeyParam.Key2Value = temp2;
+                                    mWriteKeyTask.Excute();
+                                }
+                                return;
+                            }
+                        }
+                    }                    
+                    
+                    Thread.Sleep(50);
+                    mBindKey1Task.Excute();
                 }
                 else
                 {
@@ -452,184 +307,122 @@ namespace RokyTask
                     mRecoverTask.Excute();
                     StopTask();
                 }
-            };            
-        }
-        #endregion
+            };
 
-        #region 清理钥匙    
-        private Task_Level KEYS_CLEAR(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
-            byte mAskResult = (byte)mArgs.ack_value;//响应
-            if (mAskDevice == Const.CCU && mAskResult == 0x25)
+            mBindKey2Task = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
+            mBindKey2Param = mBindKey2Task.GetRequestEntity();
+            mBindKey2Param.ack_device = Const.PCU;
+            mBindKey2Param.server_mode = 0x08;//绑定钥匙
+            mBindKey2Task.RetryMaxCnts = 0;
+            mBindKey2Task.Timerout = 10 * 1000;
+            mBindKey2Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
-                return Task_Level.TRUE;
-            }
-            else if(mAskDevice == Const.PCU || mAskDevice == Const.TESTSERVER)
-                return Task_Level.REPEAT;
-
-            return Task_Level.FALSE;
-        }
-        #endregion
-
-        #region PCU初始化
-        private Task_Level KEY_PCU_INIT(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
-            byte mAskResult = (byte)mArgs.ack_value;//响应
-            if(mAskDevice == Const.PCU)
-            {
-                return Task_Level.TRUE;
-            }
-            return Task_Level.FALSE;
-        }
-        #endregion
-
-        #region 绑定钥匙1
-        private Task_Level KEY1_BIND(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
-            byte mAskResult = (byte)mArgs.ack_value;//响应
-            byte mAddr_1 = (byte)mArgs.CutError_1;
-            byte mAddr_2 = (byte)mArgs.CutError_2;
-            byte mAddr_3 = (byte)mArgs.ShortError_1;
-            byte mAddr_4 = (byte)mArgs.ShortError_2;
-
-            if (mAskDevice == Const.CCU)
-            {
-                int key1Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-                SetKeyValue(sender, KeyType.BIND_KEY1, key1Value);
-                if (key1Value == 0)
-                    return Task_Level.FALSE;
-
-                if (mAskResult == 0x21)//绑定成功)
-                {                
-                    SetBindKey1(sender, INFO_LEVEL.PASS);
-                    return Task_Level.TRUE;
-                }
-                else if(mAskResult == 0x24)
+                SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
+                if (mEventArgs.Data != null)
                 {
-                    return Task_Level.REPEAT;
+                    byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
+                    byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
+                    int temp = (byte)mEventArgs.Data.CutError_1 |
+                                          mEventArgs.Data.CutError_2 << 8 |
+                                          mEventArgs.Data.ShortError_1 << 16;
+                    int iAddrCode = temp >> 4;                    
+                    if (mAskDevice == Const.PCU)
+                    {                        
+                            // 如果不为0， 说明有按下，把地址码键值存入List
+                        if (iAddrCode != 0 && iAddrCode != mKey1Value)
+                        {
+                            // 先判断是否含有某个Key
+                            if (ht.ContainsKey(iAddrCode))
+                            {
+                                int iCnt = (int)ht[iAddrCode];
+                                ht[iAddrCode] = iCnt + 1;
+                            }
+                            else//如果不存在此KEY
+                            {
+                                ht.Add(iAddrCode, 0);
+                            }
+                        }
+                    }
+                    //判断哈希的最大值
+                    int valueMax = 0;
+                    foreach (int value in ht.Values)
+                    {
+                        if (value >= valueMax)
+                            valueMax = value;
+                    }
+                    //判断次数是否超过某一值
+                    if (valueMax > this.TryCnts)
+                    {
+                        foreach (int key in ht.Keys)
+                        {
+                            if ((int)ht[key] == valueMax)
+                            {
+                                SetBindKey2(sender, INFO_LEVEL.PASS);
+                                //保存Key1按键
+                                mKey2Value = key;
+                                byte[] temp1 = new byte[3];
+                                temp1[0] = (byte)(mKey2Value >> 16 & 0xFF);
+                                temp1[1] = (byte)(mKey2Value >> 8 & 0xFF);
+                                temp1[2] = (byte)(mKey2Value & 0xFF);
+                                mWriteKeyParam.Key2Value = temp1;
+                                SetKeyValue(sender, KeyType.BIND_KEY2, mKey2Value);
+                                mWriteKeyTask.Excute();
+                                ht.Clear();
+                                return;
+                            }
+                        }
+                    }
+
+                    Thread.Sleep(50);
+                    mBindKey2Task.Excute();
                 }
-            }
-            
-            return Task_Level.FALSE;
+                else
+                {
+                    SetListView(sender, "未收到钥匙的绑定和检查的响应", "设备未上电或通讯有异常");
+                    SetItemFail(sender, mBindSteps);
+                    SetMainText(sender, STEP_LEVEL.FAIL);
+                    mRecoverTask.Excute();
+                    StopTask();
+                }
+            };
+
+            mWriteKeyTask = new SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp>();
+            mWriteKeyParam = mWriteKeyTask.GetRequestEntity();
+            mWriteKeyParam.Key1Index = 0;
+            mWriteKeyParam.Key2Index = 1;
+            mWriteKeyParam.KeyNumber = 2;
+            mWriteKeyParam.DeviceType = Const.CCU;
+            mWriteKeyTask.RetryMaxCnts = 0;
+            mWriteKeyTask.Timerout = 10 * 1000;
+            mWriteKeyTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<writeKeyAddrRsp> mEventArgs = e as SerialPortEventArgs<writeKeyAddrRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    byte mResult = (byte)mEventArgs.Data.Result;
+                    if(mResult == 0)
+                    {
+                        ht.Clear();
+                        SetWriteNV(sender, INFO_LEVEL.PASS);                   
+                        SetMainText(sender, STEP_LEVEL.PASS);
+                        mRecoverTask.Excute();
+                        StopTask();
+                    }
+                }
+                else
+                {
+                    SetListView(sender, "写钥匙地址到设备失败", "设备异常或通讯有异常");
+                    SetItemFail(sender, mBindSteps);
+                    SetMainText(sender, STEP_LEVEL.FAIL);
+                    mRecoverTask.Excute();
+                    StopTask();
+                }
+            };
+
         }
         #endregion
 
-        #region 绑定钥匙2
-        private Task_Level KEY2_BIND(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
-            byte mAskResult = (byte)mArgs.ack_value;//响应
-            byte mAddr_1 = (byte)mArgs.CutError_1;
-            byte mAddr_2 = (byte)mArgs.CutError_2;
-            byte mAddr_3 = (byte)mArgs.ShortError_1;
-            byte mAddr_4 = (byte)mArgs.ShortError_2;
-
-            if (mAskDevice == Const.CCU)
-            {
-                int key2Value = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-                SetKeyValue(sender, KeyType.BIND_KEY2, key2Value);
-                if (key2Value == 0)
-                    return Task_Level.FALSE;
-                if(mKey1Value == key2Value)
-                    return Task_Level.REPEAT;
-                if (mAskResult == 0x21)
-                {             
-                    SetBindKey2(sender, INFO_LEVEL.PASS);
-                    return Task_Level.TRUE;
-                }
-                else if(mAskResult == 0x24)
-                {
-                    return Task_Level.REPEAT;
-                }
-            }
-
-            return Task_Level.FALSE;
-        }
-        #endregion
-
-        private void SetKeyValue(object sender, KeyType type, int value)
-        {
-            if(KeyValueHandler != null)
-            {
-                KeyValueArgs mArgs = new KeyValueArgs();
-                mArgs.type = type;
-                mArgs.value = value;
-                KeyValueHandler(sender, mArgs);
-            }
-        }
-
-        #region Key1 check确认
-        private Task_Level KEY1_CHECK(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
-            byte mAskResult = (byte)mArgs.ack_value;//响应
-            byte mAddr_1 = (byte)mArgs.CutError_1;
-            byte mAddr_2 = (byte)mArgs.CutError_2;
-            byte mAddr_3 = (byte)mArgs.ShortError_1;
-            byte mAddr_4 = (byte)mArgs.ShortError_2;
-
-            if (mAskDevice == Const.CCU)
-            {
-                int keyValue = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-                SetKeyValue(sender, KeyType.CHECK_KEY1, keyValue);
-                if (keyValue == 0)
-                    return Task_Level.REPEAT;
-
-                if (mAskResult == 0x21)//确认成功
-                {
-                    mKey1Value = keyValue;
-                    SetChkKey1(sender, INFO_LEVEL.PASS);
-                    return Task_Level.TRUE;
-                }
-                else if (mAskResult == 0x23)
-                {
-                    SetChkKey1(sender, INFO_LEVEL.FAIL);
-                    return Task_Level.FALSE;
-                }
-            }
-
-            return Task_Level.REPEAT;
-        }
-        #endregion
-
-        #region Key2 check确认
-        private Task_Level KEY2_CHECK(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAskDevice = (byte)mArgs.ack_device;//应答设备
-            byte mAskResult = (byte)mArgs.ack_value;//响应
-            byte mAddr_1 = (byte)mArgs.CutError_1;
-            byte mAddr_2 = (byte)mArgs.CutError_2;
-            byte mAddr_3 = (byte)mArgs.ShortError_1;
-            byte mAddr_4 = (byte)mArgs.ShortError_2;
-
-            if (mAskDevice == Const.CCU)
-            {
-                int keyValue = mAddr_1 << 16 | mAddr_2 << 8 | mAddr_3;
-                SetKeyValue(sender, KeyType.CHECK_KEY2, keyValue);
-                if (keyValue == 0)
-                    return Task_Level.REPEAT;
-                if (mAskResult == 0x21)//绑定成功
-                {                    
-                    if (keyValue == mKey1Value)
-                        return Task_Level.REPEAT;
-
-                    SetChkKey2(sender, INFO_LEVEL.PASS);
-                    return Task_Level.TRUE;
-                }
-                else if (mAskResult == 0x23)//绑定失败
-                {
-                    SetChkKey2(sender, INFO_LEVEL.FAIL);
-                    return Task_Level.FALSE;
-                }
-            }
-
-            return Task_Level.REPEAT;
-        }
-        #endregion
-
+       
         #region 设置失败
         private void SetItemFail(object sender, BindSteps step)
         {
@@ -637,48 +430,25 @@ namespace RokyTask
             {
                 case BindSteps.WAIT_POWER:
                     SetValidSN(sender, INFO_LEVEL.INIT);
-                    SetClearKey(sender, INFO_LEVEL.INIT);
                     SetBindKey1(sender, INFO_LEVEL.INIT);
-                    SetChkKey1(sender, INFO_LEVEL.INIT);
                     SetBindKey2(sender, INFO_LEVEL.INIT);
-                    SetChkKey2(sender, INFO_LEVEL.INIT);
+                    SetWriteNV(sender, INFO_LEVEL.INIT);
                     break;
                 case BindSteps.SN_VALID:
                     SetValidSN(sender, INFO_LEVEL.FAIL);
-                    SetClearKey(sender, INFO_LEVEL.INIT);
                     SetBindKey1(sender, INFO_LEVEL.INIT);
-                    SetChkKey1(sender, INFO_LEVEL.INIT);
                     SetBindKey2(sender, INFO_LEVEL.INIT);
-                    SetChkKey2(sender, INFO_LEVEL.INIT);
-                    break;
-                case BindSteps.KEYS_CLEAR:
-                    SetClearKey(sender, INFO_LEVEL.FAIL);
-                    SetBindKey1(sender, INFO_LEVEL.INIT);
-                    SetChkKey1(sender, INFO_LEVEL.INIT);
-                    SetBindKey2(sender, INFO_LEVEL.INIT);
-                    SetChkKey2(sender, INFO_LEVEL.INIT);
-                    break;
-                case BindSteps.KEY_PCU_INIT:
-
+                    SetWriteNV(sender, INFO_LEVEL.INIT);
                     break;
                 case BindSteps.KEY1_BIND:
                     SetBindKey1(sender, INFO_LEVEL.FAIL);
-                    SetChkKey1(sender, INFO_LEVEL.INIT);
                     SetBindKey2(sender, INFO_LEVEL.INIT);
-                    SetChkKey2(sender, INFO_LEVEL.INIT);
-                    break;
-                case BindSteps.KEY1_CHECK:
-                    SetChkKey1(sender, INFO_LEVEL.FAIL);
-                    SetBindKey2(sender, INFO_LEVEL.INIT);
-                    SetChkKey2(sender, INFO_LEVEL.INIT);
+                    SetWriteNV(sender, INFO_LEVEL.INIT);
                     break;
                 case BindSteps.KEY2_BIND:
                     SetBindKey2(sender, INFO_LEVEL.FAIL);
-                    SetChkKey2(sender, INFO_LEVEL.INIT);
-                    break;
-                case BindSteps.KEY2_CHECK:
-                    SetChkKey2(sender, INFO_LEVEL.FAIL);
-                    break;                   
+                    SetWriteNV(sender, INFO_LEVEL.INIT);
+                    break;                 
             }
         }
         #endregion
@@ -734,38 +504,27 @@ namespace RokyTask
         }
         #endregion
 
-        #region 检查钥匙1
-        private void SetChkKey1(object sender, INFO_LEVEL level)
+        #region 写NV标志
+        private void SetWriteNV(object sender, INFO_LEVEL _level)
         {
-            if(CheckKey1Handler != null)
+            if(WriteNVHandler != null)
             {
                 UIEventArgs mArgs = new UIEventArgs();
-                mArgs.level = level;
-                CheckKey1Handler(sender, mArgs);
+                mArgs.level = _level;
+                WriteNVHandler(sender, mArgs);
             }
         }
         #endregion
 
-        #region 检查钥匙2
-        private void SetChkKey2(object sender, INFO_LEVEL level)
+        #region 设置钥匙值的显示
+        private void SetKeyValue(object sender, KeyType _type, int _value)
         {
-            if (CheckKey2Handler != null)
+            if(KeyValueHandler != null)
             {
-                UIEventArgs mArgs = new UIEventArgs();
-                mArgs.level = level;
-                CheckKey2Handler(sender, mArgs);
-            }
-        }
-        #endregion
-
-        #region 清除钥匙
-        private void SetClearKey(object sender, INFO_LEVEL level)
-        {
-            if (ClearKeyHandler != null)
-            {
-                UIEventArgs mArgs = new UIEventArgs();
-                mArgs.level = level;
-                ClearKeyHandler(sender, mArgs);
+                KeyValueArgs mArgs = new KeyValueArgs();
+                mArgs.type = _type;
+                mArgs.value = _value;
+                KeyValueHandler(sender, mArgs);
             }
         }
         #endregion
@@ -787,14 +546,16 @@ namespace RokyTask
         private void StopTask()
         {
             mGetDevInfoTask.ClearAllEvent();
-            mBindKeyTask.ClearAllEvent();
+            mBindKey1Task.ClearAllEvent();
+            mBindKey2Task.ClearAllEvent();
             mBroadCastTask.ClearAllEvent();
             mStopSyncTask.ClearAllEvent();
             mMonitorTask.ClearAllEvent();
             mRecoverTask.ClearAllEvent();
 
             mGetDevInfoTask.EnableTimeOutHandler = false;
-            mBindKeyTask.EnableTimeOutHandler = false;
+            mBindKey1Task.EnableTimeOutHandler = false;
+            mBindKey2Task.EnableTimeOutHandler = false;
             mBroadCastTask.EnableTimeOutHandler = false;
             mStopSyncTask.EnableTimeOutHandler = false;
             mMonitorTask.EnableTimeOutHandler = false;
@@ -805,14 +566,18 @@ namespace RokyTask
         #region 初始化参数
         private void InitTask()
         {
+            ht = new Hashtable();
+            mBindSteps = BindSteps.WAIT_POWER;
+            mKey1Value = 0;
+            mKey2Value = 0;
             mGetDevInfoTask.ClearAllEvent();
-            mBindKeyTask.ClearAllEvent();
+            mBindKey1Task.ClearAllEvent();
             mBroadCastTask.ClearAllEvent();
             mStopSyncTask.ClearAllEvent();
             mMonitorTask.ClearAllEvent();
             mRecoverTask.ClearAllEvent();
             mGetDevInfoTask.EnableTimeOutHandler = true;
-            mBindKeyTask.EnableTimeOutHandler = true;
+            mBindKey1Task.EnableTimeOutHandler = true;
             mBroadCastTask.EnableTimeOutHandler = true;
             mStopSyncTask.EnableTimeOutHandler = true;
             mMonitorTask.EnableTimeOutHandler = true;

@@ -31,7 +31,7 @@ namespace RK7001Test
         {
             mPhoneTask = new PhoneTestTask();
             mPhoneTask.KeyNumber = int.Parse(ConfigurationManager.AppSettings["KeysNumber"].ToString());
-            
+            mPhoneTask.TryCnts = int.Parse(ConfigurationManager.AppSettings["TryCnts"].ToString());
 
             mPhoneTask.UpdateWorkStatusHandler += (object _sender, EventArgs _e) =>
             {
@@ -69,33 +69,6 @@ namespace RK7001Test
                 }
             };
 
-            mPhoneTask.CheckKey1Handler += (object _sender, EventArgs _e) =>
-            {
-                UIEventArgs mArgs = _e as UIEventArgs;
-                if (mArgs != null)
-                {
-                    SetCheckKey1(mArgs.level);
-                }
-            };
-
-            mPhoneTask.CheckKey2Handler += (object _sender, EventArgs _e) =>
-            {
-                UIEventArgs mArgs = _e as UIEventArgs;
-                if (mArgs != null)
-                {
-                    SetCheckKey2(mArgs.level);
-                }
-            };
-
-            mPhoneTask.ClearKeyHandler += (object _sender, EventArgs _e) =>
-            {
-                UIEventArgs mArgs = _e as UIEventArgs;
-                if (mArgs != null)
-                {
-                    SetClearKey(mArgs.level);
-                }
-            };
-
             mPhoneTask.ListViewHandler += (object _sender, EventArgs _e) =>
             {
                 UIEventArgs mArgs = _e as UIEventArgs;
@@ -111,6 +84,15 @@ namespace RK7001Test
                 if (mArgs != null)
                 {
                     SetKeyValue(mArgs.type, mArgs.value);
+                }
+            };
+
+            mPhoneTask.WriteNVHandler += (object _sender, EventArgs _e) =>
+            {
+                UIEventArgs mArgs = _e as UIEventArgs;
+                if (mArgs != null)
+                {
+                    SetWriteNVFlag(mArgs.level);
                 }
             };
 
@@ -131,23 +113,19 @@ namespace RK7001Test
             {
                 if(mPhoneTask.KeyNumber == 1)
                 {
-                    this.panel_BindKey2.Visible = false;
-                    this.panel_CheckKey2.Visible = false;
+                    this.panel_BindKey2.BackColor = Color.Gray;
                 }
                 else if(mPhoneTask.KeyNumber == 2)
                 {
-                    this.panel_BindKey2.Visible = true;
-                    this.panel_CheckKey2.Visible = true;
+                    this.panel_BindKey2.BackColor = Color.White;
                 }
             }
 
             SetMainText(STEP_LEVEL.NONE);
             SetValidSN(INFO_LEVEL.INIT);
             SetBindKey1(INFO_LEVEL.INIT);
-            SetCheckKey1(INFO_LEVEL.INIT);
             SetBindKey2(INFO_LEVEL.INIT);
-            SetCheckKey2(INFO_LEVEL.INIT);
-            SetClearKey(INFO_LEVEL.INIT);
+            SetWriteNVFlag(INFO_LEVEL.INIT);
             SetKeyValue(KeyType.NONE_KEY, 0);
         }
         #endregion
@@ -197,12 +175,12 @@ namespace RK7001Test
                         break;
                     case STEP_LEVEL.BIND_KEY1:
                         this.panel_MainResult.BackColor = Color.Yellow;
-                        this.label_MainResult.Text = "绑定第一把钥匙...";
+                        this.label_MainResult.Text = "请长按按键\n绑定第一把钥匙...";
                         this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.BIND_KEY2:
                         this.panel_MainResult.BackColor = Color.Yellow;
-                        this.label_MainResult.Text = "绑定第二把钥匙...";
+                        this.label_MainResult.Text = "请长按按键\n绑定第二把钥匙...";
                         this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.FAIL:
@@ -319,46 +297,7 @@ namespace RK7001Test
                 }
             }
         }
-        #endregion
-
-        #region 检查钥匙1
-        delegate void SetCheckKey1Callback(INFO_LEVEL level);
-        private void SetCheckKey1(INFO_LEVEL level)
-        {
-            if (this.pictureBox_CheckKey1.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
-            {
-                while (!this.pictureBox_CheckKey1.IsHandleCreated)
-                {
-                    //解决窗体关闭时出现“访问已释放句柄“的异常
-                    if (this.pictureBox_CheckKey1.Disposing || this.pictureBox_CheckKey1.IsDisposed)
-                        return;
-                }
-                SetCheckKey1Callback d = new SetCheckKey1Callback(SetCheckKey1);
-                this.pictureBox_CheckKey1.Invoke(d, new object[] { level });
-            }
-            else
-            {
-                switch (level)
-                {
-                    case INFO_LEVEL.INIT:
-                        this.pictureBox_CheckKey1.Visible = false;
-                        break;
-                    case INFO_LEVEL.PASS:
-                        this.pictureBox_CheckKey1.Visible = true;
-                        this.pictureBox_CheckKey1.Image = global::RK7001Test.Properties.Resources.OK;
-                        break;
-                    case INFO_LEVEL.FAIL:
-                        this.pictureBox_CheckKey1.Visible = true;
-                        this.pictureBox_CheckKey1.Image = global::RK7001Test.Properties.Resources.Shape;
-                        break;
-                    case INFO_LEVEL.PROCESS:
-                        this.pictureBox_CheckKey1.Visible = true;
-                        this.pictureBox_CheckKey1.Image = global::RK7001Test.Properties.Resources.ic_loading;
-                        break;
-                }
-            }
-        }
-        #endregion
+        #endregion       
 
         #region 绑定钥匙2
         delegate void SetBindKey2Callback(INFO_LEVEL level);
@@ -400,79 +339,41 @@ namespace RK7001Test
         }
         #endregion
 
-        #region 检查钥匙2
-        delegate void SetCheckKey2Callback(INFO_LEVEL level);
-        private void SetCheckKey2(INFO_LEVEL level)
+        #region 写NV
+        delegate void SetWriteNVFlagCallback(INFO_LEVEL level);
+        private void SetWriteNVFlag(INFO_LEVEL level)
         {
-            if (this.pictureBox_CheckKey2.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            if (this.pictureBox_WriteNV.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
             {
-                while (!this.pictureBox_CheckKey2.IsHandleCreated)
+                while (!this.pictureBox_WriteNV.IsHandleCreated)
                 {
                     //解决窗体关闭时出现“访问已释放句柄“的异常
-                    if (this.pictureBox_CheckKey2.Disposing || this.pictureBox_CheckKey2.IsDisposed)
+                    if (this.pictureBox_WriteNV.Disposing || this.pictureBox_WriteNV.IsDisposed)
                         return;
                 }
-                SetCheckKey2Callback d = new SetCheckKey2Callback(SetCheckKey2);
-                this.pictureBox_CheckKey2.Invoke(d, new object[] { level });
+                SetWriteNVFlagCallback d = new SetWriteNVFlagCallback(SetWriteNVFlag);
+                this.pictureBox_WriteNV.Invoke(d, new object[] { level });
             }
             else
             {
                 switch (level)
                 {
                     case INFO_LEVEL.INIT:
-                        this.pictureBox_CheckKey2.Visible = false;
+                        this.pictureBox_WriteNV.Visible = false;
                         break;
                     case INFO_LEVEL.PASS:
-                        this.pictureBox_CheckKey2.Visible = true;
-                        this.pictureBox_CheckKey2.Image = global::RK7001Test.Properties.Resources.OK;
+                        this.pictureBox_WriteNV.Visible = true;
+                        this.pictureBox_WriteNV.Image = global::RK7001Test.Properties.Resources.OK;
                         break;
                     case INFO_LEVEL.FAIL:
-                        this.pictureBox_CheckKey2.Visible = true;
-                        this.pictureBox_CheckKey2.Image = global::RK7001Test.Properties.Resources.Shape;
+                        this.pictureBox_WriteNV.Visible = true;
+                        this.pictureBox_WriteNV.Image = global::RK7001Test.Properties.Resources.Shape;
                         break;
                     case INFO_LEVEL.PROCESS:
-                        this.pictureBox_CheckKey2.Visible = true;
-                        this.pictureBox_CheckKey2.Image = global::RK7001Test.Properties.Resources.ic_loading;
-                        break;                   
-                }
-            }
-        }
-        #endregion
+                        this.pictureBox_WriteNV.Visible = true;
+                        this.pictureBox_WriteNV.Image = global::RK7001Test.Properties.Resources.ic_loading;
+                        break;
 
-        #region 设置清除钥匙
-        delegate void SetClearKeyCallback(INFO_LEVEL level);
-        private void SetClearKey(INFO_LEVEL level)
-        {
-            if (this.pictureBox_ClearKey.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
-            {
-                while (!this.pictureBox_ClearKey.IsHandleCreated)
-                {
-                    //解决窗体关闭时出现“访问已释放句柄“的异常
-                    if (this.pictureBox_ClearKey.Disposing || this.pictureBox_ClearKey.IsDisposed)
-                        return;
-                }
-                SetClearKeyCallback d = new SetClearKeyCallback(SetClearKey);
-                this.pictureBox_ClearKey.Invoke(d, new object[] { level });
-            }
-            else
-            {
-                switch (level)
-                {
-                    case INFO_LEVEL.INIT:
-                        this.pictureBox_ClearKey.Visible = false;
-                        break;
-                    case INFO_LEVEL.PASS:
-                        this.pictureBox_ClearKey.Visible = true;
-                        this.pictureBox_ClearKey.Image = global::RK7001Test.Properties.Resources.OK;
-                        break;
-                    case INFO_LEVEL.FAIL:
-                        this.pictureBox_ClearKey.Visible = true;
-                        this.pictureBox_ClearKey.Image = global::RK7001Test.Properties.Resources.Shape;
-                        break;
-                    case INFO_LEVEL.PROCESS:
-                        this.pictureBox_ClearKey.Visible = true;
-                        this.pictureBox_ClearKey.Image = global::RK7001Test.Properties.Resources.ic_loading;
-                        break;
                 }
             }
         }
@@ -529,22 +430,14 @@ namespace RK7001Test
                 {
                     case KeyType.NONE_KEY:
                         this.label_Key1Value.Text = "";
-                        this.label_Key1Check.Text = "";
                         this.label_Key2Value.Text = "";
-                        this.label_Key2Check.Text = "";
                         break;
                     case KeyType.BIND_KEY1:
                         this.label_Key1Value.Text = msg.ToString();
                         break;
                     case KeyType.BIND_KEY2:
                         this.label_Key2Value.Text = msg.ToString();
-                        break;
-                    case KeyType.CHECK_KEY1:
-                        this.label_Key1Check.Text = msg.ToString();
-                        break;
-                    case KeyType.CHECK_KEY2:
-                        this.label_Key2Check.Text = msg.ToString();
-                        break;
+                        break;                    
                 }
             }
         }
@@ -562,19 +455,15 @@ namespace RK7001Test
             {
                 SetValidSN(INFO_LEVEL.PROCESS);
                 SetBindKey1(INFO_LEVEL.PROCESS);
-                SetCheckKey1(INFO_LEVEL.PROCESS);
-                SetClearKey(INFO_LEVEL.PROCESS);
-                this.pictureBox_BindKey2.Visible = false;
-                this.pictureBox_CheckKey2.Visible = false;             
+                SetWriteNVFlag(INFO_LEVEL.PROCESS);
+                this.pictureBox_BindKey2.Visible = false;           
             }
             else if (mPhoneTask.KeyNumber == 2)
             {
                 SetValidSN(INFO_LEVEL.PROCESS);
-                SetClearKey(INFO_LEVEL.PROCESS);
                 SetBindKey1(INFO_LEVEL.PROCESS);
-                SetCheckKey1(INFO_LEVEL.PROCESS);
                 SetBindKey2(INFO_LEVEL.PROCESS);
-                SetCheckKey2(INFO_LEVEL.PROCESS);
+                SetWriteNVFlag(INFO_LEVEL.PROCESS);
             }
 
             SetKeyValue(KeyType.NONE_KEY, 0);

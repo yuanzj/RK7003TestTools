@@ -85,5 +85,9 @@ namespace RokyTask
 
         public const byte CCU = 0X08;
 
+        public const int WRITE_KEY_REQ = 0X2D;
+
+        public const int WRITE_KEY_RSP = 0XAD;
+
     }
 }

@@ -166,15 +166,15 @@
             this.tbInputSN = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.lbItemValidSN = new System.Windows.Forms.Label();
-            this.lbItemChkServer = new System.Windows.Forms.Label();
             this.lvRK4003ErrItem = new RK7001Test.ListViewNF();
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lvRK7001ErrItem = new RK7001Test.ListViewNF();
             this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label3 = new System.Windows.Forms.Label();
+            this.lbItemValidSN = new System.Windows.Forms.Label();
+            this.lbItemChkServer = new System.Windows.Forms.Label();
             this.lvSolutions = new RK7001Test.ListViewNF();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -1537,8 +1537,8 @@
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.BackColor = System.Drawing.SystemColors.Info;
             this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label1.Font = new System.Drawing.Font("新宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(1, 4);
+            this.label1.Font = new System.Drawing.Font("新宋体", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(1, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(473, 35);
             this.label1.TabIndex = 0;
@@ -1581,45 +1581,6 @@
             this.panel3.Size = new System.Drawing.Size(474, 392);
             this.panel3.TabIndex = 6;
             // 
-            // label3
-            // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.BackColor = System.Drawing.SystemColors.Info;
-            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label3.Font = new System.Drawing.Font("新宋体", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(3, 158);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(471, 39);
-            this.label3.TabIndex = 1;
-            this.label3.Text = "RK7003测试列表";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lbItemValidSN
-            // 
-            this.lbItemValidSN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbItemValidSN.BackColor = System.Drawing.Color.Green;
-            this.lbItemValidSN.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbItemValidSN.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbItemValidSN.Location = new System.Drawing.Point(708, 4);
-            this.lbItemValidSN.Name = "lbItemValidSN";
-            this.lbItemValidSN.Size = new System.Drawing.Size(236, 35);
-            this.lbItemValidSN.TabIndex = 1;
-            this.lbItemValidSN.Text = "SN号合法性";
-            this.lbItemValidSN.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lbItemChkServer
-            // 
-            this.lbItemChkServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbItemChkServer.BackColor = System.Drawing.Color.Green;
-            this.lbItemChkServer.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbItemChkServer.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbItemChkServer.Location = new System.Drawing.Point(952, 4);
-            this.lbItemChkServer.Name = "lbItemChkServer";
-            this.lbItemChkServer.Size = new System.Drawing.Size(226, 35);
-            this.lbItemChkServer.TabIndex = 7;
-            this.lbItemChkServer.Text = "SERVER板检查";
-            this.lbItemChkServer.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // lvRK4003ErrItem
             // 
             this.lvRK4003ErrItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1628,9 +1589,9 @@
             this.columnHeader5});
             this.lvRK4003ErrItem.Font = new System.Drawing.Font("新宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lvRK4003ErrItem.GridLines = true;
-            this.lvRK4003ErrItem.Location = new System.Drawing.Point(2, 65);
+            this.lvRK4003ErrItem.Location = new System.Drawing.Point(2, 35);
             this.lvRK4003ErrItem.Name = "lvRK4003ErrItem";
-            this.lvRK4003ErrItem.Size = new System.Drawing.Size(474, 135);
+            this.lvRK4003ErrItem.Size = new System.Drawing.Size(474, 116);
             this.lvRK4003ErrItem.TabIndex = 4;
             this.lvRK4003ErrItem.UseCompatibleStateImageBehavior = false;
             this.lvRK4003ErrItem.View = System.Windows.Forms.View.Details;
@@ -1655,9 +1616,9 @@
             this.columnHeader7});
             this.lvRK7001ErrItem.Font = new System.Drawing.Font("新宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lvRK7001ErrItem.GridLines = true;
-            this.lvRK7001ErrItem.Location = new System.Drawing.Point(2, 264);
+            this.lvRK7001ErrItem.Location = new System.Drawing.Point(2, 190);
             this.lvRK7001ErrItem.Name = "lvRK7001ErrItem";
-            this.lvRK7001ErrItem.Size = new System.Drawing.Size(472, 125);
+            this.lvRK7001ErrItem.Size = new System.Drawing.Size(472, 202);
             this.lvRK7001ErrItem.TabIndex = 5;
             this.lvRK7001ErrItem.UseCompatibleStateImageBehavior = false;
             this.lvRK7001ErrItem.View = System.Windows.Forms.View.Details;
@@ -1678,10 +1639,10 @@
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.BackColor = System.Drawing.SystemColors.Info;
             this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label3.Font = new System.Drawing.Font("新宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(3, 203);
+            this.label3.Font = new System.Drawing.Font("新宋体", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(3, 152);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(471, 58);
+            this.label3.Size = new System.Drawing.Size(471, 35);
             this.label3.TabIndex = 1;
             this.label3.Text = "RK7003测试列表";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1705,7 +1666,7 @@
             this.lbItemChkServer.BackColor = System.Drawing.Color.Green;
             this.lbItemChkServer.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lbItemChkServer.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbItemChkServer.Location = new System.Drawing.Point(952, 4);
+            this.lbItemChkServer.Location = new System.Drawing.Point(953, 4);
             this.lbItemChkServer.Name = "lbItemChkServer";
             this.lbItemChkServer.Size = new System.Drawing.Size(226, 35);
             this.lbItemChkServer.TabIndex = 7;
@@ -1760,7 +1721,7 @@
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "新日RK7003板测 V2.0.1";
+            this.Text = "新日RK7003板测 V2.0.6";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_Closed);
             this.Load += new System.EventHandler(this.MainForm_Load);

@@ -42,17 +42,13 @@
             this.label_Key1Value = new System.Windows.Forms.Label();
             this.pictureBox_BindKey1 = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.panel_CheckKey1 = new System.Windows.Forms.Panel();
-            this.label_Key1Check = new System.Windows.Forms.Label();
-            this.pictureBox_CheckKey1 = new System.Windows.Forms.PictureBox();
-            this.label4 = new System.Windows.Forms.Label();
             this.panel_BindKey2 = new System.Windows.Forms.Panel();
             this.label_Key2Value = new System.Windows.Forms.Label();
             this.pictureBox_BindKey2 = new System.Windows.Forms.PictureBox();
             this.label7 = new System.Windows.Forms.Label();
-            this.panel_CheckKey2 = new System.Windows.Forms.Panel();
+            this.panel_WriteNV = new System.Windows.Forms.Panel();
             this.label_Key2Check = new System.Windows.Forms.Label();
-            this.pictureBox_CheckKey2 = new System.Windows.Forms.PictureBox();
+            this.pictureBox_WriteNV = new System.Windows.Forms.PictureBox();
             this.label8 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -60,22 +56,15 @@
             this.label_MainTip = new System.Windows.Forms.Label();
             this.label_TimeCount = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
-            this.panel_ClearSN = new System.Windows.Forms.Panel();
-            this.pictureBox_ClearKey = new System.Windows.Forms.PictureBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.panel_SN.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SN)).BeginInit();
             this.panel_BindKey1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_BindKey1)).BeginInit();
-            this.panel_CheckKey1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_CheckKey1)).BeginInit();
             this.panel_BindKey2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_BindKey2)).BeginInit();
-            this.panel_CheckKey2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_CheckKey2)).BeginInit();
+            this.panel_WriteNV.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_WriteNV)).BeginInit();
             this.panel_MainResult.SuspendLayout();
-            this.panel_ClearSN.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ClearKey)).BeginInit();
             this.SuspendLayout();
             // 
             // label_MainResult
@@ -84,9 +73,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label_MainResult.BackColor = System.Drawing.Color.Transparent;
             this.label_MainResult.Font = new System.Drawing.Font("宋体", 72F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label_MainResult.Location = new System.Drawing.Point(3, 7);
+            this.label_MainResult.Location = new System.Drawing.Point(3, 0);
             this.label_MainResult.Name = "label_MainResult";
-            this.label_MainResult.Size = new System.Drawing.Size(582, 303);
+            this.label_MainResult.Size = new System.Drawing.Size(582, 384);
             this.label_MainResult.TabIndex = 4;
             this.label_MainResult.Text = "成功";
             this.label_MainResult.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -107,7 +96,7 @@
             this.textBox_SN.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_SN.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textBox_SN.Font = new System.Drawing.Font("宋体", 36F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.textBox_SN.Font = new System.Drawing.Font("宋体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.textBox_SN.Location = new System.Drawing.Point(106, 704);
             this.textBox_SN.MaxLength = 10;
             this.textBox_SN.Name = "textBox_SN";
@@ -153,16 +142,16 @@
             this.panel_SN.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel_SN.Controls.Add(this.pictureBox_SN);
             this.panel_SN.Controls.Add(this.label2);
-            this.panel_SN.Location = new System.Drawing.Point(603, 36);
+            this.panel_SN.Location = new System.Drawing.Point(605, 43);
             this.panel_SN.Name = "panel_SN";
-            this.panel_SN.Size = new System.Drawing.Size(501, 70);
+            this.panel_SN.Size = new System.Drawing.Size(491, 70);
             this.panel_SN.TabIndex = 13;
             // 
             // pictureBox_SN
             // 
             this.pictureBox_SN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox_SN.Image = global::RK7001Test.Properties.Resources.ic_loading;
-            this.pictureBox_SN.Location = new System.Drawing.Point(423, 7);
+            this.pictureBox_SN.Location = new System.Drawing.Point(413, 7);
             this.pictureBox_SN.Name = "pictureBox_SN";
             this.pictureBox_SN.Size = new System.Drawing.Size(65, 54);
             this.pictureBox_SN.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -177,7 +166,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(328, 54);
             this.label2.TabIndex = 0;
-            this.label2.Text = "1、设备SN号与标签SN号匹配";
+            this.label2.Text = "设备SN号与标签SN号匹配";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // panel_BindKey1
@@ -188,9 +177,9 @@
             this.panel_BindKey1.Controls.Add(this.label_Key1Value);
             this.panel_BindKey1.Controls.Add(this.pictureBox_BindKey1);
             this.panel_BindKey1.Controls.Add(this.label3);
-            this.panel_BindKey1.Location = new System.Drawing.Point(603, 194);
+            this.panel_BindKey1.Location = new System.Drawing.Point(605, 129);
             this.panel_BindKey1.Name = "panel_BindKey1";
-            this.panel_BindKey1.Size = new System.Drawing.Size(501, 70);
+            this.panel_BindKey1.Size = new System.Drawing.Size(492, 70);
             this.panel_BindKey1.TabIndex = 14;
             // 
             // label_Key1Value
@@ -208,7 +197,7 @@
             // 
             this.pictureBox_BindKey1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox_BindKey1.Image = global::RK7001Test.Properties.Resources.OK;
-            this.pictureBox_BindKey1.Location = new System.Drawing.Point(423, 7);
+            this.pictureBox_BindKey1.Location = new System.Drawing.Point(414, 7);
             this.pictureBox_BindKey1.Name = "pictureBox_BindKey1";
             this.pictureBox_BindKey1.Size = new System.Drawing.Size(65, 54);
             this.pictureBox_BindKey1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -219,69 +208,24 @@
             // 
             this.label3.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label3.ForeColor = System.Drawing.Color.Black;
-            this.label3.Location = new System.Drawing.Point(5, 7);
+            this.label3.Location = new System.Drawing.Point(3, 7);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(306, 54);
             this.label3.TabIndex = 1;
-            this.label3.Text = "3、绑定第一把钥匙";
+            this.label3.Text = "绑定第一把钥匙";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // panel_CheckKey1
-            // 
-            this.panel_CheckKey1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel_CheckKey1.BackColor = System.Drawing.SystemColors.Window;
-            this.panel_CheckKey1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel_CheckKey1.Controls.Add(this.label_Key1Check);
-            this.panel_CheckKey1.Controls.Add(this.pictureBox_CheckKey1);
-            this.panel_CheckKey1.Controls.Add(this.label4);
-            this.panel_CheckKey1.Location = new System.Drawing.Point(603, 273);
-            this.panel_CheckKey1.Name = "panel_CheckKey1";
-            this.panel_CheckKey1.Size = new System.Drawing.Size(501, 70);
-            this.panel_CheckKey1.TabIndex = 15;
-            // 
-            // label_Key1Check
-            // 
-            this.label_Key1Check.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label_Key1Check.ForeColor = System.Drawing.SystemColors.AppWorkspace;
-            this.label_Key1Check.Location = new System.Drawing.Point(298, 22);
-            this.label_Key1Check.Name = "label_Key1Check";
-            this.label_Key1Check.Size = new System.Drawing.Size(112, 23);
-            this.label_Key1Check.TabIndex = 3;
-            this.label_Key1Check.Text = "025686";
-            this.label_Key1Check.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // pictureBox_CheckKey1
-            // 
-            this.pictureBox_CheckKey1.Image = global::RK7001Test.Properties.Resources.Shape;
-            this.pictureBox_CheckKey1.Location = new System.Drawing.Point(421, 6);
-            this.pictureBox_CheckKey1.Name = "pictureBox_CheckKey1";
-            this.pictureBox_CheckKey1.Size = new System.Drawing.Size(65, 54);
-            this.pictureBox_CheckKey1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox_CheckKey1.TabIndex = 3;
-            this.pictureBox_CheckKey1.TabStop = false;
-            // 
-            // label4
-            // 
-            this.label4.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label4.ForeColor = System.Drawing.Color.Black;
-            this.label4.Location = new System.Drawing.Point(6, 6);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(228, 54);
-            this.label4.TabIndex = 2;
-            this.label4.Text = "4、确认绑定成功？";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // panel_BindKey2
             // 
             this.panel_BindKey2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.panel_BindKey2.BackColor = System.Drawing.SystemColors.Window;
             this.panel_BindKey2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel_BindKey2.Controls.Add(this.label7);
             this.panel_BindKey2.Controls.Add(this.label_Key2Value);
             this.panel_BindKey2.Controls.Add(this.pictureBox_BindKey2);
-            this.panel_BindKey2.Controls.Add(this.label7);
-            this.panel_BindKey2.Location = new System.Drawing.Point(603, 353);
+            this.panel_BindKey2.Location = new System.Drawing.Point(605, 216);
             this.panel_BindKey2.Name = "panel_BindKey2";
-            this.panel_BindKey2.Size = new System.Drawing.Size(501, 70);
+            this.panel_BindKey2.Size = new System.Drawing.Size(491, 70);
             this.panel_BindKey2.TabIndex = 16;
             // 
             // label_Key2Value
@@ -299,7 +243,7 @@
             // 
             this.pictureBox_BindKey2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox_BindKey2.Image = global::RK7001Test.Properties.Resources.ic_loading;
-            this.pictureBox_BindKey2.Location = new System.Drawing.Point(423, 4);
+            this.pictureBox_BindKey2.Location = new System.Drawing.Point(413, 4);
             this.pictureBox_BindKey2.Name = "pictureBox_BindKey2";
             this.pictureBox_BindKey2.Size = new System.Drawing.Size(65, 57);
             this.pictureBox_BindKey2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -310,25 +254,25 @@
             // 
             this.label7.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label7.ForeColor = System.Drawing.Color.Black;
-            this.label7.Location = new System.Drawing.Point(6, 7);
+            this.label7.Location = new System.Drawing.Point(8, 7);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(261, 54);
             this.label7.TabIndex = 2;
-            this.label7.Text = "5、绑定第二把钥匙";
+            this.label7.Text = "绑定第二把钥匙";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // panel_CheckKey2
+            // panel_WriteNV
             // 
-            this.panel_CheckKey2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel_CheckKey2.BackColor = System.Drawing.SystemColors.Window;
-            this.panel_CheckKey2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel_CheckKey2.Controls.Add(this.label_Key2Check);
-            this.panel_CheckKey2.Controls.Add(this.pictureBox_CheckKey2);
-            this.panel_CheckKey2.Controls.Add(this.label8);
-            this.panel_CheckKey2.Location = new System.Drawing.Point(604, 434);
-            this.panel_CheckKey2.Name = "panel_CheckKey2";
-            this.panel_CheckKey2.Size = new System.Drawing.Size(500, 70);
-            this.panel_CheckKey2.TabIndex = 17;
+            this.panel_WriteNV.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel_WriteNV.BackColor = System.Drawing.SystemColors.Window;
+            this.panel_WriteNV.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel_WriteNV.Controls.Add(this.label_Key2Check);
+            this.panel_WriteNV.Controls.Add(this.pictureBox_WriteNV);
+            this.panel_WriteNV.Controls.Add(this.label8);
+            this.panel_WriteNV.Location = new System.Drawing.Point(605, 302);
+            this.panel_WriteNV.Name = "panel_WriteNV";
+            this.panel_WriteNV.Size = new System.Drawing.Size(492, 70);
+            this.panel_WriteNV.TabIndex = 17;
             // 
             // label_Key2Check
             // 
@@ -338,29 +282,28 @@
             this.label_Key2Check.Name = "label_Key2Check";
             this.label_Key2Check.Size = new System.Drawing.Size(102, 23);
             this.label_Key2Check.TabIndex = 5;
-            this.label_Key2Check.Text = "025686";
             this.label_Key2Check.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // pictureBox_CheckKey2
+            // pictureBox_WriteNV
             // 
-            this.pictureBox_CheckKey2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox_CheckKey2.Image = global::RK7001Test.Properties.Resources.OK;
-            this.pictureBox_CheckKey2.Location = new System.Drawing.Point(422, 5);
-            this.pictureBox_CheckKey2.Name = "pictureBox_CheckKey2";
-            this.pictureBox_CheckKey2.Size = new System.Drawing.Size(70, 56);
-            this.pictureBox_CheckKey2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox_CheckKey2.TabIndex = 5;
-            this.pictureBox_CheckKey2.TabStop = false;
+            this.pictureBox_WriteNV.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox_WriteNV.Image = global::RK7001Test.Properties.Resources.OK;
+            this.pictureBox_WriteNV.Location = new System.Drawing.Point(414, 5);
+            this.pictureBox_WriteNV.Name = "pictureBox_WriteNV";
+            this.pictureBox_WriteNV.Size = new System.Drawing.Size(70, 56);
+            this.pictureBox_WriteNV.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox_WriteNV.TabIndex = 5;
+            this.pictureBox_WriteNV.TabStop = false;
             // 
             // label8
             // 
             this.label8.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label8.ForeColor = System.Drawing.Color.Black;
-            this.label8.Location = new System.Drawing.Point(5, 7);
+            this.label8.Location = new System.Drawing.Point(9, 5);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(248, 54);
             this.label8.TabIndex = 3;
-            this.label8.Text = "6、确定绑定成功？";
+            this.label8.Text = "写NV到设备";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label1
@@ -369,7 +312,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.ForeColor = System.Drawing.Color.Red;
-            this.label1.Location = new System.Drawing.Point(599, 9);
+            this.label1.Location = new System.Drawing.Point(599, 7);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(500, 24);
             this.label1.TabIndex = 18;
@@ -401,8 +344,8 @@
             // 
             this.label_MainTip.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_MainTip.Font = new System.Drawing.Font("新宋体", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label_MainTip.Location = new System.Drawing.Point(3, 310);
+            this.label_MainTip.Font = new System.Drawing.Font("新宋体", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_MainTip.Location = new System.Drawing.Point(2, 369);
             this.label_MainTip.Name = "label_MainTip";
             this.label_MainTip.Size = new System.Drawing.Size(582, 89);
             this.label_MainTip.TabIndex = 5;
@@ -431,63 +374,27 @@
             this.label13.TabIndex = 23;
             this.label13.Text = "秒";
             // 
-            // panel_ClearSN
-            // 
-            this.panel_ClearSN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel_ClearSN.BackColor = System.Drawing.SystemColors.Window;
-            this.panel_ClearSN.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel_ClearSN.Controls.Add(this.pictureBox_ClearKey);
-            this.panel_ClearSN.Controls.Add(this.label5);
-            this.panel_ClearSN.Location = new System.Drawing.Point(603, 115);
-            this.panel_ClearSN.Name = "panel_ClearSN";
-            this.panel_ClearSN.Size = new System.Drawing.Size(501, 70);
-            this.panel_ClearSN.TabIndex = 14;
-            // 
-            // pictureBox_ClearKey
-            // 
-            this.pictureBox_ClearKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox_ClearKey.Image = global::RK7001Test.Properties.Resources.ic_loading;
-            this.pictureBox_ClearKey.Location = new System.Drawing.Point(423, 7);
-            this.pictureBox_ClearKey.Name = "pictureBox_ClearKey";
-            this.pictureBox_ClearKey.Size = new System.Drawing.Size(65, 54);
-            this.pictureBox_ClearKey.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox_ClearKey.TabIndex = 1;
-            this.pictureBox_ClearKey.TabStop = false;
-            // 
-            // label5
-            // 
-            this.label5.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label5.ForeColor = System.Drawing.Color.Black;
-            this.label5.Location = new System.Drawing.Point(6, 7);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(329, 54);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "2、清除已绑定钥匙...";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // KeysBinding
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1107, 772);
-            this.Controls.Add(this.panel_ClearSN);
+            this.Controls.Add(this.panel_BindKey2);
+            this.Controls.Add(this.panel_BindKey1);
+            this.Controls.Add(this.panel_SN);
+            this.Controls.Add(this.panel_WriteNV);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.label_TimeCount);
             this.Controls.Add(this.panel_MainResult);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.panel_CheckKey2);
-            this.Controls.Add(this.panel_BindKey2);
-            this.Controls.Add(this.panel_CheckKey1);
-            this.Controls.Add(this.panel_BindKey1);
-            this.Controls.Add(this.panel_SN);
             this.Controls.Add(this.listView_Data);
             this.Controls.Add(this.textBox_SN);
             this.Controls.Add(this.label6);
             this.KeyPreview = true;
             this.Name = "KeysBinding";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "RK7003整测工具V2.0.5";
+            this.Text = "RK7003整测工具V2.0.6";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.KeyBindForm_Closed);
             this.Load += new System.EventHandler(this.KeyBindForm_Load);
@@ -496,15 +403,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SN)).EndInit();
             this.panel_BindKey1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_BindKey1)).EndInit();
-            this.panel_CheckKey1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_CheckKey1)).EndInit();
             this.panel_BindKey2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_BindKey2)).EndInit();
-            this.panel_CheckKey2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_CheckKey2)).EndInit();
+            this.panel_WriteNV.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_WriteNV)).EndInit();
             this.panel_MainResult.ResumeLayout(false);
-            this.panel_ClearSN.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ClearKey)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -517,13 +420,11 @@
         private System.Windows.Forms.ListView listView_Data;
         private System.Windows.Forms.Panel panel_SN;
         private System.Windows.Forms.Panel panel_BindKey1;
-        private System.Windows.Forms.Panel panel_CheckKey1;
         private System.Windows.Forms.Panel panel_BindKey2;
-        private System.Windows.Forms.Panel panel_CheckKey2;
+        private System.Windows.Forms.Panel panel_WriteNV;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ColumnHeader columnHeader1;
@@ -532,19 +433,14 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.PictureBox pictureBox_SN;
         private System.Windows.Forms.PictureBox pictureBox_BindKey1;
-        private System.Windows.Forms.PictureBox pictureBox_CheckKey1;
         private System.Windows.Forms.PictureBox pictureBox_BindKey2;
-        private System.Windows.Forms.PictureBox pictureBox_CheckKey2;
+        private System.Windows.Forms.PictureBox pictureBox_WriteNV;
         private System.Windows.Forms.Panel panel_MainResult;
         private System.Windows.Forms.Label label_MainTip;
         private System.Windows.Forms.Label label_TimeCount;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label_Key1Value;
-        private System.Windows.Forms.Label label_Key1Check;
         private System.Windows.Forms.Label label_Key2Value;
         private System.Windows.Forms.Label label_Key2Check;
-        private System.Windows.Forms.Panel panel_ClearSN;
-        private System.Windows.Forms.PictureBox pictureBox_ClearKey;
-        private System.Windows.Forms.Label label5;
     }
 }

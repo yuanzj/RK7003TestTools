@@ -175,12 +175,12 @@ namespace RK7001Test
                         break;
                     case STEP_LEVEL.BIND_KEY1:
                         this.panel_MainResult.BackColor = Color.Yellow;
-                        this.label_MainResult.Text = "请长按按键\n绑定第一把钥匙...";
+                        this.label_MainResult.Text = "5秒内，多次按键\n绑定第一把钥匙...";
                         this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.BIND_KEY2:
                         this.panel_MainResult.BackColor = Color.Yellow;
-                        this.label_MainResult.Text = "请长按按键\n绑定第二把钥匙...";
+                        this.label_MainResult.Text = "5秒内，多次按键\n绑定第二把钥匙...";
                         this.label_MainTip.Text = "";
                         break;
                     case STEP_LEVEL.FAIL:
@@ -191,8 +191,17 @@ namespace RK7001Test
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
                         this.textBox_SN.Focus();
-                        break;                                           
-                                       
+                        break;
+                    case STEP_LEVEL.BIND_TIMEOUT:
+                        this.TestTimeTicker.Enabled = false;
+                        this.panel_MainResult.BackColor = Color.Red;
+                        this.label_MainResult.Text = String.Format("{0}\n绑 定 超 时", mPhoneTask.mSN);
+                        this.label_MainTip.Text = "再次扫描,进行下一次测试!";
+                        this.textBox_SN.Enabled = true;
+                        this.textBox_SN.Text = "";
+                        this.textBox_SN.Focus();
+                        break;
+                                                                                             
                 }
             }
         }

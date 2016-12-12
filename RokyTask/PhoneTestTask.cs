@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace RokyTask
 {
@@ -39,6 +40,7 @@ namespace RokyTask
         WRITE_NV = 5,
         PASS = 6,
         FAIL = 7,
+        BIND_TIMEOUT = 8,
     }
 
     public class StepArgs : EventArgs
@@ -70,9 +72,9 @@ namespace RokyTask
         public int keysNumber { get; set; }
         public bool bTaskRunning { get; set; }
         public string mSN { get; set; }
-        private BindSteps mBindSteps;
         private int mKey1Value { get; set; }
         private int mKey2Value { get; set; }
+        private int mTimeout { get; set; }
         Hashtable ht;//存储钥匙的键和值
 
         #endregion
@@ -108,6 +110,7 @@ namespace RokyTask
         //恢复同步报文
         SimpleSerialPortTask<ResetEcuReq, NullEntity> mRecoverTask;
         ResetEcuReq mRecoverParam;
+        
         #endregion
 
         #region 构造函数
@@ -119,7 +122,7 @@ namespace RokyTask
 
         #region 构造任务
         private void TaskBuilder()
-        {            
+        {
             //回复同步
             mRecoverTask = new SimpleSerialPortTask<ResetEcuReq, NullEntity>();
             mRecoverParam = mRecoverTask.GetRequestEntity();
@@ -208,6 +211,7 @@ namespace RokyTask
                         SetMainText(sender, STEP_LEVEL.BIND_KEY1);
                         mBindKey1Param.ack_device = Const.PCU;
                         mBindKey1Task.Excute();
+                        mTimeout = 100;
                     }
                 }
                 else
@@ -271,6 +275,7 @@ namespace RokyTask
                                 SetBindKey1(sender, INFO_LEVEL.PASS);
                                 //保存Key1按键
                                 mKey1Value = key;
+                                mTimeout = 100;
                                 byte[] temp1 = new byte[3];
                                 temp1[0] = (byte)(mKey1Value >> 16 & 0xFF);
                                 temp1[1] = (byte)(mKey1Value >> 8 & 0xFF);
@@ -282,7 +287,7 @@ namespace RokyTask
                                 if (KeyNumber == 2)
                                 {
                                     SetMainText(sender, STEP_LEVEL.BIND_KEY2);
-                                    mBindKey2Task.Excute();                                    
+                                    mBindKey2Task.Excute();
                                 }
                                 else
                                 {
@@ -294,15 +299,25 @@ namespace RokyTask
                                 return;
                             }
                         }
-                    }                    
-                    
-                    Thread.Sleep(50);
-                    mBindKey1Task.Excute();
+                    }   
+                    if(mTimeout-- > 0)
+                    {
+                        Thread.Sleep(50);
+                        mBindKey1Task.Excute();
+                    }
+                    else
+                    {
+                        SetListView(sender, "绑定超时", "未在5秒内，有效按下按键");
+                        SetItemFail(sender, BindSteps.KEY1_BIND);
+                        SetMainText(sender, STEP_LEVEL.BIND_TIMEOUT);
+                        mRecoverTask.Excute();
+                        StopTask();
+                    }                                           
                 }
                 else
                 {
                     SetListView(sender, "未收到钥匙的绑定和检查的响应", "设备未上电或通讯有异常");
-                    SetItemFail(sender, mBindSteps);
+                    SetItemFail(sender, BindSteps.KEY1_BIND);
                     SetMainText(sender, STEP_LEVEL.FAIL);
                     mRecoverTask.Excute();
                     StopTask();
@@ -373,13 +388,24 @@ namespace RokyTask
                         }
                     }
 
-                    Thread.Sleep(50);
-                    mBindKey2Task.Excute();
+                    if (mTimeout-- > 0)
+                    {
+                        Thread.Sleep(50);
+                        mBindKey2Task.Excute();
+                    }
+                    else
+                    {
+                        SetListView(sender, "绑定超时", "未在5秒内，有效按下按键");
+                        SetItemFail(sender, BindSteps.KEY2_BIND);
+                        SetMainText(sender, STEP_LEVEL.BIND_TIMEOUT);
+                        mRecoverTask.Excute();
+                        StopTask();
+                    }
                 }
                 else
                 {
                     SetListView(sender, "未收到钥匙的绑定和检查的响应", "设备未上电或通讯有异常");
-                    SetItemFail(sender, mBindSteps);
+                    SetItemFail(sender, BindSteps.KEY2_BIND);
                     SetMainText(sender, STEP_LEVEL.FAIL);
                     mRecoverTask.Excute();
                     StopTask();
@@ -412,7 +438,7 @@ namespace RokyTask
                 else
                 {
                     SetListView(sender, "写钥匙地址到设备失败", "设备异常或通讯有异常");
-                    SetItemFail(sender, mBindSteps);
+                    SetItemFail(sender, BindSteps.WRITE_NV);
                     SetMainText(sender, STEP_LEVEL.FAIL);
                     mRecoverTask.Excute();
                     StopTask();
@@ -421,8 +447,7 @@ namespace RokyTask
 
         }
         #endregion
-
-       
+      
         #region 设置失败
         private void SetItemFail(object sender, BindSteps step)
         {
@@ -456,7 +481,7 @@ namespace RokyTask
         #region 更新主页显示状态
         private void SetMainText(object sender, STEP_LEVEL _level)
         {
-            if (_level == STEP_LEVEL.FAIL || _level == STEP_LEVEL.PASS)
+            if (_level == STEP_LEVEL.FAIL || _level == STEP_LEVEL.PASS || _level == STEP_LEVEL.BIND_TIMEOUT)
                 bTaskRunning = false;
 
             if(UpdateWorkStatusHandler != null)
@@ -567,9 +592,9 @@ namespace RokyTask
         private void InitTask()
         {
             ht = new Hashtable();
-            mBindSteps = BindSteps.WAIT_POWER;
             mKey1Value = 0;
             mKey2Value = 0;
+            mTimeout = 100;
             mGetDevInfoTask.ClearAllEvent();
             mBindKey1Task.ClearAllEvent();
             mBroadCastTask.ClearAllEvent();

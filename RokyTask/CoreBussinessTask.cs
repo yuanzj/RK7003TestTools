@@ -1853,6 +1853,7 @@ namespace RokyTask
 
         public void ExcuteTask()
         {
+            
             InitParameters();
             mRK7001Pins = new PIN_STATUS();
             mRK4103Pins = new PIN_STATUS();
@@ -1861,6 +1862,8 @@ namespace RokyTask
             UpdateRemoteStatus(this, INFO_LEVEL.PROCESS);
             UpdateVddGpsPin(this, INFO_LEVEL.PROCESS);
             this.DynamicPotTicker.Enabled = true;
+
+            mGet7001ResultTask.Excute();
             if (bServerActivated)
             {
                 if (!GetValueFrmServer(this))

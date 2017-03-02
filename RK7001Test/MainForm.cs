@@ -918,7 +918,7 @@ namespace RK7001Test
             {
                 for (int i = 2; i <= 30; i++)
                 {
-                   
+                    
                     if (i == 16 || i == 17 || i == 19 || i == 26 || i== 15 || i == 20 
                         || i== 5 || i == 2 || i== 29 || i == 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);

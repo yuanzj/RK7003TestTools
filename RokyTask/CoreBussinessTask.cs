@@ -350,7 +350,7 @@ namespace RokyTask
                                 mGet700ResultParam.server_mode = 0x04;//开启软件上电
                                 mGet700ResultParam.backlight = 0;
                                 mGet700ResultParam.batt_soc = 0;
-                                mGet700ResultParam.level_ctrl = 0XFFFF;//开启铁喇叭
+                                mGet700ResultParam.level_ctrl = 0x0100;//开启铁喇叭
                                 mGet700ResultParam.limit_per = 0;
                                 mGet700ResultParam.trigger_ctrl = 0;
                             }
@@ -365,7 +365,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
                                 mGet700ResultParam.ecu_status = 0x34;
                                 mGet700ResultParam.server_mode = 0x4;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -382,7 +382,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.PCU;//发送PCU
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -399,7 +399,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -416,7 +416,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x2;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -433,7 +433,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -452,7 +452,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x1;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {                                
@@ -469,7 +469,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.PCU;
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x1;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -500,7 +500,7 @@ namespace RokyTask
                             level = Step8_RemoteTest(sender, mEventArgs.Data);
                             if (level == Task_Level.FALSE)
                             {
-                                UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                                UpdateListView(sender, "7010 遥控电路测试失败", "遥控电路有问题");
                                 UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                                 bExcute = true;
                             }
@@ -531,7 +531,7 @@ namespace RokyTask
                             ManualVisio mMaualFrm = new ManualVisio();
                             DialogResult result = mMaualFrm.ShowDialog();
                             if (result == DialogResult.OK)
-                            {
+                            {                                
                                 /*
                                 UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);                               
                                 string mRest = String.Format("{0}\n测 试 成 功！", mSN);                                
@@ -540,12 +540,14 @@ namespace RokyTask
                                 mMaualFrm.Close();
                                 */
                                 mMaualFrm.Close();
+                                UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+                                SetMainText(sender, "继续测试中...", "", INFO_LEVEL.PROCESS);
                                 //关闭VDD_CCU
                                 mTaskSteps = TaskSteps.Step12_CloseVddCCu;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x0;
-                                mGet700ResultParam.server_mode = 0x1;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.ecu_status = 0x34;
+                                mGet700ResultParam.server_mode = 0x0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if (result == DialogResult.Cancel)
                             {
@@ -553,9 +555,9 @@ namespace RokyTask
                                 UpdateListView(sender, "BUZZER故障", "听不到喇叭发出的声音，或喇叭电路有问题");
                                 UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
                                 mMaualFrm.Close();
+                                StopTask();
+                                return;
                             }
-                            //StopTask();
-                            //return;
                             break;
                         case TaskSteps.Step12_CloseVddCCu:
                             level = Step12_CloseVddCCu(sender, mEventArgs.Data);
@@ -563,17 +565,17 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step12_CloseVddCCu;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x0;
-                                mGet700ResultParam.server_mode = 0x1;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.ecu_status = 0x34;
+                                mGet700ResultParam.server_mode = 0x0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.TRUE)
                             {
                                 mTaskSteps = TaskSteps.Step13_CheckVddCCu;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;
-                                mGet700ResultParam.ecu_status = 0x0;
-                                mGet700ResultParam.server_mode = 0x8;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.ecu_status = 0x34;
+                                mGet700ResultParam.server_mode = 0x0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -581,7 +583,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.PCU;
                                 mGet700ResultParam.ecu_status = 0x0;
                                 mGet700ResultParam.server_mode = 0x1;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             break;
                         case TaskSteps.Step13_CheckVddCCu:
@@ -592,7 +594,7 @@ namespace RokyTask
                             }
                             else if(level == Task_Level.TRUE)
                             {
-                                UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+                                
                                 string mRest = String.Format("{0}\n测 试 成 功！", mSN);
                                 //保存数据
                                 SetMainText(sender, mRest, "PASS", INFO_LEVEL.PASS);
@@ -603,7 +605,7 @@ namespace RokyTask
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;
                                 mGet700ResultParam.ecu_status = 0x0;
                                 mGet700ResultParam.server_mode = 0x8;
-                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             break;                            
                     }
@@ -1180,7 +1182,7 @@ namespace RokyTask
                     {
                         testResult = true;
                         UpdateRK7001Items(sender, RK7001ITEM.AMPLIFY, null, INFO_LEVEL.FAIL);
-                        UpdateListView(sender, "7003运放故障", "U200或者运放有问题");
+                        UpdateListView(sender, "7010运放故障", "U200或者运放有问题");
                     }
                     else
                     {
@@ -1191,14 +1193,14 @@ namespace RokyTask
                         testResult = true;
                         mRK7001Pins.Pin11_Open = true;
                         mRK7001Pins.Pin19_Open = true;
-                        UpdateListView(sender, "7003 DC故障", "ACC_DC或者12V有问题");
+                        UpdateListView(sender, "7010 DC故障", "ACC_DC或者12V有问题");
                     }
                     
                     if ((mDeviceFault >> 5 & 0x1) == 1) //mosfet故障
                     {
                         testResult = true;
                         UpdateRK7001Items(sender, RK7001ITEM.MOSFET, null, INFO_LEVEL.FAIL);
-                        UpdateListView(sender, "7003 Mosfet故障", "Mosfet可能短路");
+                        UpdateListView(sender, "7010 Mosfet故障", "Mosfet可能短路");
                     }
                     else
                     {
@@ -1208,57 +1210,57 @@ namespace RokyTask
                     {
                         testResult = true;
                         mRK7001Pins.Pin25_Open = true;
-                        UpdateListView(sender, "7003前左转灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010前左转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 1 & 0x1) == 1)//后左转
                     {
                         testResult = true;
                         mRK7001Pins.Pin28_Open = true;
-                        UpdateListView(sender, "7003后左转灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010后左转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 2 & 0x1) == 1)//前右转
                     {
                         testResult = true;
                         mRK7001Pins.Pin24_Open = true;
-                        UpdateListView(sender, "7003前右转灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010前右转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 3 & 0x1) == 1)//后右转
                     {
                         testResult = true;
                         mRK7001Pins.Pin27_Open = true;
-                        UpdateListView(sender, "7003后右转灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010后右转灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 4 & 0x1) == 1)//近光
                     {
                         testResult = true;
                         mRK7001Pins.Pin5_Open = true;
-                        UpdateListView(sender, "7003近光灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010近光灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 5 & 0x1) == 1)//远光
                     {
                         testResult = true;
                         mRK7001Pins.Pin6_Open = true;
-                        UpdateListView(sender, "7003远光灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010远光灯断路", "该pin脚可能断路或其他原因");
                     }
                     if ((mCutError1 >> 6 & 0x1) == 1)//尾灯
                     {
                         testResult = true;
                         mRK7001Pins.Pin2_Open = true;
-                        UpdateListView(sender, "7003尾灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010尾灯断路", "该pin脚可能断路或其他原因");
                     }
 
                     if ((mCutError1 >> 7 & 0x1) == 1)//刹车灯
                     {
                         testResult = true;
                         mRK7001Pins.Pin3_Open = true;
-                        UpdateListView(sender, "7003刹车灯断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010刹车灯断路", "该pin脚可能断路或其他原因");
                     }
 
                     if ((mCutError2 >> 0 & 0x1) == 1)//背景灯R
                     {
                         testResult = true;
                         mRK7001Pins.Pin23_Open = true;
-                        UpdateListView(sender, "7003背景灯红断路", "该pin脚可能断路或其他原因");
+                        UpdateListView(sender, "7010背景灯红断路", "该pin脚可能断路或其他原因");
                     }
                     /*
                     if ((mCutError2 >> 1 & 0x1) == 1)//背景灯G
@@ -1270,7 +1272,7 @@ namespace RokyTask
                     {
                         testResult = true;
                         mRK7001Pins.Pin4_Open = true;
-                        UpdateListView(sender, "7003铁喇叭故障", "该pin脚短路或者断路");
+                        UpdateListView(sender, "7010铁喇叭故障", "该pin脚短路或者断路");
                     }
                     /*
                     if ((mCutError2 >> 4 & 0x1) == 1)//BUZZER
@@ -1285,55 +1287,55 @@ namespace RokyTask
                     {
                         testResult = true;
                         mRK7001Pins.Pin25_Short = true;
-                        UpdateListView(sender, "7003前左转灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010前左转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 1 & 0x1) == 1)//后左转
                     {
                         testResult = true;
                         mRK7001Pins.Pin28_Short = true;
-                        UpdateListView(sender, "7003后左转灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010后左转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 2 & 0x1) == 1)//前右转
                     {
                         testResult = true;
                         mRK7001Pins.Pin24_Short = true;
-                        UpdateListView(sender, "7003前右转灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010前右转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 3 & 0x1) == 1)//后右转
                     {
                         testResult = true;
                         mRK7001Pins.Pin27_Short = true;
-                        UpdateListView(sender, "7003后右转灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010后右转灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 4 & 0x1) == 1)//近光
                     {
                         testResult = true;
                         mRK7001Pins.Pin5_Short = true;
-                        UpdateListView(sender, "7003近光灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010近光灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 5 & 0x1) == 1)//远光
                     {
                         testResult = true;
                         mRK7001Pins.Pin6_Short = true;
-                        UpdateListView(sender, "7003远光灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010远光灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 6 & 0x1) == 1)//尾灯
                     {
                         testResult = true;
                         mRK7001Pins.Pin2_Short = true;
-                        UpdateListView(sender, "7003尾灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010尾灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError1 >> 7 & 0x1) == 1)//刹车灯
                     {
                         testResult = true;
                         mRK7001Pins.Pin3_Short = true;
-                        UpdateListView(sender, "7003刹车灯短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010刹车灯短路", "该pin脚短路或者其他原因");
                     }
                     if ((mShortError2 >> 0 & 0x1) == 1)//背景灯R
                     {
                         testResult = true;
                         mRK7001Pins.Pin23_Short = true;
-                        UpdateListView(sender, "7003背景灯红短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010背景灯红短路", "该pin脚短路或者其他原因");
                     }
                     /*
                     if ((mShortError2 >> 1 & 0x1) == 1)//背景灯G
@@ -1345,7 +1347,7 @@ namespace RokyTask
                     {
                         testResult = true;
                         mRK7001Pins.Pin4_Open = true;
-                        UpdateListView(sender, "7003铁喇叭短路", "该pin脚短路或者其他原因");
+                        UpdateListView(sender, "7010铁喇叭短路", "该pin脚短路或者其他原因");
                     }
                     /*
                     if ((mShortError2 >> 4 & 0x1) == 1)//BUZZER
@@ -1362,7 +1364,7 @@ namespace RokyTask
                 {
                     testResult = true;
                     mRK7001Pins.Pin4_Open = true;
-                    UpdateListView(sender, "7003铁喇叭故障", "采样电流异常");
+                    UpdateListView(sender, "7010铁喇叭故障", "采样电流异常");
                     Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
                 }
                 else
@@ -1498,13 +1500,15 @@ namespace RokyTask
             byte mAccStatus = (byte)mArgs.AccStatus;
             byte mDcOUT = (byte)mArgs.DcVoltage;
             if (mAckDevice == Const.TESTSERVER)
-            {                          
+            {    
+                /*                      
                 if (mAccStatus == 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
                     mRK7001Pins.Pin18_Open = true;
                     UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
-                }                
+                }
+                */                
                 return Task_Level.TRUE;
             }
 
@@ -1520,13 +1524,15 @@ namespace RokyTask
             byte mAccStatus = (byte)mArgs.AccStatus;
             byte mDcOUT = (byte)mArgs.DcVoltage;
             if (mAckDevice == Const.TESTSERVER)
-            {                     
+            {        
+                /*          
                 if (mAccStatus != 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
                     mRK7001Pins.Pin18_Open = true;
                     UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
-                }                
+                } 
+                */              
                 return Task_Level.TRUE;
             }
             return Task_Level.REPEAT;
@@ -1598,11 +1604,11 @@ namespace RokyTask
             {
                 if((mAccStatus >> 1 & 0x1) == 0x1)
                 {
-                    return Task_Level.FALSE;//说明没有关闭成功
+                    return Task_Level.TRUE;
                 }
                 else if((mAccStatus >> 1 & 0x1) == 0x0)
                 {
-                    return Task_Level.TRUE;//说明没有关闭成功
+                    return Task_Level.FALSE;
                 }
             }
             
@@ -1878,7 +1884,7 @@ namespace RokyTask
             if(mGet700ResultParam != null)
             {
                 mGet700ResultParam.ack_device = Const.PCU;//发给PCU
-                mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
                 mGet700ResultParam.server_mode = 0x4;//开启软件上电
                 mGet700ResultParam.backlight = 0;
                 mGet700ResultParam.batt_soc = 0;
@@ -1972,7 +1978,7 @@ namespace RokyTask
             UpdateVddGpsPin(this, INFO_LEVEL.PROCESS);
             this.DynamicPotTicker.Enabled = true;
 
-            mGet7001ResultTask.Excute();
+            //mGet7001ResultTask.Excute();
             if (bServerActivated)
             {
                 if (!GetValueFrmServer(this))

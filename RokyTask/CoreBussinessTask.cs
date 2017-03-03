@@ -120,7 +120,9 @@ namespace RokyTask
         Step8_RemoteTest = 8,
         Step9_MujianInit = 9,
         Step10_MujianTest = 10,
-        Step11_RetryRemote = 11
+        Step11_RetryRemote = 11,
+        Step12_CloseVddCCu = 12,
+        Step13_CheckVddCCu = 13,
     }
 
     public enum Task_Level
@@ -323,7 +325,7 @@ namespace RokyTask
             mGet7001ResultTask.RetryMaxCnts = 10;
             mGet7001ResultTask.Timerout = 1000;//10s超时
             mGet700ResultParam.ack_device = Const.PCU;//发给PCU
-            mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+            mGet700ResultParam.ecu_status = 0x34;//默认;//默认
             mGet700ResultParam.server_mode = 0x04;//开启软件上电
             mGet700ResultParam.backlight = 0;
             mGet700ResultParam.batt_soc = 0;
@@ -337,7 +339,6 @@ namespace RokyTask
                 {
                     bool bExcute = false;
                     Task_Level level = Task_Level.FALSE;
-
                     switch(mTaskSteps)
                     {
                         case TaskSteps.Step0_Init:
@@ -345,7 +346,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step1_SelfTest;
                                 mGet700ResultParam.ack_device = Const.PCU;//发给PCU
-                                mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
                                 mGet700ResultParam.server_mode = 0x04;//开启软件上电
                                 mGet700ResultParam.backlight = 0;
                                 mGet700ResultParam.batt_soc = 0;
@@ -362,7 +363,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step2_CheckEcuOpen;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x34;
                                 mGet700ResultParam.server_mode = 0x4;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -379,7 +380,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step3_SoftCloseEcu;
                                 mGet700ResultParam.ack_device = Const.PCU;//发送PCU
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -396,7 +397,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step4_CheckEcuClose;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -413,7 +414,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step5_OpenKSI;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x2;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -430,7 +431,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step6_CloseKSI;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -449,7 +450,7 @@ namespace RokyTask
                                 UpdateRK7001Pins(sender, mRK7001Pins, INFO_LEVEL.PASS);
                                 mTaskSteps = TaskSteps.Step7_RemoteInit;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x1;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -466,7 +467,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step8_RemoteTest;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x1;
                                 mGet700ResultParam.level_ctrl = 0;
                             }
@@ -486,7 +487,7 @@ namespace RokyTask
                                 SetMainText(sender, "开始目检...", "", INFO_LEVEL.PROCESS);
                                 mTaskSteps = TaskSteps.Step9_MujianInit;                                
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
                                 mGet700ResultParam.server_mode = 0x04;//开启软件上电
                                 mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
                             }
@@ -510,7 +511,7 @@ namespace RokyTask
                                 SetMainText(sender, "开始目检...", "", INFO_LEVEL.PROCESS);
                                 mTaskSteps = TaskSteps.Step9_MujianInit;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
                                 mGet700ResultParam.server_mode = 0x04;//开启软件上电
                                 mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
                             }
@@ -522,7 +523,7 @@ namespace RokyTask
                         case TaskSteps.Step9_MujianInit:
                             mTaskSteps = TaskSteps.Step10_MujianTest;
                             mGet700ResultParam.ack_device = Const.PCU;
-                            mGet700ResultParam.ecu_status = 0x14;//默认;//默认
+                            mGet700ResultParam.ecu_status = 0x34;//默认;//默认
                             mGet700ResultParam.server_mode = 0x04;//开启软件上电
                             mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
                             break;
@@ -531,11 +532,20 @@ namespace RokyTask
                             DialogResult result = mMaualFrm.ShowDialog();
                             if (result == DialogResult.OK)
                             {
+                                /*
                                 UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);                               
                                 string mRest = String.Format("{0}\n测 试 成 功！", mSN);                                
                                 //保存数据
                                 SetMainText(sender, mRest, "PASS", INFO_LEVEL.PASS);
                                 mMaualFrm.Close();
+                                */
+                                mMaualFrm.Close();
+                                //关闭VDD_CCU
+                                mTaskSteps = TaskSteps.Step12_CloseVddCCu;
+                                mGet700ResultParam.ack_device = Const.PCU;
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x1;
+                                mGet700ResultParam.level_ctrl = 0;
                             }
                             else if (result == DialogResult.Cancel)
                             {
@@ -544,13 +554,63 @@ namespace RokyTask
                                 UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
                                 mMaualFrm.Close();
                             }
-                            StopTask();
-                            return;
+                            //StopTask();
+                            //return;
+                            break;
+                        case TaskSteps.Step12_CloseVddCCu:
+                            level = Step12_CloseVddCCu(sender, mEventArgs.Data);
+                            if(level == Task_Level.FALSE)
+                            {
+                                mTaskSteps = TaskSteps.Step12_CloseVddCCu;
+                                mGet700ResultParam.ack_device = Const.PCU;
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x1;
+                                mGet700ResultParam.level_ctrl = 0;
+                            }
+                            else if(level == Task_Level.TRUE)
+                            {
+                                mTaskSteps = TaskSteps.Step13_CheckVddCCu;
+                                mGet700ResultParam.ack_device = Const.TESTSERVER;
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x8;
+                                mGet700ResultParam.level_ctrl = 0;
+                            }
+                            else if(level == Task_Level.REPEAT)
+                            {
+                                mTaskSteps = TaskSteps.Step12_CloseVddCCu;
+                                mGet700ResultParam.ack_device = Const.PCU;
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x1;
+                                mGet700ResultParam.level_ctrl = 0;
+                            }
+                            break;
+                        case TaskSteps.Step13_CheckVddCCu:
+                            level = Step13_CheckVddCCu(sender, mEventArgs.Data);
+                            if(level == Task_Level.FALSE)
+                            {
+
+                            }
+                            else if(level == Task_Level.TRUE)
+                            {
+                                UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+                                string mRest = String.Format("{0}\n测 试 成 功！", mSN);
+                                //保存数据
+                                SetMainText(sender, mRest, "PASS", INFO_LEVEL.PASS);
+                            }
+                            else if(level == Task_Level.REPEAT)
+                            {
+                                mTaskSteps = TaskSteps.Step13_CheckVddCCu;
+                                mGet700ResultParam.ack_device = Const.TESTSERVER;
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x8;
+                                mGet700ResultParam.level_ctrl = 0;
+                            }
+                            break;                            
                     }
                     if(!bExcute)
-                    {
-                        Thread.Sleep(500);
+                    {                        
                         mGet7001ResultTask.Excute();
+                        Thread.Sleep(1000);//全部延迟1s
                     } 
                     else
                     {
@@ -639,6 +699,7 @@ namespace RokyTask
                     //开始执行查询
                     mTaskSteps = TaskSteps.Step0_Init;
                     mGet7001ResultTask.Excute();
+                    Thread.Sleep(500);
                     SetMainText(sender, "RK7003自测中...", "", INFO_LEVEL.PROCESS);
                 }
                 else
@@ -1342,25 +1403,26 @@ namespace RokyTask
                 {
                     bFlag = true;
                     mRK7001Pins.Pin16_Open = true;
-                    UpdateListView(sender, "7003 ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
                 }
                 if (mDcOUT == 0)
                 {
                     bFlag = true;
                     mRK7001Pins.Pin16_Open = true;
-                    UpdateListView(sender, "7003 ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
                 }
-                if((mDeviceFault >> 6 & 0x1) == 1)
+                if((mDeviceFault >> 6 & 0x1) == 1)//ACC_CCU已经开启
                 {
                     bFlag = true;
                     UpdateVddGpsPin(sender, INFO_LEVEL.FAIL);
-                    UpdateListView(sender, "7003 VDD_GPS错误", "VDD_GPS的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "ACC_CCU错误", "ACC_CCU的pin脚短路或者断路或者其他原因");
                 }
+                /*
                 else
                 {
                     UpdateVddGpsPin(sender, INFO_LEVEL.PASS);
                 }
-
+                */
                 if (!bFlag)
                 {
                     return Task_Level.TRUE;
@@ -1405,13 +1467,13 @@ namespace RokyTask
                 {
                     bFlag = true;
                     mRK7001Pins.Pin16_Open = true;
-                    UpdateListView(sender, "7003 ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
                 }
                 if (mDcOUT != 0)
                 {
                     bFlag = true;
                     mRK7001Pins.Pin16_Open = true;
-                    UpdateListView(sender, "7003 ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "ACC_ECU错误", "ACC_ECU的pin脚短路或者断路或者其他原因");
                 }
                 
                 if (!bFlag)
@@ -1440,7 +1502,7 @@ namespace RokyTask
                 if (mAccStatus == 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
                     mRK7001Pins.Pin18_Open = true;
-                    UpdateListView(sender, "7003 KSI错误", "KSI的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
                 }                
                 return Task_Level.TRUE;
@@ -1462,7 +1524,7 @@ namespace RokyTask
                 if (mAccStatus != 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
                     mRK7001Pins.Pin18_Open = true;
-                    UpdateListView(sender, "7003 KSI错误", "KSI的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
                 }                
                 return Task_Level.TRUE;
@@ -1505,13 +1567,13 @@ namespace RokyTask
                 }
                 else if (mAckValue == Const.REMOTE_CHECK_FAIL)
                 {
-                    UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                    UpdateListView(sender, "遥控电路测试失败", "遥控电路有问题");
                     UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
                 else if (mAckValue == Const.REMOTE_NO_RECV)
                 {
-                    UpdateListView(sender, "7003 遥控电路测试失败", "遥控电路有问题");
+                    UpdateListView(sender, "遥控电路测试失败", "遥控电路有问题");
                     UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
                     return Task_Level.FALSE;
                 }
@@ -1523,9 +1585,57 @@ namespace RokyTask
 
             return Task_Level.FALSE;
         }
-#endregion
+        #endregion
 
-#region RK7001目检失败
+
+        #region Step12: 关闭VDD_CCU
+        private Task_Level Step12_CloseVddCCu(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            if (mAckDevice == Const.PCU)
+            {
+                if((mAccStatus >> 1 & 0x1) == 0x1)
+                {
+                    return Task_Level.FALSE;//说明没有关闭成功
+                }
+                else if((mAccStatus >> 1 & 0x1) == 0x0)
+                {
+                    return Task_Level.TRUE;//说明没有关闭成功
+                }
+            }
+            
+            return Task_Level.REPEAT;
+        }
+        #endregion
+
+        #region Step13: 查询VDD_CCU状态
+        private Task_Level Step13_CheckVddCCu(object sender, get7001ResultRsp mArgs)
+        {
+            byte mAckDevice = (byte)mArgs.ack_device;
+            byte mAckValue = (byte)mArgs.ack_value;
+            byte mAccStatus = (byte)mArgs.AccStatus;
+            byte mDeviceFault = (byte)mArgs.DeviceFault;
+            if (mAckDevice == Const.TESTSERVER)
+            {                
+                if ((mDeviceFault >> 6 & 0x1) == 0)
+                {
+                    UpdateVddGpsPin(sender, INFO_LEVEL.FAIL);
+                    UpdateListView(sender, "ACC_CCU错误", "ACC_CCU的pin脚短路或者断路或者其他原因");
+                    return Task_Level.FALSE;
+                }                
+                else if((mDeviceFault >> 6 & 0x1) == 1)
+                {
+                    UpdateVddGpsPin(sender, INFO_LEVEL.PASS);
+                    return Task_Level.TRUE;
+                }
+            }
+            return Task_Level.REPEAT;
+        }
+        #endregion
+
+        #region RK7001目检失败
         public void RK7001KSICheckFail()
         {
             mGet7001ResultTask.ClearAllEvent();
@@ -1852,8 +1962,7 @@ namespace RokyTask
         }
 
         public void ExcuteTask()
-        {
-            
+        {            
             InitParameters();
             mRK7001Pins = new PIN_STATUS();
             mRK4103Pins = new PIN_STATUS();

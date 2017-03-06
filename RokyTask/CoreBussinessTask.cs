@@ -118,8 +118,6 @@ namespace RokyTask
         Step6_CloseKSI = 6,
         Step7_RemoteInit = 7,
         Step8_RemoteTest = 8,
-        Step9_MujianInit = 9,
-        Step10_MujianTest = 10,
         Step11_RetryRemote = 11,
         Step12_CloseVddCCu = 12,
         Step13_CheckVddCCu = 13,
@@ -262,9 +260,9 @@ namespace RokyTask
         chk4103Server mChk4103ServerParam;
         
         //接受0x06
-        SimpleSerialPortTask<NullEntity, get4103BroadcastReq> mFirstRunningReqTask; //
+        SimpleSerialPortTask<NullEntity, get4103BroadcastReq> mFirstRunningReqTask;
         //发送0x86，接受0x03
-        SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq> mParamSettingReqTask; //
+        SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq> mParamSettingReqTask;
         get4103BroadcastRsp mFirstRunRspParam;
         //发送0x83， 接受0x23
         SimpleSerialPortTask<ParameterSettingRsp, boardTestResultReq> mRecvTestResultTask;
@@ -429,11 +427,12 @@ namespace RokyTask
                                 bExcute = true;
                             else if(level == Task_Level.TRUE)
                             {
-                                //mTaskSteps = TaskSteps.Step6_CloseKSI;
+                                mTaskSteps = TaskSteps.Step6_CloseKSI;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0x0100;
+                                ReTryCnts = 0;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -443,7 +442,9 @@ namespace RokyTask
                         case TaskSteps.Step6_CloseKSI:
                             level = Step6_CloseKSI(sender, mEventArgs.Data);
                             if (level == Task_Level.FALSE)
-                                bExcute = true;
+                            {                                
+                                bExcute = true;                                
+                            }                                
                             else if(level == Task_Level.TRUE)
                             {
                                 //设置pin脚
@@ -455,8 +456,12 @@ namespace RokyTask
                                 mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
-                            {                                
+                            {
                                 mTaskSteps = TaskSteps.Step6_CloseKSI;
+                                mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
+                                mGet700ResultParam.ecu_status = 0x20;
+                                mGet700ResultParam.server_mode = 0x0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             break;
                         case TaskSteps.Step7_RemoteInit:
@@ -482,21 +487,20 @@ namespace RokyTask
                                 mTaskSteps = TaskSteps.Step11_RetryRemote;
                             else if(level == Task_Level.TRUE)
                             {
-                                UpdateRemoteStatus(sender, INFO_LEVEL.PASS);
-                                //人工目检
-                                SetMainText(sender, "开始目检...", "", INFO_LEVEL.PROCESS);
-                                mTaskSteps = TaskSteps.Step9_MujianInit;                                
+                                UpdateRemoteStatus(sender, INFO_LEVEL.PASS);                                
+                                //关闭VDD_CCU
+                                mTaskSteps = TaskSteps.Step12_CloseVddCCu;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
-                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
-                                mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x0;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
                                 mTaskSteps = TaskSteps.Step8_RemoteTest;
                             }
                             break;
-                        case TaskSteps.Step11_RetryRemote: //重试Remote测试
+                        case TaskSteps.Step11_RetryRemote:
                             level = Step8_RemoteTest(sender, mEventArgs.Data);
                             if (level == Task_Level.FALSE)
                             {
@@ -506,42 +510,7 @@ namespace RokyTask
                             }
                             else if (level == Task_Level.TRUE)
                             {
-                                UpdateRemoteStatus(sender, INFO_LEVEL.PASS);
-                                //人工目检
-                                SetMainText(sender, "开始目检...", "", INFO_LEVEL.PROCESS);
-                                mTaskSteps = TaskSteps.Step9_MujianInit;
-                                mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
-                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
-                                mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
-                            }
-                            else if (level == Task_Level.REPEAT)
-                            {
-                                mTaskSteps = TaskSteps.Step8_RemoteTest;
-                            }
-                            break;
-                        case TaskSteps.Step9_MujianInit:
-                            mTaskSteps = TaskSteps.Step10_MujianTest;
-                            mGet700ResultParam.ack_device = Const.PCU;
-                            mGet700ResultParam.ecu_status = 0x34;//默认;//默认
-                            mGet700ResultParam.server_mode = 0x04;//开启软件上电
-                            mGet700ResultParam.trigger_ctrl = 0 | 1 << 3;//开启Buzzer
-                            break;
-                        case TaskSteps.Step10_MujianTest:
-                            ManualVisio mMaualFrm = new ManualVisio();
-                            DialogResult result = mMaualFrm.ShowDialog();
-                            if (result == DialogResult.OK)
-                            {                                
-                                /*
-                                UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);                               
-                                string mRest = String.Format("{0}\n测 试 成 功！", mSN);                                
-                                //保存数据
-                                SetMainText(sender, mRest, "PASS", INFO_LEVEL.PASS);
-                                mMaualFrm.Close();
-                                */
-                                mMaualFrm.Close();
-                                UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
-                                SetMainText(sender, "继续测试中...", "", INFO_LEVEL.PROCESS);
+                                UpdateRemoteStatus(sender, INFO_LEVEL.PASS);                               
                                 //关闭VDD_CCU
                                 mTaskSteps = TaskSteps.Step12_CloseVddCCu;
                                 mGet700ResultParam.ack_device = Const.PCU;
@@ -549,16 +518,11 @@ namespace RokyTask
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0x0100;
                             }
-                            else if (result == DialogResult.Cancel)
+                            else if (level == Task_Level.REPEAT)
                             {
-                                SetMainText(sender, "目检失败！", "FAIL", INFO_LEVEL.FAIL);
-                                UpdateListView(sender, "BUZZER故障", "听不到喇叭发出的声音，或喇叭电路有问题");
-                                UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
-                                mMaualFrm.Close();
-                                StopTask();
-                                return;
+                                mTaskSteps = TaskSteps.Step8_RemoteTest;
                             }
-                            break;
+                            break;                        
                         case TaskSteps.Step12_CloseVddCCu:
                             level = Step12_CloseVddCCu(sender, mEventArgs.Data);
                             if(level == Task_Level.FALSE)
@@ -597,8 +561,7 @@ namespace RokyTask
                                 mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.TRUE)
-                            {
-                                
+                            {                                
                                 string mRest = String.Format("{0}\n测 试 成 功！", mSN);
                                 //保存数据
                                 SetMainText(sender, mRest, "PASS", INFO_LEVEL.PASS);
@@ -696,11 +659,11 @@ namespace RokyTask
                     DeviceInfo info = new DeviceInfo();
                     info.sn = uid;
                     info.hw = String.Format("RK{0}", System.Text.Encoding.Default.GetString(hwArray));
-                    info.sw = String.Format("W{0}{1}.0{2}", swArray[1], swArray[2], swArray[3]);
+                    info.sw = String.Format("W{0}{1:D2}.{2:D2}", swArray[1], swArray[2], swArray[3]);
                     UpdateRK7001Items(sender, RK7001ITEM.VERSION, info, INFO_LEVEL.NONE);
                     if (j >= 10)
                     {
-                        SetMainText(sender, "RK7003未上电", "FAIL", INFO_LEVEL.FAIL);
+                        SetMainText(sender, "RK7010未上电", "FAIL", INFO_LEVEL.FAIL);
                         StopTask();
                         return;
                     }
@@ -708,11 +671,11 @@ namespace RokyTask
                     mTaskSteps = TaskSteps.Step0_Init;
                     mGet7001ResultTask.Excute();
                     Thread.Sleep(500);
-                    SetMainText(sender, "RK7003自测中...", "", INFO_LEVEL.PROCESS);
+                    SetMainText(sender, "RK7010自测中...", "", INFO_LEVEL.PROCESS);
                 }
                 else
                 {
-                    SetMainText(sender, "RK7003未上电", "FAIL", INFO_LEVEL.FAIL);
+                    SetMainText(sender, "RK7010未上电", "FAIL", INFO_LEVEL.FAIL);
                     UpdateListView(sender, "测试异常中断", "夹具被弹起，或485通讯失败");
                     StopTask();
                 }
@@ -755,7 +718,11 @@ namespace RokyTask
                 SerialPortEventArgs<get4103BroadcastReq> mEventArgs = e as SerialPortEventArgs<get4103BroadcastReq>;
                 if (mEventArgs.Data != null)
                 {
-                    string softVersion = String.Format("W{0}{1}.0{2}", (byte)(mEventArgs.Data.hardwareID >> 24), 
+                    byte hw1 = (byte)(mEventArgs.Data.hardwareID >> 24);
+                    byte hw2 = (byte)(mEventArgs.Data.hardwareID >> 16);
+                    byte hw3 = (byte)(mEventArgs.Data.hardwareID >> 8);
+
+                    string softVersion = String.Format("W{0}{1:D2}.{2:D2}", (byte)(mEventArgs.Data.hardwareID >> 24), 
                                                                        (byte)(mEventArgs.Data.hardwareID >> 16), 
                                                                        (byte)(mEventArgs.Data.hardwareID >> 8));
                     DeviceInfo info = new DeviceInfo();
@@ -779,7 +746,7 @@ namespace RokyTask
             };
 #endregion
 
-#region 发送0x86, 接受0x03
+            #region 发送0x86, 接受0x03
             mParamSettingReqTask = new SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq>();
             mFirstRunRspParam = mParamSettingReqTask.GetRequestEntity();
             mParamSettingReqTask.RetryMaxCnts = 10;
@@ -816,7 +783,7 @@ namespace RokyTask
             };
 #endregion
 
-#region 发送0x83， 接受0x23
+            #region 发送0x83， 接受0x23
             mRecvTestResultTask = new SimpleSerialPortTask<ParameterSettingRsp, boardTestResultReq>();
             mParamSettingParam = mRecvTestResultTask.GetRequestEntity();
             mRecvTestResultTask.RetryMaxCnts = 5;
@@ -1072,7 +1039,7 @@ namespace RokyTask
             };
 #endregion
 
-#region 发送0xA3,接受0x24
+            #region 发送0xA3,接受0x24
             mSaveNvReqTask = new SimpleSerialPortTask<boardTestResultRsp, SaveNvReq>();
             mTestResultRspParam = mSaveNvReqTask.GetRequestEntity();
             mSaveNvReqTask.RetryMaxCnts = 0;
@@ -1097,7 +1064,7 @@ namespace RokyTask
             };
 #endregion
 
-#region 发送0XA4，接受0x26
+            #region 发送0XA4，接受0x26
             mBtTestReqTask = new SimpleSerialPortTask<SaveNvRsp, btTestReq>();
             mSaveNvRspParam = mBtTestReqTask.GetRequestEntity();
             mBtTestReqTask.RetryMaxCnts = 0;
@@ -1136,7 +1103,7 @@ namespace RokyTask
                     }                        
                     else
                     {                        
-                        SetMainText(sender, "获取RK7003版本号...", "", INFO_LEVEL.PROCESS);
+                        SetMainText(sender, "获取RK7010版本号...", "", INFO_LEVEL.PROCESS);
                         Thread.Sleep(5);
                         mGet7001VersionTask.Excute();
                     }          
@@ -1151,7 +1118,7 @@ namespace RokyTask
 };
 #endregion
 
-#region 测试蓝牙 回应
+            #region 测试蓝牙 回应
             mCompeteTestTask = new SimpleSerialPortTask<btTestRsp, NullEntity>();
             mBtTestRspParam = mCompeteTestTask.GetRequestEntity();
             mBtTestRspParam.status = 0;
@@ -1160,7 +1127,7 @@ namespace RokyTask
         }
 #endregion
 
-#region Step1：Client 自检检测  
+            #region Step1：Client 自检检测  
         private Task_Level Step1_SelfTest(object sender, get7001ResultRsp mArgs)
         {
             byte mAskDevice = (byte)mArgs.ack_device;//应答设备
@@ -1396,7 +1363,7 @@ namespace RokyTask
         }
 #endregion
 
-#region Step2: 检查ACC_ECU
+            #region Step2: 检查ACC_ECU
         private Task_Level Step2_CheckEcuOpen(object sender, get7001ResultRsp mArgs)
         {
             byte mAckDevice = (byte)mArgs.ack_device;
@@ -1445,7 +1412,7 @@ namespace RokyTask
         }
         #endregion
 
-#region Step3:软关DC
+            #region Step3:软关DC
         private Task_Level Step3_SoftCloseEcu(object sender, get7001ResultRsp mArgs)
         {
             byte mAckDevice = (byte)mArgs.ack_device;
@@ -1460,7 +1427,7 @@ namespace RokyTask
         }
         #endregion
 
-#region Step4:检查ACC_ECU是否关闭
+            #region Step4:检查ACC_ECU是否关闭
         private Task_Level Step4_CheckEcuClose(object sender, get7001ResultRsp mArgs)
         {
             byte mAckDevice = (byte)mArgs.ack_device;
@@ -1498,7 +1465,7 @@ namespace RokyTask
         }
         #endregion
 
-#region Step5:硬开KSI
+            #region Step5:硬开KSI
         private Task_Level Step5_OpenKSI(object sender, get7001ResultRsp mArgs)
         {
             byte mAckDevice = (byte)mArgs.ack_device;
@@ -1520,7 +1487,7 @@ namespace RokyTask
         }
         #endregion
 
-#region Step6:关闭KSI
+            #region Step6:关闭KSI
         private Task_Level Step6_CloseKSI(object sender, get7001ResultRsp mArgs)
         {
             byte mAckDevice = (byte)mArgs.ack_device;
@@ -1531,267 +1498,278 @@ namespace RokyTask
             {                            
                 if (mAccStatus != 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
-                    mRK7001Pins.Pin18_Open = true;
-                    UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
-                    return Task_Level.FALSE;
-                } 
-                              
+                    if (ReTryCnts++ >= 2)
+                    {
+                        mRK7001Pins.Pin18_Open = true;
+                        UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
+                        return Task_Level.FALSE;
+                    }
+                    else
+                    {
+                        mTaskSteps = TaskSteps.Step6_CloseKSI;
+                        mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
+                        mGet700ResultParam.ecu_status = 0x20;
+                        mGet700ResultParam.server_mode = 0x0;
+                        mGet700ResultParam.level_ctrl = 0x0100;
+                        return Task_Level.REPEAT;
+                    }
+                }
+                
                 return Task_Level.TRUE;
             }
             return Task_Level.REPEAT;
         }
         #endregion
 
-#region Step9: Server 通知server，按下遥控器按键
-        private Task_Level Step7_RemoteInit(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAckDevice = (byte)mArgs.ack_device;
-            byte mAckValue = (byte)mArgs.ack_value;
-            if(mAckDevice == Const.TESTSERVER)
+            #region Step9: Server 通知server，按下遥控器按键
+            private Task_Level Step7_RemoteInit(object sender, get7001ResultRsp mArgs)
             {
-                if(mAckValue == Const.TESTSERVER_KEY_PRESS)
-                {                   
-                    return Task_Level.TRUE;
-                }                        
+                byte mAckDevice = (byte)mArgs.ack_device;
+                byte mAckValue = (byte)mArgs.ack_value;
+                if(mAckDevice == Const.TESTSERVER)
+                {
+                    if(mAckValue == Const.TESTSERVER_KEY_PRESS)
+                    {                   
+                        return Task_Level.TRUE;
+                    }                        
+                }
+                else if(mAckDevice == Const.PCU)
+                {
+                    return Task_Level.REPEAT;
+                }
+
+                return Task_Level.FALSE;
             }
-            else if(mAckDevice == Const.PCU)
+            #endregion
+
+            #region Step10: Client 通知client，进行配对
+            private Task_Level Step8_RemoteTest(object sender, get7001ResultRsp mArgs)
             {
+                byte mAckDevice = (byte)mArgs.ack_device;
+                byte mAckValue = (byte)mArgs.ack_value;
+                if (mAckDevice == Const.PCU)
+                {
+                    if (mAckValue == Const.REMOTE_CONNECTED)
+                    {
+                        return Task_Level.TRUE;
+                    }
+                    else if (mAckValue == Const.REMOTE_CHECK_FAIL)
+                    {
+                        UpdateListView(sender, "遥控电路测试失败", "遥控电路有问题");
+                        UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
+                        return Task_Level.FALSE;
+                    }
+                    else if (mAckValue == Const.REMOTE_NO_RECV)
+                    {
+                        UpdateListView(sender, "遥控电路测试失败", "遥控电路有问题");
+                        UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
+                        return Task_Level.FALSE;
+                    }
+                    else
+                        return Task_Level.REPEAT;
+                }
+                else if (mAckDevice == Const.TESTSERVER)
+                    return Task_Level.REPEAT;
+
+                return Task_Level.FALSE;
+            }
+            #endregion
+
+            #region Step12: 关闭VDD_CCU
+            private Task_Level Step12_CloseVddCCu(object sender, get7001ResultRsp mArgs)
+            {
+                byte mAckDevice = (byte)mArgs.ack_device;
+                byte mAckValue = (byte)mArgs.ack_value;
+                byte mAccStatus = (byte)mArgs.AccStatus;
+                if (mAckDevice == Const.PCU)
+                {
+                    if((mAccStatus >> 1 & 0x1) == 0x1)
+                    {
+                        return Task_Level.TRUE;
+                    }
+                    else if((mAccStatus >> 1 & 0x1) == 0x0)
+                    {
+                        return Task_Level.FALSE;
+                    }
+                }
+            
                 return Task_Level.REPEAT;
             }
+            #endregion
 
-            return Task_Level.FALSE;
-        }
-#endregion
-
-#region Step10: Client 通知client，进行配对
-        private Task_Level Step8_RemoteTest(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAckDevice = (byte)mArgs.ack_device;
-            byte mAckValue = (byte)mArgs.ack_value;
-            if (mAckDevice == Const.PCU)
+            #region Step13: 查询VDD_CCU状态
+            private Task_Level Step13_CheckVddCCu(object sender, get7001ResultRsp mArgs)
             {
-                if (mAckValue == Const.REMOTE_CONNECTED)
-                {
-                    return Task_Level.TRUE;
+                byte mAckDevice = (byte)mArgs.ack_device;
+                byte mAckValue = (byte)mArgs.ack_value;
+                byte mAccStatus = (byte)mArgs.AccStatus;
+                byte mDeviceFault = (byte)mArgs.DeviceFault;
+                if (mAckDevice == Const.TESTSERVER)
+                {                
+                    if ((mDeviceFault >> 6 & 0x1) == 0)
+                    {
+                        UpdateVddGpsPin(sender, INFO_LEVEL.FAIL);
+                        UpdateListView(sender, "ACC_CCU错误", "ACC_CCU的pin脚短路或者断路或者其他原因");
+                        return Task_Level.FALSE;
+                    }                
+                    else if((mDeviceFault >> 6 & 0x1) == 1)
+                    {
+                        UpdateVddGpsPin(sender, INFO_LEVEL.PASS);
+                        return Task_Level.TRUE;
+                    }
                 }
-                else if (mAckValue == Const.REMOTE_CHECK_FAIL)
+                return Task_Level.REPEAT;
+            }
+            #endregion
+
+            #region RK7001目检失败
+            public void RK7001KSICheckFail()
+            {
+                mGet7001ResultTask.ClearAllEvent();
+                SetMainText(this, "RK7010目检失败!", "FAIL", INFO_LEVEL.FAIL);
+            }
+            #endregion
+
+            #region 遥控器
+            private void UpdateRemoteStatus(object sender, INFO_LEVEL level)
+            {
+                if(UpdateRemoteHandler != null)
                 {
-                    UpdateListView(sender, "遥控电路测试失败", "遥控电路有问题");
-                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
-                    return Task_Level.FALSE;
+                    UIEventArgs mArgs = new UIEventArgs();
+                    mArgs.level = level;
+                    UpdateRemoteHandler(sender, mArgs);
                 }
-                else if (mAckValue == Const.REMOTE_NO_RECV)
+            }
+            #endregion
+
+            #region 通过SN，获取RK4103的数据
+            private bool GetValueFrmServer(object sender)
+            {
+                DbHelperSQL.connectionString = mSqlserverConnString;
+                string selectString = String.Format("select * from [PreDistribtNum] where SN='{0}'", mSN);
+                string selectCount = String.Format("select count(*) from [PreDistribtNum] where SN='{0}'", mSN);            
+                int cnt = (int)DbHelperSQL.GetSingle(selectCount);
+                if (cnt > 0)
                 {
-                    UpdateListView(sender, "遥控电路测试失败", "遥控电路有问题");
-                    UpdateRemoteStatus(sender, INFO_LEVEL.FAIL);
-                    return Task_Level.FALSE;
+                    DataSet ds = DbHelperSQL.Query(selectString);
+                    mBTaddr = ds.Tables[0].Rows[0][2].ToString();
+                    mBLEaddr = ds.Tables[0].Rows[0][3].ToString();
+                    mKeyt = ds.Tables[0].Rows[0][4].ToString();
+                    string mUsdFlag = ds.Tables[0].Rows[0][5].ToString();
+                    if(mUsdFlag == "TRUE")
+                    {
+                        UpdateValidSN(sender, INFO_LEVEL.FAIL);
+                        SetMainText(sender, "该SN号已经被使用过！", "SAVENONE", INFO_LEVEL.FAIL);
+                        UpdateListView(sender, "该SN号已经被使用过", "该SN号以前被成功测试过！");
+                        return false;
+                    }
+                    else
+                    {
+                        UpdateValidSN(sender, INFO_LEVEL.PASS);
+                        SetMainText(sender, "测试Server是否在线？", "", INFO_LEVEL.PROCESS);
+                        mChk4103ServerTask.Excute();
+                    }                
                 }
                 else
-                    return Task_Level.REPEAT;
-            }
-            else if (mAckDevice == Const.TESTSERVER)
-                return Task_Level.REPEAT;
-
-            return Task_Level.FALSE;
-        }
-        #endregion
-
-
-        #region Step12: 关闭VDD_CCU
-        private Task_Level Step12_CloseVddCCu(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAckDevice = (byte)mArgs.ack_device;
-            byte mAckValue = (byte)mArgs.ack_value;
-            byte mAccStatus = (byte)mArgs.AccStatus;
-            if (mAckDevice == Const.PCU)
-            {
-                if((mAccStatus >> 1 & 0x1) == 0x1)
-                {
-                    return Task_Level.TRUE;
-                }
-                else if((mAccStatus >> 1 & 0x1) == 0x0)
-                {
-                    return Task_Level.FALSE;
-                }
-            }
-            
-            return Task_Level.REPEAT;
-        }
-        #endregion
-
-        #region Step13: 查询VDD_CCU状态
-        private Task_Level Step13_CheckVddCCu(object sender, get7001ResultRsp mArgs)
-        {
-            byte mAckDevice = (byte)mArgs.ack_device;
-            byte mAckValue = (byte)mArgs.ack_value;
-            byte mAccStatus = (byte)mArgs.AccStatus;
-            byte mDeviceFault = (byte)mArgs.DeviceFault;
-            if (mAckDevice == Const.TESTSERVER)
-            {                
-                if ((mDeviceFault >> 6 & 0x1) == 0)
-                {
-                    UpdateVddGpsPin(sender, INFO_LEVEL.FAIL);
-                    UpdateListView(sender, "ACC_CCU错误", "ACC_CCU的pin脚短路或者断路或者其他原因");
-                    return Task_Level.FALSE;
-                }                
-                else if((mDeviceFault >> 6 & 0x1) == 1)
-                {
-                    UpdateVddGpsPin(sender, INFO_LEVEL.PASS);
-                    return Task_Level.TRUE;
-                }
-            }
-            return Task_Level.REPEAT;
-        }
-        #endregion
-
-        #region RK7001目检失败
-        public void RK7001KSICheckFail()
-        {
-            mGet7001ResultTask.ClearAllEvent();
-            SetMainText(this, "RK7003目检失败!", "FAIL", INFO_LEVEL.FAIL);
-        }
-#endregion
-
-#region 遥控器
-        private void UpdateRemoteStatus(object sender, INFO_LEVEL level)
-        {
-            if(UpdateRemoteHandler != null)
-            {
-                UIEventArgs mArgs = new UIEventArgs();
-                mArgs.level = level;
-                UpdateRemoteHandler(sender, mArgs);
-            }
-        }
-#endregion
-
-#region 通过SN，获取RK4103的数据
-        private bool GetValueFrmServer(object sender)
-        {
-            DbHelperSQL.connectionString = mSqlserverConnString;
-            string selectString = String.Format("select * from [PreDistribtNum] where SN='{0}'", mSN);
-            string selectCount = String.Format("select count(*) from [PreDistribtNum] where SN='{0}'", mSN);            
-            int cnt = (int)DbHelperSQL.GetSingle(selectCount);
-            if (cnt > 0)
-            {
-                DataSet ds = DbHelperSQL.Query(selectString);
-                mBTaddr = ds.Tables[0].Rows[0][2].ToString();
-                mBLEaddr = ds.Tables[0].Rows[0][3].ToString();
-                mKeyt = ds.Tables[0].Rows[0][4].ToString();
-                string mUsdFlag = ds.Tables[0].Rows[0][5].ToString();
-                if(mUsdFlag == "TRUE")
                 {
                     UpdateValidSN(sender, INFO_LEVEL.FAIL);
-                    SetMainText(sender, "该SN号已经被使用过！", "SAVENONE", INFO_LEVEL.FAIL);
-                    UpdateListView(sender, "该SN号已经被使用过", "该SN号以前被成功测试过！");
+                    SetMainText(sender, "SN号在服务器不存在！", "SAVENONE", INFO_LEVEL.FAIL);
+                    UpdateListView(sender, "SN号在服务器不存在", "服务器未开启，或SN号在服务器不存在！");
                     return false;
+                }
+
+                return true;
+            }
+            #endregion
+
+            #region 保存数据
+            private void SaveData2Server(INFO_LEVEL level)
+            {
+                DbHelperSQL.connectionString = mSqlserverConnString;
+                string mGenTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                string insertString = String.Format("insert into [RK7001_Complex] (SN,BTaddr,BLEaddr,Keyt,UID,TestResult,GenTime) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')",
+                            mSN, mBTaddr, mBLEaddr, mKeyt, mUid, mTestResult, mGenTime);
+                string queryString = String.Format("select count(*) from [RK7001_Complex] where SN='{0}'", mSN);
+                string updateString = String.Format("update [RK7001_Complex] set BTaddr='{0}',BLEaddr='{1}',Keyt='{2}',UID='{3}',TestResult='{4}',GenTime='{5}' where SN='{6}'",
+                            mBTaddr, mBLEaddr, mKeyt, mUid, mTestResult, mGenTime, mSN);
+                string updateUsdFlag = "";
+                switch(level)
+                {
+                    case INFO_LEVEL.FAIL:
+                        updateUsdFlag = String.Format("update [PredistribtNum] set UsdFlag='FALSE' where SN='{0}'", mSN);
+                        break;
+                    case INFO_LEVEL.PASS:
+                        updateUsdFlag = String.Format("update [PredistribtNum] set UsdFlag='TRUE' where SN='{0}'", mSN);
+                        break;
+                }
+            
+                if ((int)DbHelperSQL.GetSingle(queryString) > 0)
+                {
+                    DbHelperSQL.ExecuteSql(updateString);
                 }
                 else
                 {
-                    UpdateValidSN(sender, INFO_LEVEL.PASS);
-                    SetMainText(sender, "测试Server是否在线？", "", INFO_LEVEL.PROCESS);
-                    mChk4103ServerTask.Excute();
-                }                
-            }
-            else
-            {
-                UpdateValidSN(sender, INFO_LEVEL.FAIL);
-                SetMainText(sender, "SN号在服务器不存在！", "SAVENONE", INFO_LEVEL.FAIL);
-                UpdateListView(sender, "SN号在服务器不存在", "服务器未开启，或SN号在服务器不存在！");
-                return false;
-            }
+                    DbHelperSQL.ExecuteSql(insertString);
+                }
+                //更新
+                DbHelperSQL.ExecuteSql(updateUsdFlag);
+            }       
+            #endregion
 
-            return true;
-        }
-#endregion
-
-#region 保存数据
-        private void SaveData2Server(INFO_LEVEL level)
-        {
-            DbHelperSQL.connectionString = mSqlserverConnString;
-            string mGenTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            string insertString = String.Format("insert into [RK7001_Complex] (SN,BTaddr,BLEaddr,Keyt,UID,TestResult,GenTime) values ('{0}','{1}','{2}','{3}','{4}','{5}','{6}')",
-                        mSN, mBTaddr, mBLEaddr, mKeyt, mUid, mTestResult, mGenTime);
-            string queryString = String.Format("select count(*) from [RK7001_Complex] where SN='{0}'", mSN);
-            string updateString = String.Format("update [RK7001_Complex] set BTaddr='{0}',BLEaddr='{1}',Keyt='{2}',UID='{3}',TestResult='{4}',GenTime='{5}' where SN='{6}'",
-                        mBTaddr, mBLEaddr, mKeyt, mUid, mTestResult, mGenTime, mSN);
-            string updateUsdFlag = "";
-            switch(level)
+            #region 设置界面
+            private void SetMainText(object sender, string msg, string submsg, INFO_LEVEL level)
             {
-                case INFO_LEVEL.FAIL:
-                    updateUsdFlag = String.Format("update [PredistribtNum] set UsdFlag='FALSE' where SN='{0}'", mSN);
-                    break;
-                case INFO_LEVEL.PASS:
-                    updateUsdFlag = String.Format("update [PredistribtNum] set UsdFlag='TRUE' where SN='{0}'", mSN);
-                    break;
-            }
-            
-            if ((int)DbHelperSQL.GetSingle(queryString) > 0)
-            {
-                DbHelperSQL.ExecuteSql(updateString);
-            }
-            else
-            {
-                DbHelperSQL.ExecuteSql(insertString);
-            }
-            //更新
-            DbHelperSQL.ExecuteSql(updateUsdFlag);
-        }       
-#endregion
-
-#region 设置界面
-        private void SetMainText(object sender, string msg, string submsg, INFO_LEVEL level)
-        {
-            if(level == INFO_LEVEL.FAIL || level == INFO_LEVEL.PASS)
-            {
-                bTaskRunning = false;
-                if (bServerActivated)
+                if(level == INFO_LEVEL.FAIL || level == INFO_LEVEL.PASS)
                 {
-                    if(submsg != "SAVENONE")
+                    bTaskRunning = false;
+                    if (bServerActivated)
                     {
-                        mTestResult = submsg;
-                        SaveData2Server(level);
-                    }                   
-                }                    
+                        if(submsg != "SAVENONE")
+                        {
+                            mTestResult = submsg;
+                            SaveData2Server(level);
+                        }                   
+                    }                    
+                }
+                if(UpdateWorkStatusHandler != null)
+                {
+                    UIEventArgs mArgs = new UIEventArgs();
+                    mArgs.msg = msg;
+                    mArgs.submsg = submsg;
+                    mArgs.level = level;
+                    UpdateWorkStatusHandler(sender, mArgs);
+                }
             }
-            if(UpdateWorkStatusHandler != null)
-            {
-                UIEventArgs mArgs = new UIEventArgs();
-                mArgs.msg = msg;
-                mArgs.submsg = submsg;
-                mArgs.level = level;
-                UpdateWorkStatusHandler(sender, mArgs);
-            }
-        }
-#endregion
+            #endregion
 
 
-#region 刷新RK7001列表
-        private void UpdateRK7001Items(object sender, RK7001ITEM items, DeviceInfo info, INFO_LEVEL level)
-        {
-            if(Update7001ListViewHandler != null)
+            #region 刷新RK7001列表
+            private void UpdateRK7001Items(object sender, RK7001ITEM items, DeviceInfo info, INFO_LEVEL level)
             {
-                RK7001ItemsArgs mArgs = new RK7001ItemsArgs();
-                mArgs.items = items;
-                mArgs.info = info;
-                mArgs.level = level;
-                Update7001ListViewHandler(sender, mArgs);
+                if(Update7001ListViewHandler != null)
+                {
+                    RK7001ItemsArgs mArgs = new RK7001ItemsArgs();
+                    mArgs.items = items;
+                    mArgs.info = info;
+                    mArgs.level = level;
+                    Update7001ListViewHandler(sender, mArgs);
+                }
             }
-        }
 #endregion
 
-#region 刷新RK4103列表
-        private void UpdateRK4103Items(object sender, RK4103ITEM items, DeviceInfo info, INFO_LEVEL level)
-        {
-            if(Update4103ListViewHandler != null)
+            #region 刷新RK4103列表
+            private void UpdateRK4103Items(object sender, RK4103ITEM items, DeviceInfo info, INFO_LEVEL level)
             {
-                RK4103ItemsArgs mArgs = new RK4103ItemsArgs();
-                mArgs.items = items;
-                mArgs.info = info;
-                mArgs.level = level;
-                Update4103ListViewHandler(sender, mArgs);
+                if(Update4103ListViewHandler != null)
+                {
+                    RK4103ItemsArgs mArgs = new RK4103ItemsArgs();
+                    mArgs.items = items;
+                    mArgs.info = info;
+                    mArgs.level = level;
+                    Update4103ListViewHandler(sender, mArgs);
+                }
             }
-        }
-#endregion
+            #endregion
 
 #region 刷新7001的PIN脚
         private void UpdateRK7001Pins(object sender, PIN_STATUS pins, INFO_LEVEL level)

@@ -1644,7 +1644,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(471, 35);
             this.label3.TabIndex = 1;
-            this.label3.Text = "RK7003测试列表";
+            this.label3.Text = "RK7010测试列表";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbItemValidSN
@@ -1721,7 +1721,7 @@
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "新日RK7003板测 V2.0.6";
+            this.Text = "新日RK7010板测 V2.0.6";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_Closed);
             this.Load += new System.EventHandler(this.MainForm_Load);

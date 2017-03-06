@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RK7001Test", "RK7001Test\RK7001Test.csproj", "{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RK7010Test", "RK7001Test\RK7010Test.csproj", "{083A9CF5-A5D6-446B-A94E-01C8F359D0DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonUtils", "CommonUtils\CommonUtils.csproj", "{03CBD632-539A-457E-ADE9-C857A4B800E5}"
 EndProject

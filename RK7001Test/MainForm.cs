@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -26,7 +27,6 @@ namespace RK7001Test
         private ListViewItem lv7001hw;
         private ListViewItem lv7001ampf;
         private ListViewItem lv7001mosfet;
-        private ListViewItem lv7001buzzer;
         private ListViewItem lv4103sw;
         private ListViewItem lv4103lgtsensor;
         private ListViewItem lv4103gsensor;
@@ -50,28 +50,27 @@ namespace RK7001Test
         #region 加载界面
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //版本号
+            this.Text = String.Format("RK7010板测工具 V{0}", AssemblyFileVersion());
             #region Listview初始化
             lv7001uid = new ListViewItem("设备UID");
             lv7001sw = new ListViewItem("软件版本号");
             lv7001hw = new ListViewItem("硬件版本号");
             lv7001ampf = new ListViewItem("运放故障");
             lv7001mosfet = new ListViewItem("Mos短路");
-            lv7001buzzer = new ListViewItem("Buzzer故障");
 
             lv7001uid.UseItemStyleForSubItems = false;
             lv7001sw.UseItemStyleForSubItems = false;
             lv7001hw.UseItemStyleForSubItems = false;
             lv7001ampf.UseItemStyleForSubItems = false;
             lv7001mosfet.UseItemStyleForSubItems = false;
-            lv7001buzzer.UseItemStyleForSubItems = false;
 
             this.lvRK7001ErrItem.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             lv7001uid,
             lv7001sw,
             lv7001hw,
             lv7001ampf,
-            lv7001mosfet,
-            lv7001buzzer});
+            lv7001mosfet});
 
             lv4103sw = new ListViewItem("软件版本号");
             lv4103lgtsensor = new ListViewItem("光感异常测试");
@@ -523,28 +522,23 @@ namespace RK7001Test
                                 this.lv7001sw.SubItems.Clear();
                                 this.lv7001hw.SubItems.Clear();
                                 this.lv7001ampf.SubItems.Clear();
-                                this.lv7001mosfet.SubItems.Clear();
-                                this.lv7001buzzer.SubItems.Clear();                                
+                                this.lv7001mosfet.SubItems.Clear();                              
                                 this.lv7001uid.BackColor = Color.White;
                                 this.lv7001sw.BackColor = Color.White;
                                 this.lv7001hw.BackColor = Color.White;
                                 this.lv7001ampf.BackColor = Color.White;
                                 this.lv7001mosfet.BackColor = Color.White;
-                                this.lv7001buzzer.BackColor = Color.White;
                                 this.lv7001uid.Text = "设备UID";
                                 this.lv7001sw.Text = "软件版本号";
                                 this.lv7001hw.Text = "硬件版本号";
                                 this.lv7001ampf.Text = "运放故障";
                                 this.lv7001mosfet.Text = "Mos短路";
-                                this.lv7001buzzer.Text = "Buzzer故障";
                                 break;
                             case INFO_LEVEL.PASS:
                                 this.lv7001ampf.SubItems.Add("通过");
                                 this.lv7001mosfet.SubItems.Add("通过");
-                                this.lv7001buzzer.SubItems.Add("通过");
                                 this.lv7001ampf.SubItems[1].ForeColor = Color.Green;
                                 this.lv7001mosfet.SubItems[1].ForeColor = Color.Green;
-                                this.lv7001buzzer.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }                 
                         
@@ -576,21 +570,7 @@ namespace RK7001Test
                                 this.lv7001mosfet.SubItems[1].BackColor = Color.Red;
                                 break;
                         }
-                        break;
-                    case RK7001ITEM.BUZZER:
-                        switch (level)
-                        {
-                            case INFO_LEVEL.PASS:
-                                this.lv7001buzzer.SubItems.Add("通过");
-                                this.lv7001buzzer.SubItems[1].ForeColor = Color.Green;
-                                break;
-                            case INFO_LEVEL.FAIL:
-                                this.lv7001buzzer.SubItems.Add("失败");
-                                this.lv7001buzzer.SubItems[0].BackColor = Color.Red;
-                                this.lv7001buzzer.SubItems[1].BackColor = Color.Red;
-                                break;
-                        }
-                        break;
+                        break;                    
                 }
                 this.lvRK7001ErrItem.EndUpdate();
             }
@@ -1165,6 +1145,21 @@ namespace RK7001Test
                     StartTask();
                 }                
             }                   
+        }
+        #endregion
+
+        #region 获得版本号
+        private string AssemblyFileVersion()
+        {
+            object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+            if (attributes.Length == 0)
+            {
+                return "";
+            }
+            else
+            {
+                return ((AssemblyFileVersionAttribute)attributes[0]).Version;
+            }
         }
         #endregion
     }

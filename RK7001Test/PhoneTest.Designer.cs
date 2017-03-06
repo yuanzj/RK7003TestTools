@@ -201,7 +201,7 @@
             this.Controls.Add(this.panelWorkStatus);
             this.KeyPreview = true;
             this.Name = "PhoneTest";
-            this.Text = "RK7003整测工具V2.0.3";
+            this.Text = "RK7010整测工具V2.0.3";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.PhoneTest_Closed);
             this.Load += new System.EventHandler(this.PhoneTest_Load);

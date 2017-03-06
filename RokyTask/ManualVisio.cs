@@ -48,10 +48,33 @@ namespace RK7001Test
             DynamicPotTicker.Enabled = true;
             DynamicPotTicker.Elapsed += new ElapsedEventHandler((object source, ElapsedEventArgs ElapsedEventArgs) =>
             {
-                this.Close();
+
+                MainVisoClose();
                 DynamicPotTicker.Enabled = false;
                 this.DialogResult = DialogResult.Cancel;
             });
-        }        
+        }
+
+        #region 关闭界面
+        delegate void MainVisoCloseCallback();
+        private void MainVisoClose()
+        {
+            if (this.panel1.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            {
+                while (!this.panel1.IsHandleCreated)
+                {
+                    //解决窗体关闭时出现“访问已释放句柄“的异常
+                    if (this.panel1.Disposing || this.panel1.IsDisposed)
+                        return;
+                }
+                MainVisoCloseCallback d = new MainVisoCloseCallback(MainVisoClose);
+                this.panel1.Invoke(d, new object[] {  });
+            }
+            else
+            {
+                this.Close();
+            }
+        }
+        #endregion
     }
 }

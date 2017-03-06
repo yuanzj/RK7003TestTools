@@ -429,7 +429,7 @@ namespace RokyTask
                                 bExcute = true;
                             else if(level == Task_Level.TRUE)
                             {
-                                mTaskSteps = TaskSteps.Step6_CloseKSI;
+                                //mTaskSteps = TaskSteps.Step6_CloseKSI;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
                                 mGet700ResultParam.ecu_status = 0x20;
                                 mGet700ResultParam.server_mode = 0x0;
@@ -545,7 +545,7 @@ namespace RokyTask
                                 //关闭VDD_CCU
                                 mTaskSteps = TaskSteps.Step12_CloseVddCCu;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x34;
+                                mGet700ResultParam.ecu_status = 0x0;
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0x0100;
                             }
@@ -565,7 +565,7 @@ namespace RokyTask
                             {
                                 mTaskSteps = TaskSteps.Step12_CloseVddCCu;
                                 mGet700ResultParam.ack_device = Const.PCU;
-                                mGet700ResultParam.ecu_status = 0x34;
+                                mGet700ResultParam.ecu_status = 0x00;
                                 mGet700ResultParam.server_mode = 0x0;
                                 mGet700ResultParam.level_ctrl = 0x0100;
                             }
@@ -574,7 +574,7 @@ namespace RokyTask
                                 mTaskSteps = TaskSteps.Step13_CheckVddCCu;
                                 mGet700ResultParam.ack_device = Const.TESTSERVER;
                                 mGet700ResultParam.ecu_status = 0x34;
-                                mGet700ResultParam.server_mode = 0x0;
+                                mGet700ResultParam.server_mode = 0x8;
                                 mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.REPEAT)
@@ -590,7 +590,11 @@ namespace RokyTask
                             level = Step13_CheckVddCCu(sender, mEventArgs.Data);
                             if(level == Task_Level.FALSE)
                             {
-
+                                mTaskSteps = TaskSteps.Step13_CheckVddCCu;
+                                mGet700ResultParam.ack_device = Const.TESTSERVER;
+                                mGet700ResultParam.ecu_status = 0x0;
+                                mGet700ResultParam.server_mode = 0x8;
+                                mGet700ResultParam.level_ctrl = 0x0100;
                             }
                             else if(level == Task_Level.TRUE)
                             {
@@ -598,6 +602,8 @@ namespace RokyTask
                                 string mRest = String.Format("{0}\n测 试 成 功！", mSN);
                                 //保存数据
                                 SetMainText(sender, mRest, "PASS", INFO_LEVEL.PASS);
+                                StopTask();
+                                return;
                             }
                             else if(level == Task_Level.REPEAT)
                             {
@@ -612,7 +618,7 @@ namespace RokyTask
                     if(!bExcute)
                     {                        
                         mGet7001ResultTask.Excute();
-                        Thread.Sleep(1000);//全部延迟1s
+                        Thread.Sleep(500);
                     } 
                     else
                     {
@@ -1500,15 +1506,13 @@ namespace RokyTask
             byte mAccStatus = (byte)mArgs.AccStatus;
             byte mDcOUT = (byte)mArgs.DcVoltage;
             if (mAckDevice == Const.TESTSERVER)
-            {    
-                /*                      
+            {                                         
                 if (mAccStatus == 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
                     mRK7001Pins.Pin18_Open = true;
                     UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
-                }
-                */                
+                }             
                 return Task_Level.TRUE;
             }
 
@@ -1524,15 +1528,14 @@ namespace RokyTask
             byte mAccStatus = (byte)mArgs.AccStatus;
             byte mDcOUT = (byte)mArgs.DcVoltage;
             if (mAckDevice == Const.TESTSERVER)
-            {        
-                /*          
+            {                            
                 if (mAccStatus != 0)//V2.0.0 拆掉D416,所以DCout不测
                 {
                     mRK7001Pins.Pin18_Open = true;
                     UpdateListView(sender, "KSI错误", "KSI的pin脚短路或者断路或者其他原因");
                     return Task_Level.FALSE;
                 } 
-                */              
+                              
                 return Task_Level.TRUE;
             }
             return Task_Level.REPEAT;

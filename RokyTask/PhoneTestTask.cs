@@ -228,6 +228,8 @@ namespace RokyTask
             mBindKey1Param = mBindKey1Task.GetRequestEntity();
             mBindKey1Param.ack_device = Const.PCU;
             mBindKey1Param.server_mode = 0x08;//绑定钥匙
+            mBindKey1Param.ecu_status = 0x34;
+            mBindKey1Param.level_ctrl = 0x0100;
             mBindKey1Task.RetryMaxCnts = 0;
             mBindKey1Task.Timerout = 10*1000;
             mBindKey1Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
@@ -328,6 +330,8 @@ namespace RokyTask
             mBindKey2Param = mBindKey2Task.GetRequestEntity();
             mBindKey2Param.ack_device = Const.PCU;
             mBindKey2Param.server_mode = 0x08;//绑定钥匙
+            mBindKey2Param.ecu_status = 0x34;
+            mBindKey2Param.level_ctrl = 0x0100;
             mBindKey2Task.RetryMaxCnts = 0;
             mBindKey2Task.Timerout = 10 * 1000;
             mBindKey2Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
@@ -336,7 +340,7 @@ namespace RokyTask
                 if (mEventArgs.Data != null)
                 {
                     byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
-                    byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
+                    byte mAskRessult = (byte)mEventArgs.Data.ack_value;//响应
                     int temp = (byte)mEventArgs.Data.CutError_1 |
                                           mEventArgs.Data.CutError_2 << 8 |
                                           mEventArgs.Data.ShortError_1 << 16;

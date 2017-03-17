@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -29,6 +30,8 @@ namespace RK7001Test
         #region 加载界面
         private void KeyBindForm_Load(object sender, EventArgs e)
         {
+            //版本号
+            this.Text = String.Format("RK7010整测工具 V{0}", AssemblyFileVersion());
             mPhoneTask = new PhoneTestTask();
             mPhoneTask.KeyNumber = int.Parse(ConfigurationManager.AppSettings["KeysNumber"].ToString());
             mPhoneTask.TryCnts = int.Parse(ConfigurationManager.AppSettings["TryCnts"].ToString());
@@ -200,8 +203,7 @@ namespace RK7001Test
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
                         this.textBox_SN.Focus();
-                        break;
-                                                                                             
+                        break;                                                                                             
                 }
             }
         }
@@ -452,8 +454,6 @@ namespace RK7001Test
         }
         #endregion
 
-
-
         #region 执行任务
         private void StartTask()
         {
@@ -502,6 +502,21 @@ namespace RK7001Test
                     if (this.textBox_SN.TextLength == 10)
                         StartTask();
                 }
+            }
+        }
+        #endregion
+
+        #region 获得版本号
+        private string AssemblyFileVersion()
+        {
+            object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false);
+            if (attributes.Length == 0)
+            {
+                return "";
+            }
+            else
+            {
+                return ((AssemblyFileVersionAttribute)attributes[0]).Version;
             }
         }
         #endregion

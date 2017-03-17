@@ -16,6 +16,7 @@ using System.Windows.Forms;
 
 namespace RK7001Test
 {
+    
     public partial class MainForm : Form
     {
         #region 私有变量
@@ -32,13 +33,14 @@ namespace RK7001Test
         private ListViewItem lv4103gsensor;
         //private ListViewItem lv4103pwm;
         private ListViewItem lv4103ble;
+        private FACTORY_MODE mode { get; set; }
         #endregion
 
-        public MainForm(string _comPort)
+        public MainForm(string _comPort, int index)
         {
             InitializeComponent();
             Const.COM_PORT = _comPort;
-            
+            mode = (FACTORY_MODE)index;
             mRK7001Pin = new Label[] { this.lbPin_1, this.lbPin_2, this.lbPin_3, this.lbPin_4, this.lbPin_5, this.lbPin_6, this.lbPin_7, this.lbPin_8, this.lbPin_9, this.lbPin_10,
                                         this.lbPin_11, this.lbPin_12, this.lbPin_13, this.lbPin_14, this.lbPin_15, this.lbPin_16, this.lbPin_17, this.lbPin_18, this.lbPin_19, this.lbPin_20,
                                        this.lbPin_21, this.lbPin_22, this.lbPin_23, this.lbPin_24, this.lbPin_25, this.lbPin_26, this.lbPin_27, this.lbPin_28};
@@ -50,6 +52,13 @@ namespace RK7001Test
         #region 加载界面
         private void MainForm_Load(object sender, EventArgs e)
         {
+            this.toolStripStatusLabel_port.Text = "串口:" + Const.COM_PORT.ToString();
+            if (mode == FACTORY_MODE.TEST_MODE)
+                this.toolStripStatusLabel_mode.Text = "当前模式: 板测模式";
+            else if(mode == FACTORY_MODE.CHECK_MODE)
+            {
+                this.toolStripStatusLabel_mode.Text = "当前模式: 复检模式";
+            }
             //版本号
             this.Text = String.Format("RK7010板测工具 V{0}", AssemblyFileVersion());
             #region Listview初始化
@@ -103,6 +112,16 @@ namespace RK7001Test
             mCoreTask.bPushcar = Convert.ToBoolean(ConfigurationManager.AppSettings["PushSwitch"].ToString());
             mCoreTask.bBackcar = Convert.ToBoolean(ConfigurationManager.AppSettings["BackSwitch"].ToString());
 
+            mCoreTask.bLcm_P = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_P"].ToString());
+            mCoreTask.bLcm_L = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_L"].ToString());
+            mCoreTask.bLcm_R = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_R"].ToString());
+            mCoreTask.bLcm_RD = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_RD"].ToString());
+            mCoreTask.bLcm_F = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_F"].ToString());
+            mCoreTask.bAnt = Convert.ToBoolean(ConfigurationManager.AppSettings["ANT"].ToString());
+            mCoreTask.bLcm_CS = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_CS"].ToString());
+            mCoreTask.bLcm_CLK = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_CLK"].ToString());
+            mCoreTask.bLcm_DO = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_DO"].ToString());
+          
             mCoreTask.bServerActivated = Convert.ToBoolean(ConfigurationManager.AppSettings["ServerFlag"].ToString());
             mCoreTask.DefaultSN = ConfigurationManager.AppSettings["DefaultSN"].ToString();
             mCoreTask.DefaultBT = ConfigurationManager.AppSettings["DefaultBT"].ToString();
@@ -201,7 +220,16 @@ namespace RK7001Test
                 }
             };
             //初始化界面
-            SetValidSN(INFO_LEVEL.INIT);
+            if (mode == FACTORY_MODE.TEST_MODE)
+            {
+                SetValidSN(INFO_LEVEL.INIT);
+                this.tbInputSN.Enabled = true;
+            }
+            else
+            {
+                SetValidSN(INFO_LEVEL.GREY);
+                this.tbInputSN.Enabled = false;
+            }
             SetTestServer(INFO_LEVEL.INIT);
             SetRK7001PinList(null, INFO_LEVEL.INIT);
             SetRK4103PinList(null, INFO_LEVEL.INIT);
@@ -215,13 +243,17 @@ namespace RK7001Test
         #region 启动任务
         private void StartTask()
         {
-            SetValidSN(INFO_LEVEL.PROCESS);
+            if(mode == FACTORY_MODE.TEST_MODE)
+                SetValidSN(INFO_LEVEL.PROCESS);
+            else
+                SetValidSN(INFO_LEVEL.GREY);
             SetTestServer(INFO_LEVEL.PROCESS);
             SetRK7001ItemList(RK7001ITEM.INIT, null, INFO_LEVEL.INIT);
             SetRK4103ItemList(RK4103ITEM.INIT, null, INFO_LEVEL.INIT);
             this.lvSolutions.Items.Clear();
             mCoreTask.mSN = this.tbInputSN.Text;
             this.tbInputSN.Enabled = false;
+            mCoreTask.mode = this.mode;//选择模式
             mCoreTask.ExcuteTask();
         }
         #endregion
@@ -411,6 +443,9 @@ namespace RK7001Test
                         break;
                     case INFO_LEVEL.PROCESS:
                         this.lbItemValidSN.BackColor = Color.Yellow;
+                        break;
+                    case INFO_LEVEL.GREY:
+                        this.lbItemValidSN.BackColor = Color.Gray;
                         break;
                 }
             }
@@ -1144,6 +1179,12 @@ namespace RK7001Test
                     this.tbInputSN.Text = mCoreTask.DefaultSN;
                     StartTask();
                 }                
+            }
+            else if(e.KeyCode == Keys.Space)//空格键，进行复检
+            {
+                if (mCoreTask.bTaskRunning)
+                    return;                
+                StartTask();
             }                   
         }
         #endregion

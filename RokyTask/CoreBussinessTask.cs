@@ -130,6 +130,12 @@ namespace RokyTask
         REPEAT = 2,
     }
 
+    public enum FACTORY_MODE
+    {
+        TEST_MODE = 0,
+        CHECK_MODE = 2,
+    }
+
     #region PIN脚状态
     public class PIN_STATUS
     {
@@ -213,11 +219,22 @@ namespace RokyTask
         private PIN_STATUS mRK7001Pins;
         private PIN_STATUS mRK4103Pins;
 
+        public FACTORY_MODE mode { get; set; }
+
         public bool bCruised { get; set; }
         public bool bRepaired { get; set; }
         public bool bPushcar { get; set; }
         public bool bBackcar { get; set; }
         public bool bTest4103 { get; set; }
+        public bool bLcm_P { get; set; }
+        public bool bLcm_F { get; set; }
+        public bool bLcm_R { get; set; }
+        public bool bLcm_L { get; set; }
+        public bool bLcm_RD { get; set; }
+        public bool bAnt { get; set; }
+        public bool bLcm_CS { get; set; }
+        public bool bLcm_CLK { get; set; }
+        public bool bLcm_DO { get; set; }
 
         public bool bServerActivated { get; set; }
         public string DefaultSN { get; set; }
@@ -757,7 +774,14 @@ namespace RokyTask
                 if (mEventArgs.Data != null)
                 {
                     mParamSettingParam.deviceType = 0x03;
-                    mParamSettingParam.testItem = 0x7F;
+                    if(mode == FACTORY_MODE.TEST_MODE)
+                    {
+                        mParamSettingParam.testItem = 0x7F;//写号
+                    }
+                    else if(mode == FACTORY_MODE.CHECK_MODE)
+                    {
+                        mParamSettingParam.testItem = 0x5F;//不写号
+                    }                    
                     mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
                     byte[] aArray = new byte[6];
                     aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
@@ -963,54 +987,78 @@ namespace RokyTask
                         //扩展pin脚
                         if ((m_result >> 8 & 0x1) == 1)
                         {
-                            if ((extensionOut >> 0 & 0x1) == 1)//LCM_左转指示
+                            if(bLcm_L)
                             {
-                                mRK4103Pins.Pin8_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM左转指示", "4103 LCM左转指示异常或者其他原因");
+                                if ((extensionOut >> 0 & 0x1) == 1)//LCM_左转指示
+                                {
+                                    mRK4103Pins.Pin8_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM左转指示", "4103 LCM左转指示异常或者其他原因");
+                                }
                             }
-                            if ((extensionOut >> 1 & 0x1) == 1)//LCM_远光指示
+                            if(bLcm_F)
                             {
-                                mRK4103Pins.Pin24_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM远光指示", "4103 LCM远光指示异常或者其他原因");
+                                if ((extensionOut >> 1 & 0x1) == 1)//LCM_远光指示
+                                {
+                                    mRK4103Pins.Pin24_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM远光指示", "4103 LCM远光指示异常或者其他原因");
+                                }
                             }
-                            if ((extensionOut >> 2 & 0x1) == 1)//LCM_READY指示
+                            if(bLcm_R)
                             {
-                                mRK4103Pins.Pin7_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM_READY指示", "4103 LCM_READY指示异常或者其他原因");
+                                if ((extensionOut >> 2 & 0x1) == 1)//LCM_READY指示
+                                {
+                                    mRK4103Pins.Pin7_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM_READY指示", "4103 LCM_READY指示异常或者其他原因");
+                                }
                             }
-                            if ((extensionOut >> 3 & 0x1) == 1) //LCM_PARK指示
+                            if(bLcm_P)
                             {
-                                mRK4103Pins.Pin23_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示异常或者其他原因");
+                                if ((extensionOut >> 3 & 0x1) == 1) //LCM_PARK指示
+                                {
+                                    mRK4103Pins.Pin23_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示异常或者其他原因");
+                                }
                             }
-                            if ((extensionOut >> 4 & 0x1) == 1)//LCM_右转指示
+                            if(bLcm_R)
                             {
-                                mRK4103Pins.Pin25_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM_右转指示", "4103 LCM_右转指示异常或者其他原因");
-                            }
-                            if ((extensionOut >> 5 & 0x1) == 1)//LCM_CS
+                                if ((extensionOut >> 4 & 0x1) == 1)//LCM_右转指示
+                                {
+                                    mRK4103Pins.Pin25_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM_右转指示", "4103 LCM_右转指示异常或者其他原因");
+                                }
+                            }     
+                            if(bLcm_CS)
                             {
-                                mRK4103Pins.Pin21_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM_CS脚", "4103 LCM_CS异常或者其他原因");
-                            }
-                            if ((extensionOut >> 6 & 0x1) == 1)//LCM_CLK
+                                if ((extensionOut >> 5 & 0x1) == 1)//LCM_CS
+                                {
+                                    mRK4103Pins.Pin21_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM_CS脚", "4103 LCM_CS异常或者其他原因");
+                                }
+                            }                       
+                            if(bLcm_CLK)
                             {
-                                mRK4103Pins.Pin9_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK异常或者其他原因");
+                                if ((extensionOut >> 6 & 0x1) == 1)//LCM_CLK
+                                {
+                                    mRK4103Pins.Pin9_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK异常或者其他原因");
+                                }
                             }
-                            if ((extensionOut >> 7 & 0x1) == 1)//LCM_DO
+                            if(bLcm_DO)
                             {
-                                mRK4103Pins.Pin10_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 LCM_DO脚", "4103 LCM_DO异常或者其他原因");
-                            }
+                                if ((extensionOut >> 7 & 0x1) == 1)//LCM_DO
+                                {
+                                    mRK4103Pins.Pin10_Open = true;
+                                    InputPinError = true;
+                                    UpdateListView(sender, "4103 LCM_DO脚", "4103 LCM_DO异常或者其他原因");
+                                }
+                            }                            
                         }
                         //最后判断
                         if(!InputPinError)
@@ -1722,14 +1770,17 @@ namespace RokyTask
                 if(level == INFO_LEVEL.FAIL || level == INFO_LEVEL.PASS)
                 {
                     bTaskRunning = false;
-                    if (bServerActivated)
+                    if (mode == FACTORY_MODE.TEST_MODE)
                     {
-                        if(submsg != "SAVENONE")
+                        if (bServerActivated)
                         {
-                            mTestResult = submsg;
-                            SaveData2Server(level);
-                        }                   
-                    }                    
+                            if (submsg != "SAVENONE")
+                            {
+                                mTestResult = submsg;
+                                SaveData2Server(level);
+                            }
+                        }
+                    }                                       
                 }
                 if(UpdateWorkStatusHandler != null)
                 {
@@ -1755,7 +1806,7 @@ namespace RokyTask
                     Update7001ListViewHandler(sender, mArgs);
                 }
             }
-#endregion
+            #endregion
 
             #region 刷新RK4103列表
             private void UpdateRK4103Items(object sender, RK4103ITEM items, DeviceInfo info, INFO_LEVEL level)
@@ -1960,24 +2011,36 @@ namespace RokyTask
             this.DynamicPotTicker.Enabled = true;
 
             //mGet7001ResultTask.Excute();
-            if (bServerActivated)
+            if(mode == FACTORY_MODE.TEST_MODE)
             {
-                if (!GetValueFrmServer(this))
+                if (bServerActivated)
                 {
-                    StopTask();
-                    return;
-                }                    
+                    if (!GetValueFrmServer(this))
+                    {
+                        StopTask();
+                        return;
+                    }
+                }
+                else
+                {
+                    mSN = DefaultSN;
+                    mBTaddr = DefaultBT;
+                    mBLEaddr = DefaultBLE;
+                    mKeyt = DefaultKeyt;
+                    UpdateValidSN(this, INFO_LEVEL.PASS);
+                    SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
+                    mChk4103ServerTask.Excute();
+                }
             }
-            else
+            else if(mode == FACTORY_MODE.CHECK_MODE)//如果是复检模式
             {
                 mSN = DefaultSN;
                 mBTaddr = DefaultBT;
                 mBLEaddr = DefaultBLE;
                 mKeyt = DefaultKeyt;
-                UpdateValidSN(this, INFO_LEVEL.PASS);
                 SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
                 mChk4103ServerTask.Excute();
-            }      
+            }                  
         }
     }
 }

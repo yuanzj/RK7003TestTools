@@ -34,6 +34,7 @@ namespace RK7001Test
             //生产模式
             this.ccbMode.Items.Insert(0, "板级测试");
             this.ccbMode.Items.Insert(1, "整机测试");
+            this.ccbMode.Items.Insert(2, "复检抽测");
 
             LoadSetting();
 
@@ -95,6 +96,9 @@ namespace RK7001Test
                 case 1:
                     PhoneTest();
                     break;
+                case 2:
+                    BoardTest();
+                    break;
             }
         }
         #endregion
@@ -109,7 +113,7 @@ namespace RK7001Test
         #region 板测
         private void BoardTest()
         {
-            MainForm mForm = new MainForm((String)this.ccb_Port.SelectedItem);
+            MainForm mForm = new MainForm((String)this.ccb_Port.SelectedItem, this.ccbMode.SelectedIndex);
             this.Hide();
             if (mForm.ShowDialog() == DialogResult.OK)
             {

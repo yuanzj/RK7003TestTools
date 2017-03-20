@@ -776,11 +776,11 @@ namespace RokyTask
                     mParamSettingParam.deviceType = 0x03;
                     if(mode == FACTORY_MODE.TEST_MODE)
                     {
-                        mParamSettingParam.testItem = 0x7F;//写号
+                        mParamSettingParam.testItem = 0xFF;//写号
                     }
                     else if(mode == FACTORY_MODE.CHECK_MODE)
                     {
-                        mParamSettingParam.testItem = 0x5F;//不写号
+                        mParamSettingParam.testItem = 0xBF;//不写号
                     }                    
                     mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
                     byte[] aArray = new byte[6];
@@ -868,53 +868,53 @@ namespace RokyTask
                         */
                         if ((m_result >> 4 & 0x1) == 1) 
                         {
-                            if ((inputPin >> 0 & 0x1) == 1) //右转灯
+                            if ((inputPin >> 0 & 0x1) == 1) //右转灯 => 档位(RK7010)
                             {
                                 mRK4103Pins.Pin27_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103右转灯", "右转灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103档位", "档位脚异常或者其他原因");
                             }
-                            if ((inputPin >> 1 & 0x1) == 1)//左转灯
+                            if ((inputPin >> 1 & 0x1) == 1)//左转灯 => P档（RK7010）
                             {
                                 mRK4103Pins.Pin28_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103左转灯", "左转灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 P档", "P档脚异常或者其他原因");
                             }
-                            if ((inputPin >> 2 & 0x1) == 1)//远近光
+                            if ((inputPin >> 2 & 0x1) == 1)//远近光 => 大灯（RK7010）
                             {
                                 mRK4103Pins.Pin3_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103远近光灯", "远近光转灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 大灯", "大灯灯脚异常或者其他原因");
                             }
-                            if ((inputPin >> 3 & 0x1) == 1)//喇叭
+                            if ((inputPin >> 3 & 0x1) == 1)//喇叭 => 双闪（RK7010）
                             {
                                 mRK4103Pins.Pin4_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103喇叭", "喇叭脚异常或者其他原因");
+                                UpdateListView(sender, "4103双闪", "双闪脚异常或者其他原因");
                             }
-                            if ((inputPin >> 4 & 0x1) == 1)//P档切换
+                            if ((inputPin >> 4 & 0x1) == 1)//P档切换 => 巡航（RK7010）
                             {
                                 mRK4103Pins.Pin12_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 P档切换", "4103 P档切换脚异常或者其他原因");
+                                UpdateListView(sender, "4103 巡航", "巡航脚异常或者其他原因");
                             }
-                            if ((inputPin >> 5 & 0x1) == 1)//Power档切换
+                            if ((inputPin >> 5 & 0x1) == 1)//Power档切换  => 左转灯
                             {
                                 mRK4103Pins.Pin18_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 档位切换", "4103档位切换脚异常或者其他原因");
+                                UpdateListView(sender, "4103 左转灯", "左转灯脚异常或者其他原因");
                             }
-                            if ((inputPin >> 6 & 0x1) == 1)//开关大灯
+                            if ((inputPin >> 6 & 0x1) == 1)//开关大灯 => PASS(RK7010)
                             {
                                 mRK4103Pins.Pin14_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 开关大灯", "4103开关大灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 PASS", "PASS灯脚异常或者其他原因");
                             }
-                            if ((inputPin >> 7 & 0x1) == 1)//自动大灯
+                            if ((inputPin >> 7 & 0x1) == 1)//自动大灯 => 远近光（RK7010）
                             {
                                 mRK4103Pins.Pin13_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 自动大灯", "4103自动大灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 远近光", "远近光灯脚异常或者其他原因");
                             }
                             /*
                             if ((inputPin >> 8 & 0x1) == 1)
@@ -927,7 +927,7 @@ namespace RokyTask
                             */
                             if(bCruised)
                             {
-                                if ((inputPin >> 9 & 0x1) == 1)  //巡航开关
+                                if ((inputPin >> 9 & 0x1) == 1)  //巡航开关 =》 空
                                 {
                                     mRK4103Pins.Pin26_Open = true;
                                     InputPinError = true;
@@ -936,25 +936,25 @@ namespace RokyTask
                             }
                             if(bPushcar)
                             {
-                                if ((inputPin >> 10 & 0x1) == 1) //推车开关
+                                if ((inputPin >> 10 & 0x1) == 1) //推车开关  => 铁喇叭（RK7010）
                                 {
                                     mRK4103Pins.Pin17_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 推车开关", "4103 推车开关脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 铁喇叭", "4103 铁喇叭脚异常或者其他原因");
                                 }                                    
                             }                   
                             if(bBackcar)
                             {
-                                if ((inputPin >> 11 & 0x1) == 1) //倒车开关
+                                if ((inputPin >> 11 & 0x1) == 1) //倒车开关 => 右转
                                 {
-                                    mRK4103Pins.Pin16_Open = true;
+                                    mRK4103Pins.Pin15_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 倒车开关", "4103 倒车开关脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 右转灯", "4103 右转脚异常或者其他原因");
                                 }                                 
                             }
                             if(bRepaired)
                             {
-                                if ((inputPin >> 12 & 0x1) == 1)//一键修复
+                                if ((inputPin >> 12 & 0x1) == 1)//一键修复  =》 空
                                 {
                                     mRK4103Pins.Pin19_Open = true;
                                     InputPinError = true;

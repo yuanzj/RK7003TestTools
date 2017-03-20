@@ -932,9 +932,8 @@ namespace RK7001Test
             if (level == INFO_LEVEL.INIT)
             {
                 for (int i = 2; i <= 30; i++)
-                {
-                    
-                    if (i == 16 || i == 17 || i == 19 || i == 26 || i== 15 || i == 20 
+                {                    
+                    if (i == 16 || i == 19 || i == 26 || i == 20 
                         || i== 5 || i == 2 || i== 29 || i == 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);
                     else
@@ -946,7 +945,7 @@ namespace RK7001Test
             {
                 for (int i = 2; i <= 30; i++)
                 {                    
-                    if (i == 16 || i == 17 || i == 19 || i == 26 || i == 15 || i == 20 
+                    if (i == 16 || i == 19 || i == 26 || i == 20 
                         || i == 5 || i == 2 || i == 29 || i == 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);
                     else
@@ -958,7 +957,7 @@ namespace RK7001Test
             {
                 for (int i = 2; i <= 30; i++)
                 {                    
-                    if (i == 16 || i == 17 || i == 19 || i == 26 || i == 15 || i == 20 
+                    if (i == 16 || i == 19 || i == 26 || i == 20 
                         || i == 5 || i == 2 || i== 29 || i== 30 || i == 6)
                         SetRK4103Pin(i, INFO_LEVEL.GREY);
                     else
@@ -1033,23 +1032,21 @@ namespace RK7001Test
             if (status.Pin14_Open || status.Pin14_Short)
                 SetRK4103Pin(14, INFO_LEVEL.FAIL);
             else
-                SetRK4103Pin(14, INFO_LEVEL.PASS);
-            /*
+                SetRK4103Pin(14, INFO_LEVEL.PASS);            
             if (status.Pin15_Open || status.Pin15_Short)
                 SetRK4103Pin(15, INFO_LEVEL.FAIL);
             else
-                SetRK4103Pin(15, INFO_LEVEL.PASS);
-            */
-            /*
+                SetRK4103Pin(15, INFO_LEVEL.PASS);            
             if (status.Pin16_Open || status.Pin16_Short)
                 SetRK4103Pin(16, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(16, INFO_LEVEL.PASS);
+            
             if (status.Pin17_Open || status.Pin17_Short)
                 SetRK4103Pin(17, INFO_LEVEL.FAIL);
             else
                 SetRK4103Pin(17, INFO_LEVEL.PASS);
-            */
+            
             if (status.Pin18_Open || status.Pin18_Short)
                 SetRK4103Pin(18, INFO_LEVEL.FAIL);
             else

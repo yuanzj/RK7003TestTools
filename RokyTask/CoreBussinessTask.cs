@@ -275,7 +275,9 @@ namespace RokyTask
         
         SimpleSerialPortTask<chk4103Server, chk4103ServerRsp> mChk4103ServerTask;
         chk4103Server mChk4103ServerParam;
-        
+        //获取中控信息
+        SimpleSerialPortTask<getDevinfoReq, getDevinfoRsp> mGetDevinfoTask;
+        getDevinfoReq mGetDevinfoParam;
         //接受0x06
         SimpleSerialPortTask<NullEntity, get4103BroadcastReq> mFirstRunningReqTask;
         //发送0x86，接受0x03
@@ -309,6 +311,47 @@ namespace RokyTask
         #region 构造任务
         private void TaskBuilder()
         {
+            #region 获取中控信息
+            mGetDevinfoTask = new SimpleSerialPortTask<getDevinfoReq, getDevinfoRsp>();
+            mGetDevinfoParam = mGetDevinfoTask.GetRequestEntity();
+            mGetDevinfoParam.devType = 0X08;
+            mGetDevinfoTask.Timerout = 1000;
+            mGetDevinfoTask.RetryMaxCnts = 1;
+            mGetDevinfoTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<getDevinfoRsp> mEventArgs = e as SerialPortEventArgs<getDevinfoRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    mParamSettingParam.sn = mEventArgs.Data.devSN;
+                    mParamSettingParam.edrAddr = mEventArgs.Data.devBTaddr;
+                    mParamSettingParam.bleAddr = mEventArgs.Data.devBLEaddr;
+                    mParamSettingParam.key = mEventArgs.Data.devKeyt;
+                    byte[] temp = new byte[4];
+                    mParamSettingParam.adcParam = temp;
+                    mParamSettingParam.v15Param = temp;
+                    mParamSettingParam.sntemp = temp;
+                    SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
+                    mParamSettingReqTask.Excute();
+                    string sn = ByteProcess.byteArrayToString(mEventArgs.Data.devSN);
+                    byte[] edrByteArray = new byte[6];
+                    edrByteArray = mEventArgs.Data.devBTaddr;
+                    Array.Reverse(edrByteArray);
+                    string edr = Util.ToHexString(edrByteArray);
+                    string ble = Util.ToHexString(mEventArgs.Data.devBLEaddr);
+                    string key = ByteProcess.byteArrayToString(mEventArgs.Data.devKeyt);
+                    string devInfo = String.Format("SN:{0},BT2.1地址:{1},BLE4.0地址:{2},密钥:{3}",sn, edr, ble,key);
+                    UpdateListView(sender, "当前设备信息", devInfo);
+                }
+                else
+                {
+                    SetMainText(sender, "未获取中控设备信息！", "SAVENONE", INFO_LEVEL.FAIL);
+                    UpdateListView(sender, "未获取中控设备信息", "485失去通讯，或者夹具中断异常！");
+                    UpdateTestServer(sender, INFO_LEVEL.FAIL);
+                    StopTask();
+                }
+            };
+            #endregion
+
             #region 显示POS
             DynamicPotTicker = new System.Timers.Timer(1000);
             PotTickCnt = 0;
@@ -617,7 +660,7 @@ namespace RokyTask
             };
 #endregion
 
-#region 查找UID报文
+            #region 查找UID报文
             mGet7001VersionTask = new SimpleSerialPortTask<get7001Version, get7001VersionRsp>();
             mGet7001VersionParam = mGet7001VersionTask.GetRequestEntity();
             mGet7001VersionTask.RetryMaxCnts = 30;
@@ -699,7 +742,7 @@ namespace RokyTask
             };
 #endregion
 
-#region 检查测试Server
+            #region 检查测试Server
             mChk4103ServerTask = new SimpleSerialPortTask<chk4103Server, chk4103ServerRsp>();
             mChk4103ServerParam = mChk4103ServerTask.GetRequestEntity();
             mChk4103ServerTask.RetryMaxCnts = 10;
@@ -712,8 +755,8 @@ namespace RokyTask
                 {
                     UpdateTestServer(sender, INFO_LEVEL.PASS);
                     //先来获取版本号和uid
-                    mFirstRunningReqTask.Excute();
                     SetMainText(sender, "等待设备上电中...", "", INFO_LEVEL.PROCESS);
+                    mFirstRunningReqTask.Excute();                                        
                 }
                 else
                 {
@@ -725,7 +768,7 @@ namespace RokyTask
             };
 #endregion
 
-#region RK4103上电 发送广播报文
+            #region RK4103上电 发送广播报文
             mFirstRunningReqTask = new SimpleSerialPortTask<NullEntity, get4103BroadcastReq>();
             mFirstRunningReqTask.RetryMaxCnts = 1;
             mFirstRunningReqTask.Timerout = 20*1000;
@@ -745,14 +788,22 @@ namespace RokyTask
                     DeviceInfo info = new DeviceInfo();
                     info.sw = softVersion;
                     UpdateRK4103Items(sender, RK4103ITEM.VERSION, info, INFO_LEVEL.NONE);
-                    
+
                     mFirstRunRspParam.deviceType = 0x01;
                     mFirstRunRspParam.firmwareYears = (byte)(mEventArgs.Data.hardwareID >> 24);
                     mFirstRunRspParam.firmwareWeeks = (byte)(mEventArgs.Data.hardwareID >> 16);
                     mFirstRunRspParam.firmwareVersion = (byte)(mEventArgs.Data.hardwareID >> 8);
                     mFirstRunRspParam.hardwareID = 0xFB;
-                    SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
-                    mParamSettingReqTask.Excute();
+                    if (mode == FACTORY_MODE.TEST_MODE)
+                    {                        
+                        SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
+                        mParamSettingReqTask.Excute();
+                    }
+                    else if(mode == FACTORY_MODE.CHECK_MODE)
+                    {                        
+                        SetMainText(sender, "获得中控设备信息...", "", INFO_LEVEL.PROCESS);
+                        mGetDevinfoTask.Excute();
+                    }
                 }
                 else
                 {
@@ -777,22 +828,22 @@ namespace RokyTask
                     if(mode == FACTORY_MODE.TEST_MODE)
                     {
                         mParamSettingParam.testItem = 0xFF;//写号
+                        mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
+                        byte[] aArray = new byte[6];
+                        aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
+                        Array.Reverse(aArray);
+                        mParamSettingParam.edrAddr = aArray;
+                        mParamSettingParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
+                        mParamSettingParam.key = ByteProcess.stringToByteArray(mKeyt);
+                        byte[] temp = new byte[4];
+                        mParamSettingParam.adcParam = temp;
+                        mParamSettingParam.v15Param = temp;
+                        mParamSettingParam.sntemp = temp;
                     }
                     else if(mode == FACTORY_MODE.CHECK_MODE)
                     {
                         mParamSettingParam.testItem = 0xBF;//不写号
-                    }                    
-                    mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
-                    byte[] aArray = new byte[6];
-                    aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
-                    Array.Reverse(aArray);
-                    mParamSettingParam.edrAddr = aArray;
-                    mParamSettingParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
-                    mParamSettingParam.key = ByteProcess.stringToByteArray(mKeyt);
-                    byte[] temp = new byte[4];
-                    mParamSettingParam.adcParam = temp;
-                    mParamSettingParam.v15Param = temp;
-                    mParamSettingParam.sntemp = temp;
+                    }                                        
                     //等待接受结果
                     SetMainText(sender, "RK4103 测试中...", "", INFO_LEVEL.PROCESS);
                     Thread.Sleep(5);
@@ -1960,7 +2011,11 @@ namespace RokyTask
             //发送0xA6
             mCompeteTestTask.ClearAllEvent();
             mCompeteTestTask.EnableTimeOutHandler = true;
-            
+
+            mGetDevinfoTask.ClearAllEvent();
+            mGetDevinfoTask.EnableTimeOutHandler = true;
+
+
         }
         #endregion
 
@@ -1995,7 +2050,10 @@ namespace RokyTask
             //发送0xA6
             mCompeteTestTask.ClearAllEvent();
             mCompeteTestTask.EnableTimeOutHandler = false;
-            
+
+            mGetDevinfoTask.ClearAllEvent();
+            mGetDevinfoTask.EnableTimeOutHandler = false;
+
             UpdatePotTicker(this, "", INFO_LEVEL.INIT);
         }
 
@@ -2032,12 +2090,8 @@ namespace RokyTask
                     mChk4103ServerTask.Excute();
                 }
             }
-            else if(mode == FACTORY_MODE.CHECK_MODE)//如果是复检模式
-            {
-                mSN = DefaultSN;
-                mBTaddr = DefaultBT;
-                mBLEaddr = DefaultBLE;
-                mKeyt = DefaultKeyt;
+            else if(mode == FACTORY_MODE.CHECK_MODE)//如果是复检模式,SN号仍使
+            {                
                 SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
                 mChk4103ServerTask.Excute();
             }                  

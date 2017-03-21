@@ -227,13 +227,12 @@ namespace RK7001Test
             }
             else
             {
-                SetValidSN(INFO_LEVEL.GREY);
                 this.tbInputSN.Enabled = false;
-            }
+                SetValidSN(INFO_LEVEL.GREY);
+            }                           
             SetTestServer(INFO_LEVEL.INIT);
             SetRK7001PinList(null, INFO_LEVEL.INIT);
             SetRK4103PinList(null, INFO_LEVEL.INIT);
-
             this.labelPos.Visible = false;
             this.tbInputSN.Focus();
             this.tbInputSN.TabIndex = 0;
@@ -251,7 +250,7 @@ namespace RK7001Test
             SetRK7001ItemList(RK7001ITEM.INIT, null, INFO_LEVEL.INIT);
             SetRK4103ItemList(RK4103ITEM.INIT, null, INFO_LEVEL.INIT);
             this.lvSolutions.Items.Clear();
-            mCoreTask.mSN = this.tbInputSN.Text;
+            mCoreTask.mSN = this.tbInputSN.Text;            
             this.tbInputSN.Enabled = false;
             mCoreTask.mode = this.mode;//选择模式
             mCoreTask.ExcuteTask();
@@ -316,14 +315,20 @@ namespace RK7001Test
                     case INFO_LEVEL.PASS:
                         this.PnWorkStatus.BackColor = Color.Green;
                         this.LbWorkTip.Text = "再次扫描,进行下一次测试!";
-                        this.tbInputSN.Enabled = true;
-                        this.tbInputSN.Text = "";
+                        if(mode == FACTORY_MODE.TEST_MODE)
+                            this.tbInputSN.Enabled = true;
+                        else if(mode == FACTORY_MODE.CHECK_MODE)
+                            this.tbInputSN.Enabled = false;
+                        this.tbInputSN.Text = "";                        
                         this.tbInputSN.Focus();
                         break;
                     case INFO_LEVEL.FAIL:
                         this.PnWorkStatus.BackColor = Color.Red;
                         this.LbWorkTip.Text = "再次扫描,进行下一次测试!";
-                        this.tbInputSN.Enabled = true;
+                        if (mode == FACTORY_MODE.TEST_MODE)
+                            this.tbInputSN.Enabled = true;
+                        else if (mode == FACTORY_MODE.CHECK_MODE)
+                            this.tbInputSN.Enabled = false;
                         this.tbInputSN.Text = "";
                         this.tbInputSN.Focus();
                         break;
@@ -1166,23 +1171,29 @@ namespace RK7001Test
             {
                 if (mCoreTask.bTaskRunning)
                     return;
-                if (mCoreTask.bServerActivated)
+                if(this.mode == FACTORY_MODE.TEST_MODE)
                 {
-                    if(this.tbInputSN.TextLength == 10)
+                    if (mCoreTask.bServerActivated)
+                    {
+                        if (this.tbInputSN.TextLength == 10)
+                            StartTask();
+                    }
+                    else
+                    {
+                        this.tbInputSN.Text = mCoreTask.DefaultSN;
                         StartTask();
-                }
-                else
-                {
-                    this.tbInputSN.Text = mCoreTask.DefaultSN;
-                    StartTask();
-                }                
+                    }
+                }                                                
             }
-            else if(e.KeyCode == Keys.Space)//空格键，进行复检
+            else if(e.KeyCode == Keys.Space)
             {
                 if (mCoreTask.bTaskRunning)
-                    return;                
-                StartTask();
-            }                   
+                    return;
+                if (this.mode == FACTORY_MODE.CHECK_MODE)
+                {
+                    StartTask();
+                }
+            }                               
         }
         #endregion
 

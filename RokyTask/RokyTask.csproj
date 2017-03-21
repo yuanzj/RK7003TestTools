@@ -50,6 +50,7 @@
     <Compile Include="Entity\Protocols\request\boardTestResultReq.cs" />
     <Compile Include="Entity\Protocols\request\btTestReq.cs" />
     <Compile Include="Entity\Protocols\request\getDevinfoReq.cs" />
+    <Compile Include="Entity\Protocols\request\getNVInfoReq.cs" />
     <Compile Include="Entity\Protocols\request\NullEntity.cs" />
     <Compile Include="Entity\Protocols\request\pcTakeoverReq.cs" />
     <Compile Include="Entity\Protocols\request\ResetEcuReq.cs" />

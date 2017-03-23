@@ -25,9 +25,9 @@ namespace RokyTask
 
         public const int GET_7001_VERSION_RSP = 0X88;
 
-        public const int CHECK_4103_SERVER = 0X02;
+        public const int CHECK_4110_SERVER = 0X02;
 
-        public const int CHECK_4103_SERVER_RSP = 0X82;
+        public const int CHECK_4110_SERVER_RSP = 0X82;
 
         public const int RECV_BROADCAST_REQ = 0X06;
 

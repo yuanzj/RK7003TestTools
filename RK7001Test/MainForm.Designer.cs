@@ -1405,7 +1405,7 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 25);
             this.label5.TabIndex = 0;
-            this.label5.Text = "RK4103";
+            this.label5.Text = "RK4110";
             // 
             // panel5
             // 
@@ -1546,7 +1546,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(473, 35);
             this.label1.TabIndex = 0;
-            this.label1.Text = "RK4103测试列表";
+            this.label1.Text = "RK4110测试列表";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tbInputSN

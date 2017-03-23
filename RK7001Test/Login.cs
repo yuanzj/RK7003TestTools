@@ -28,13 +28,13 @@ namespace RK7001Test
         private void LoginForm_Load(object sender, EventArgs e)
         {
             //版本号
-            this.Text = String.Format("RK7010板测工具 V{0}", AssemblyFileVersion());
+            this.Text = String.Format("RK7010生产工具 V{0}", AssemblyFileVersion());
             //串口
             this.ccb_Port.DataSource = System.IO.Ports.SerialPort.GetPortNames();
             //生产模式
             this.ccbMode.Items.Insert(0, "板级测试");
-            this.ccbMode.Items.Insert(1, "整机测试");
-            this.ccbMode.Items.Insert(2, "复检抽测");
+            this.ccbMode.Items.Insert(1, "钥匙配对");
+            this.ccbMode.Items.Insert(2, "整机测试");
 
             LoadSetting();
 

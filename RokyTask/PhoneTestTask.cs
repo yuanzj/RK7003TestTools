@@ -229,7 +229,7 @@ namespace RokyTask
             mBindKey1Param.ack_device = Const.PCU;
             mBindKey1Param.server_mode = 0x08;//绑定钥匙
             mBindKey1Param.ecu_status = 0x34;
-            mBindKey1Param.level_ctrl = 0x0100;
+            mBindKey1Param.level_ctrl = 0x0000;
             mBindKey1Task.RetryMaxCnts = 0;
             mBindKey1Task.Timerout = 10*1000;
             mBindKey1Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
@@ -331,7 +331,7 @@ namespace RokyTask
             mBindKey2Param.ack_device = Const.PCU;
             mBindKey2Param.server_mode = 0x08;//绑定钥匙
             mBindKey2Param.ecu_status = 0x34;
-            mBindKey2Param.level_ctrl = 0x0100;
+            mBindKey2Param.level_ctrl = 0x0000;
             mBindKey2Task.RetryMaxCnts = 0;
             mBindKey2Task.Timerout = 10 * 1000;
             mBindKey2Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RokyTask.Entity.Protocols.response
 {
-    class get4110BroadcastRsp : BaseProtocolImpl<get4110BroadcastRsp>
+    class get4103BroadcastRsp : BaseProtocolImpl<get4103BroadcastRsp>
     {
         [ProtocolAttribute("deviceType", 0, 1)]
         public int deviceType { get; set; }

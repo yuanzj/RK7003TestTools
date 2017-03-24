@@ -28,11 +28,11 @@ namespace RK7001Test
         private ListViewItem lv7001hw;
         private ListViewItem lv7001ampf;
         private ListViewItem lv7001mosfet;
-        private ListViewItem lv4110sw;
-        private ListViewItem lv4110lgtsensor;
-        private ListViewItem lv4110gsensor;
-        //private ListViewItem lv4110pwm;
-        private ListViewItem lv4110ble;
+        private ListViewItem lv4103sw;
+        private ListViewItem lv4103lgtsensor;
+        private ListViewItem lv4103gsensor;
+        //private ListViewItem lv4103pwm;
+        private ListViewItem lv4103ble;
         private FACTORY_MODE mode { get; set; }
         #endregion
 
@@ -61,9 +61,8 @@ namespace RK7001Test
             }
             else if (mode == FACTORY_MODE.CHECK_MODE)
             {
-                this.toolStripStatusLabel_mode.Text = "当前模式: 整测模式";
-                //版本号
-                this.Text = String.Format("RK7010整测工具 V{0}", AssemblyFileVersion());
+                this.toolStripStatusLabel_mode.Text = "当前模式: 复检模式";
+                this.Text = String.Format("RK7010板测工具 V{0}", AssemblyFileVersion());
             }
             
             #region Listview初始化
@@ -86,21 +85,21 @@ namespace RK7001Test
             lv7001ampf,
             lv7001mosfet});
 
-            lv4110sw = new ListViewItem("软件版本号");
-            lv4110lgtsensor = new ListViewItem("光感异常测试");
-            lv4110gsensor = new ListViewItem("Gsensor测试");
-            lv4110ble = new ListViewItem("蓝牙4.0测试");
+            lv4103sw = new ListViewItem("软件版本号");
+            lv4103lgtsensor = new ListViewItem("光感异常测试");
+            lv4103gsensor = new ListViewItem("Gsensor测试");
+            lv4103ble = new ListViewItem("蓝牙4.0测试");
 
-            lv4110sw.UseItemStyleForSubItems = false;
-            lv4110lgtsensor.UseItemStyleForSubItems = false;
-            lv4110gsensor.UseItemStyleForSubItems = false;
-            lv4110ble.UseItemStyleForSubItems = false;
+            lv4103sw.UseItemStyleForSubItems = false;
+            lv4103lgtsensor.UseItemStyleForSubItems = false;
+            lv4103gsensor.UseItemStyleForSubItems = false;
+            lv4103ble.UseItemStyleForSubItems = false;
 
             this.lvRK4003ErrItem.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            lv4110sw,
-            lv4110lgtsensor,
-            lv4110gsensor,
-            lv4110ble});
+            lv4103sw,
+            lv4103lgtsensor,
+            lv4103gsensor,
+            lv4103ble});
             #endregion
 
             UpdateVddGpsPin(INFO_LEVEL.INIT);
@@ -126,14 +125,14 @@ namespace RK7001Test
             mCoreTask.bLcm_CS = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_CS"].ToString());
             mCoreTask.bLcm_CLK = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_CLK"].ToString());
             mCoreTask.bLcm_DO = Convert.ToBoolean(ConfigurationManager.AppSettings["LCM_DO"].ToString());
-          
+            
             mCoreTask.bServerActivated = Convert.ToBoolean(ConfigurationManager.AppSettings["ServerFlag"].ToString());
             mCoreTask.DefaultSN = ConfigurationManager.AppSettings["DefaultSN"].ToString();
             mCoreTask.DefaultBT = ConfigurationManager.AppSettings["DefaultBT"].ToString();
             mCoreTask.DefaultBLE = ConfigurationManager.AppSettings["DefaultBLE"].ToString();
             mCoreTask.DefaultKeyt = ConfigurationManager.AppSettings["DefaultKeyt"].ToString();
 
-            mCoreTask.Update4110ListViewHandler += (object _sender, EventArgs _e) =>
+            mCoreTask.Update4103ListViewHandler += (object _sender, EventArgs _e) =>
             {
                 RK4110ItemsArgs mArgs = _e as RK4110ItemsArgs;
                 if (mArgs != null)
@@ -141,7 +140,7 @@ namespace RK7001Test
                     SetRK4110ItemList(mArgs.items, mArgs.info, mArgs.level);
                 }
             };
-            mCoreTask.Update4110PinListHandler += (object _sender, EventArgs _e) =>
+            mCoreTask.Update4103PinListHandler += (object _sender, EventArgs _e) =>
             {
                 PinStatusArgs mArgs = _e as PinStatusArgs;
                 if (mArgs != null)
@@ -646,42 +645,42 @@ namespace RK7001Test
                         switch(level)
                         {
                             case INFO_LEVEL.INIT:
-                                this.lv4110sw.SubItems.Clear();
-                                this.lv4110lgtsensor.SubItems.Clear();
-                                this.lv4110gsensor.SubItems.Clear();
-                                this.lv4110ble.SubItems.Clear();
-                                this.lv4110sw.BackColor = Color.White;
-                                this.lv4110lgtsensor.BackColor = Color.White;
-                                this.lv4110gsensor.BackColor = Color.White;
-                                this.lv4110ble.BackColor = Color.White;
-                                this.lv4110sw.Text = "软件版本号";
-                                this.lv4110lgtsensor.Text = "光感异常测试";
-                                this.lv4110gsensor.Text = "Gsensor测试";
-                                this.lv4110ble.Text = "蓝牙4.0测试";
+                                this.lv4103sw.SubItems.Clear();
+                                this.lv4103lgtsensor.SubItems.Clear();
+                                this.lv4103gsensor.SubItems.Clear();
+                                this.lv4103ble.SubItems.Clear();
+                                this.lv4103sw.BackColor = Color.White;
+                                this.lv4103lgtsensor.BackColor = Color.White;
+                                this.lv4103gsensor.BackColor = Color.White;
+                                this.lv4103ble.BackColor = Color.White;
+                                this.lv4103sw.Text = "软件版本号";
+                                this.lv4103lgtsensor.Text = "光感异常测试";
+                                this.lv4103gsensor.Text = "Gsensor测试";
+                                this.lv4103ble.Text = "蓝牙4.0测试";
                                 break;
                             case INFO_LEVEL.PASS:
-                                this.lv4110lgtsensor.SubItems.Add("通过");
-                                this.lv4110gsensor.SubItems.Add("通过");
-                                this.lv4110lgtsensor.SubItems[1].ForeColor = Color.Green;
-                                this.lv4110gsensor.SubItems[1].ForeColor = Color.Green;
+                                this.lv4103lgtsensor.SubItems.Add("通过");
+                                this.lv4103gsensor.SubItems.Add("通过");
+                                this.lv4103lgtsensor.SubItems[1].ForeColor = Color.Green;
+                                this.lv4103gsensor.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
                                          
                         break;
                     case RK4110ITEM.VERSION:
-                        this.lv4110sw.SubItems.Add(info.sw);
+                        this.lv4103sw.SubItems.Add(info.sw);
                         break;
                     case RK4110ITEM.LIGHTSENSOR:
                         switch(level)
                         {
                             case INFO_LEVEL.FAIL:
-                                this.lv4110lgtsensor.SubItems.Add("失败");
-                                this.lv4110lgtsensor.SubItems[0].BackColor = Color.Red;
-                                this.lv4110lgtsensor.SubItems[1].BackColor = Color.Red;
+                                this.lv4103lgtsensor.SubItems.Add("失败");
+                                this.lv4103lgtsensor.SubItems[0].BackColor = Color.Red;
+                                this.lv4103lgtsensor.SubItems[1].BackColor = Color.Red;
                                 break;
                             case INFO_LEVEL.PASS:
-                                this.lv4110lgtsensor.SubItems.Add("通过");
-                                this.lv4110lgtsensor.SubItems[1].ForeColor = Color.Green;
+                                this.lv4103lgtsensor.SubItems.Add("通过");
+                                this.lv4103lgtsensor.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
                         break;
@@ -689,13 +688,13 @@ namespace RK7001Test
                         switch(level)
                         {
                             case INFO_LEVEL.FAIL:
-                                this.lv4110gsensor.SubItems.Add("失败");
-                                this.lv4110gsensor.SubItems[0].BackColor = Color.Red;
-                                this.lv4110gsensor.SubItems[1].BackColor = Color.Red;
+                                this.lv4103gsensor.SubItems.Add("失败");
+                                this.lv4103gsensor.SubItems[0].BackColor = Color.Red;
+                                this.lv4103gsensor.SubItems[1].BackColor = Color.Red;
                                 break;
                             case INFO_LEVEL.PASS:
-                                this.lv4110gsensor.SubItems.Add("通过");
-                                this.lv4110gsensor.SubItems[1].ForeColor = Color.Green;
+                                this.lv4103gsensor.SubItems.Add("通过");
+                                this.lv4103gsensor.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
                         break;                                                            
@@ -703,13 +702,13 @@ namespace RK7001Test
                         switch(level)
                         {
                             case INFO_LEVEL.FAIL:
-                                this.lv4110ble.SubItems.Add("失败");
-                                this.lv4110ble.SubItems[0].BackColor = Color.Red;
-                                this.lv4110ble.SubItems[1].BackColor = Color.Red;
+                                this.lv4103ble.SubItems.Add("失败");
+                                this.lv4103ble.SubItems[0].BackColor = Color.Red;
+                                this.lv4103ble.SubItems[1].BackColor = Color.Red;
                                 break;
                             case INFO_LEVEL.PASS:
-                                this.lv4110ble.SubItems.Add("通过");
-                                this.lv4110ble.SubItems[1].ForeColor = Color.Green;
+                                this.lv4103ble.SubItems.Add("通过");
+                                this.lv4103ble.SubItems[1].ForeColor = Color.Green;
                                 break;
                         }
                         break;                    

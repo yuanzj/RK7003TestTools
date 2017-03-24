@@ -170,6 +170,8 @@
             this.lbItemValidSN = new System.Windows.Forms.Label();
             this.lbItemChkServer = new System.Windows.Forms.Label();
             this.statusStrip_tip = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel_port = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel_mode = new System.Windows.Forms.ToolStripStatusLabel();
             this.lvRK4003ErrItem = new RK7001Test.ListViewNF();
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -180,8 +182,6 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.toolStripStatusLabel_port = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabel_mode = new System.Windows.Forms.ToolStripStatusLabel();
             this.PnWorkStatus.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel11.SuspendLayout();
@@ -1635,6 +1635,19 @@
             this.statusStrip_tip.TabIndex = 8;
             this.statusStrip_tip.Text = "statusStrip1";
             // 
+            // toolStripStatusLabel_port
+            // 
+            this.toolStripStatusLabel_port.AutoSize = false;
+            this.toolStripStatusLabel_port.Name = "toolStripStatusLabel_port";
+            this.toolStripStatusLabel_port.Size = new System.Drawing.Size(131, 17);
+            // 
+            // toolStripStatusLabel_mode
+            // 
+            this.toolStripStatusLabel_mode.AutoSize = false;
+            this.toolStripStatusLabel_mode.Name = "toolStripStatusLabel_mode";
+            this.toolStripStatusLabel_mode.Size = new System.Drawing.Size(200, 17);
+            this.toolStripStatusLabel_mode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // lvRK4003ErrItem
             // 
             this.lvRK4003ErrItem.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1718,19 +1731,6 @@
             // 
             this.columnHeader3.Text = "解决方案";
             this.columnHeader3.Width = 328;
-            // 
-            // toolStripStatusLabel_port
-            // 
-            this.toolStripStatusLabel_port.AutoSize = false;
-            this.toolStripStatusLabel_port.Name = "toolStripStatusLabel_port";
-            this.toolStripStatusLabel_port.Size = new System.Drawing.Size(131, 17);
-            // 
-            // toolStripStatusLabel_mode
-            // 
-            this.toolStripStatusLabel_mode.AutoSize = false;
-            this.toolStripStatusLabel_mode.Name = "toolStripStatusLabel_mode";
-            this.toolStripStatusLabel_mode.Size = new System.Drawing.Size(200, 17);
-            this.toolStripStatusLabel_mode.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // MainForm
             // 

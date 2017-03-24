@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RokyTask.Entity.Protocols.response
 {
-    class chk4110ServerRsp : BaseProtocolImpl<chk4110ServerRsp>
+    class chk4103ServerRsp : BaseProtocolImpl<chk4103ServerRsp>
     {
         [ProtocolAttribute("deviceType", 0, 1)]
         public int deviceType { get; set; }
@@ -16,7 +16,7 @@ namespace RokyTask.Entity.Protocols.response
 
         public override int GetCommand()
         {
-            return Const.CHECK_4110_SERVER_RSP;
+            return Const.CHECK_4103_SERVER_RSP;
         }
     }
 }

@@ -236,7 +236,7 @@ namespace RokyTask
         public bool bRepaired { get; set; }
         public bool bPushcar { get; set; }
         public bool bBackcar { get; set; }
-        public bool bTest4110 { get; set; }
+        public bool bTest4103 { get; set; }
         public bool bLcm_P { get; set; }
         public bool bLcm_F { get; set; }
         public bool bLcm_R { get; set; }
@@ -266,8 +266,8 @@ namespace RokyTask
         public event EventHandler UpdateWorkStatusHandler;
         public event EventHandler UpdateValidSNHandler;
         public event EventHandler UpdateChkServerHandler;
-        public event EventHandler Update4110ListViewHandler;
-        public event EventHandler Update4110PinListHandler;
+        public event EventHandler Update4103ListViewHandler;
+        public event EventHandler Update4103PinListHandler;
         public event EventHandler Update7001ListViewHandler;
         public event EventHandler Update7001PinListHandler;
         public event EventHandler UpdateRemoteHandler;
@@ -284,16 +284,16 @@ namespace RokyTask
         SimpleSerialPortTask<get7001Result, get7001ResultRsp> mGet7001ResultTask;
         get7001Result mGet700ResultParam;
         
-        SimpleSerialPortTask<chk4110Server, chk4110ServerRsp> mChk4110ServerTask;
-        chk4110Server mChk4110ServerParam;
+        SimpleSerialPortTask<chk4103Server, chk4103ServerRsp> mChk4103ServerTask;
+        chk4103Server mChk4103ServerParam;
         //获取中控信息
         SimpleSerialPortTask<getDevinfoReq, getDevinfoRsp> mGetDevinfoTask;
         getDevinfoReq mGetDevinfoParam;
         //接受0x06
-        SimpleSerialPortTask<NullEntity, get4110BroadcastReq> mFirstRunningReqTask;
+        SimpleSerialPortTask<NullEntity, get4103BroadcastReq> mFirstRunningReqTask;
         //发送0x86，接受0x03
-        SimpleSerialPortTask<get4110BroadcastRsp, ParameterSettingReq> mParamSettingReqTask;
-        get4110BroadcastRsp mFirstRunRspParam;
+        SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq> mParamSettingReqTask;
+        get4103BroadcastRsp mFirstRunRspParam;
         //发送0x83， 接受0x23
         SimpleSerialPortTask<ParameterSettingRsp, boardTestResultReq> mRecvTestResultTask;
         ParameterSettingRsp mParamSettingParam;
@@ -340,7 +340,7 @@ namespace RokyTask
                     mParamSettingParam.adcParam = temp;
                     mParamSettingParam.v15Param = temp;
                     mParamSettingParam.sntemp = temp;
-                    SetMainText(sender, "等待4110参数配置请求...", "", INFO_LEVEL.PROCESS);
+                    SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
                     mParamSettingReqTask.Excute();
                     string sn = ByteProcess.byteArrayToString(mEventArgs.Data.devSN);
                     byte[] edrByteArray = new byte[6];
@@ -898,14 +898,14 @@ namespace RokyTask
 #endregion
 
             #region 检查测试Server
-            mChk4110ServerTask = new SimpleSerialPortTask<chk4110Server, chk4110ServerRsp>();
-            mChk4110ServerParam = mChk4110ServerTask.GetRequestEntity();
-            mChk4110ServerTask.RetryMaxCnts = 10;
-            mChk4110ServerTask.Timerout = 1000;
-            mChk4110ServerParam.deviceType = 0x02;
-            mChk4110ServerTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            mChk4103ServerTask = new SimpleSerialPortTask<chk4103Server, chk4103ServerRsp>();
+            mChk4103ServerParam = mChk4103ServerTask.GetRequestEntity();
+            mChk4103ServerTask.RetryMaxCnts = 10;
+            mChk4103ServerTask.Timerout = 1000;
+            mChk4103ServerParam.deviceType = 0x02;
+            mChk4103ServerTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
-                SerialPortEventArgs<chk4110ServerRsp> mEventArgs = e as SerialPortEventArgs<chk4110ServerRsp>;
+                SerialPortEventArgs<chk4103ServerRsp> mEventArgs = e as SerialPortEventArgs<chk4103ServerRsp>;
                 if (mEventArgs.Data != null)
                 {
                     UpdateTestServer(sender, INFO_LEVEL.PASS);
@@ -924,13 +924,13 @@ namespace RokyTask
             #endregion
 
             #region RK4110上电 发送广播报文
-            mFirstRunningReqTask = new SimpleSerialPortTask<NullEntity, get4110BroadcastReq>();
+            mFirstRunningReqTask = new SimpleSerialPortTask<NullEntity, get4103BroadcastReq>();
             mFirstRunningReqTask.RetryMaxCnts = 1;
             mFirstRunningReqTask.Timerout = 20*1000;
-            bTest4110 = false;
+            bTest4103 = false;
             mFirstRunningReqTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
-                SerialPortEventArgs<get4110BroadcastReq> mEventArgs = e as SerialPortEventArgs<get4110BroadcastReq>;
+                SerialPortEventArgs<get4103BroadcastReq> mEventArgs = e as SerialPortEventArgs<get4103BroadcastReq>;
                 if (mEventArgs.Data != null)
                 {
                     byte hw1 = (byte)(mEventArgs.Data.hardwareID >> 24);
@@ -951,7 +951,7 @@ namespace RokyTask
                     mFirstRunRspParam.hardwareID = 0xFB;
                     if (mode == FACTORY_MODE.TEST_MODE)
                     {                        
-                        SetMainText(sender, "等待4110参数配置请求...", "", INFO_LEVEL.PROCESS);
+                        SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
                         mParamSettingReqTask.Excute();
                     }
                     else if(mode == FACTORY_MODE.CHECK_MODE)
@@ -970,7 +970,7 @@ namespace RokyTask
             #endregion
 
             #region 发送0x86, 接受0x03
-            mParamSettingReqTask = new SimpleSerialPortTask<get4110BroadcastRsp, ParameterSettingReq>();
+            mParamSettingReqTask = new SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq>();
             mFirstRunRspParam = mParamSettingReqTask.GetRequestEntity();
             mParamSettingReqTask.RetryMaxCnts = 10;
             mParamSettingReqTask.Timerout = 1000;            
@@ -1078,49 +1078,49 @@ namespace RokyTask
                             {
                                 mRK4110Pins.Pin27_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110档位", "档位脚异常或者其他原因");
+                                UpdateListView(sender, "4103档位", "档位脚异常或者其他原因");
                             }
                             if ((inputPin >> 1 & 0x1) == 1)//左转灯 => P档（RK7010）
                             {
                                 mRK4110Pins.Pin28_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 P档", "P档脚异常或者其他原因");
+                                UpdateListView(sender, "4103 P档", "P档脚异常或者其他原因");
                             }
                             if ((inputPin >> 2 & 0x1) == 1)//远近光 => 大灯（RK7010）
                             {
                                 mRK4110Pins.Pin3_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 大灯", "大灯灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 大灯", "大灯灯脚异常或者其他原因");
                             }
                             if ((inputPin >> 3 & 0x1) == 1)//喇叭 => 双闪（RK7010）
                             {
                                 mRK4110Pins.Pin4_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110双闪", "双闪脚异常或者其他原因");
+                                UpdateListView(sender, "4103双闪", "双闪脚异常或者其他原因");
                             }
                             if ((inputPin >> 4 & 0x1) == 1)//P档切换 => 巡航（RK7010）
                             {
                                 mRK4110Pins.Pin12_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 巡航", "巡航脚异常或者其他原因");
+                                UpdateListView(sender, "4103 巡航", "巡航脚异常或者其他原因");
                             }
                             if ((inputPin >> 5 & 0x1) == 1)//Power档切换  => 左转灯
                             {
                                 mRK4110Pins.Pin18_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 左转灯", "左转灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 左转灯", "左转灯脚异常或者其他原因");
                             }
                             if ((inputPin >> 6 & 0x1) == 1)//开关大灯 => PASS(RK7010)
                             {
                                 mRK4110Pins.Pin14_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 PASS", "PASS灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 PASS", "PASS灯脚异常或者其他原因");
                             }
                             if ((inputPin >> 7 & 0x1) == 1)//自动大灯 => 远近光（RK7010）
                             {
                                 mRK4110Pins.Pin13_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 远近光", "远近光灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 远近光", "远近光灯脚异常或者其他原因");
                             }
                             /*
                             if ((inputPin >> 8 & 0x1) == 1)
@@ -1137,7 +1137,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin26_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 巡航开关", "4110巡航开关脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 巡航开关", "4103巡航开关脚异常或者其他原因");
                                 }                                    
                             }
                             if(bPushcar)
@@ -1146,7 +1146,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin17_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 铁喇叭", "4110 铁喇叭脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 铁喇叭", "4103 铁喇叭脚异常或者其他原因");
                                 }                                    
                             }                   
                             if(bBackcar)
@@ -1155,7 +1155,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin15_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 右转灯", "4110 右转脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 右转灯", "4103 右转脚异常或者其他原因");
                                 }                                 
                             }
                             if(bRepaired)
@@ -1164,7 +1164,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin19_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 一键修复", "4110 一键修复脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 一键修复", "4103 一键修复脚异常或者其他原因");
                                 }
                                     
                             }                 
@@ -1185,7 +1185,7 @@ namespace RokyTask
                             {
                                 UpdateRK4110Items(sender, RK4110ITEM.PWM, null, INFO_LEVEL.FAIL);
                                 InputPinError = true;
-                                UpdateListView(sender, "4110 -PWM", "4110 PWM 异常或者其他原因");
+                                UpdateListView(sender, "4103 -PWM", "4103 PWM 异常或者其他原因");
                             }
                             else
                                 UpdateRK4110Items(sender, RK4110ITEM.PWM, null, INFO_LEVEL.PASS);
@@ -1199,7 +1199,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin8_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM左转指示", "4110 LCM左转指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM左转指示", "4103 LCM左转指示异常或者其他原因");
                                 }
                             }
                             if(bLcm_F)
@@ -1208,7 +1208,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin24_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM远光指示", "4110 LCM远光指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM远光指示", "4103 LCM远光指示异常或者其他原因");
                                 }
                             }
                             if(bLcm_R)
@@ -1217,7 +1217,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin7_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM_READY指示", "4110 LCM_READY指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_READY指示", "4103 LCM_READY指示异常或者其他原因");
                                 }
                             }
                             if(bLcm_P)
@@ -1226,7 +1226,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin23_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM_P档指示", "4110 LCM_P档指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示异常或者其他原因");
                                 }
                             }
                             if(bLcm_R)
@@ -1235,7 +1235,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin25_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM_右转指示", "4110 LCM_右转指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_右转指示", "4103 LCM_右转指示异常或者其他原因");
                                 }
                             }     
                             if(bLcm_CS)
@@ -1244,7 +1244,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin21_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM_CS脚", "4110 LCM_CS异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_CS脚", "4103 LCM_CS异常或者其他原因");
                                 }
                             }                       
                             if(bLcm_CLK)
@@ -1253,7 +1253,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin9_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM_CLK脚", "4110 LCM_CLK异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK异常或者其他原因");
                                 }
                             }
                             if(bLcm_DO)
@@ -1262,7 +1262,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin10_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4110 LCM_DO脚", "4110 LCM_DO异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_DO脚", "4103 LCM_DO异常或者其他原因");
                                 }
                             }                            
                         }
@@ -1966,7 +1966,7 @@ namespace RokyTask
                     {
                         UpdateValidSN(sender, INFO_LEVEL.PASS);
                         SetMainText(sender, "测试Server是否在线？", "", INFO_LEVEL.PROCESS);
-                        mChk4110ServerTask.Excute();
+                        mChk4103ServerTask.Excute();
                     }                
                 }
                 else
@@ -2061,13 +2061,13 @@ namespace RokyTask
         #region 刷新RK4110列表
         private void UpdateRK4110Items(object sender, RK4110ITEM items, DeviceInfo info, INFO_LEVEL level)
         {
-            if(Update4110ListViewHandler != null)
+            if(Update4103ListViewHandler != null)
             {
                 RK4110ItemsArgs mArgs = new RK4110ItemsArgs();
                 mArgs.items = items;
                 mArgs.info = info;
                 mArgs.level = level;
-                Update4110ListViewHandler(sender, mArgs);
+                Update4103ListViewHandler(sender, mArgs);
             }
         }
         #endregion
@@ -2088,12 +2088,12 @@ namespace RokyTask
         #region 刷新RK4110的PIN脚
             private void UpdateRK4110Pins(object sender, PIN_STATUS pins, INFO_LEVEL level)
             {
-                if(Update4110PinListHandler != null)
+                if(Update4103PinListHandler != null)
                 {
                     PinStatusArgs mArgs = new PinStatusArgs();
                     mArgs.status = pins;
                     mArgs.level = level;
-                    Update4110PinListHandler(sender, mArgs);
+                    Update4103PinListHandler(sender, mArgs);
                 }
             }
             #endregion
@@ -2189,8 +2189,8 @@ namespace RokyTask
             mGet7001ResultTask.ClearAllEvent();
             mGet7001ResultTask.EnableTimeOutHandler = true;
 
-            mChk4110ServerTask.ClearAllEvent();
-            mChk4110ServerTask.EnableTimeOutHandler = true;
+            mChk4103ServerTask.ClearAllEvent();
+            mChk4103ServerTask.EnableTimeOutHandler = true;
             //接受0x06
             mFirstRunningReqTask.ClearAllEvent(); 
             mFirstRunningReqTask.EnableTimeOutHandler = true;
@@ -2229,8 +2229,8 @@ namespace RokyTask
             mGet7001ResultTask.ClearAllEvent();
             mGet7001ResultTask.EnableTimeOutHandler = false;
 
-            mChk4110ServerTask.ClearAllEvent();
-            mChk4110ServerTask.EnableTimeOutHandler = false;
+            mChk4103ServerTask.ClearAllEvent();
+            mChk4103ServerTask.EnableTimeOutHandler = false;
             //接受0x06
             mFirstRunningReqTask.ClearAllEvent();
             mFirstRunningReqTask.EnableTimeOutHandler = false;
@@ -2289,13 +2289,13 @@ namespace RokyTask
                     mKeyt = DefaultKeyt;
                     UpdateValidSN(this, INFO_LEVEL.PASS);
                     SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
-                    mChk4110ServerTask.Excute();
+                    mChk4103ServerTask.Excute();
                 }
             }
             else if(mode == FACTORY_MODE.CHECK_MODE)//如果是复检模式,SN号仍使
             {                
                 SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
-                mChk4110ServerTask.Excute();
+                mChk4103ServerTask.Excute();
             }                  
         }
         #endregion

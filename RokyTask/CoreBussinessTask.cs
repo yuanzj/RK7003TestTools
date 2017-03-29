@@ -1078,49 +1078,49 @@ namespace RokyTask
                             {
                                 mRK4110Pins.Pin27_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103档位", "档位脚异常或者其他原因");
+                                UpdateListView(sender, "4103档位", "档位脚短路或者断路");
                             }
                             if ((inputPin >> 1 & 0x1) == 1)//左转灯 => P档（RK7010）
                             {
                                 mRK4110Pins.Pin28_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 P档", "P档脚异常或者其他原因");
+                                UpdateListView(sender, "4103 P档", "P档脚短路或者断路");
                             }
                             if ((inputPin >> 2 & 0x1) == 1)//远近光 => 大灯（RK7010）
                             {
                                 mRK4110Pins.Pin3_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 大灯", "大灯灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 大灯", "大灯灯脚短路或者断路");
                             }
                             if ((inputPin >> 3 & 0x1) == 1)//喇叭 => 双闪（RK7010）
                             {
                                 mRK4110Pins.Pin4_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103双闪", "双闪脚异常或者其他原因");
+                                UpdateListView(sender, "4103双闪", "双闪脚短路或者断路");
                             }
                             if ((inputPin >> 4 & 0x1) == 1)//P档切换 => 巡航（RK7010）
                             {
                                 mRK4110Pins.Pin12_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 巡航", "巡航脚异常或者其他原因");
+                                UpdateListView(sender, "4103 巡航", "巡航脚短路或者断路");
                             }
                             if ((inputPin >> 5 & 0x1) == 1)//Power档切换  => 左转灯
                             {
                                 mRK4110Pins.Pin18_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 左转灯", "左转灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 左转灯", "左转灯脚短路或者断路");
                             }
                             if ((inputPin >> 6 & 0x1) == 1)//开关大灯 => PASS(RK7010)
                             {
                                 mRK4110Pins.Pin14_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 PASS", "PASS灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 PASS", "PASS灯脚短路或者断路");
                             }
                             if ((inputPin >> 7 & 0x1) == 1)//自动大灯 => 远近光（RK7010）
                             {
                                 mRK4110Pins.Pin13_Open = true;
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 远近光", "远近光灯脚异常或者其他原因");
+                                UpdateListView(sender, "4103 远近光", "远近光灯脚短路或者断路");
                             }
                             /*
                             if ((inputPin >> 8 & 0x1) == 1)
@@ -1137,7 +1137,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin26_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 巡航开关", "4103巡航开关脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 巡航开关", "4103巡航开关脚短路或者断路");
                                 }                                    
                             }
                             if(bPushcar)
@@ -1146,7 +1146,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin17_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 铁喇叭", "4103 铁喇叭脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 铁喇叭", "4103 铁喇叭脚短路或者断路");
                                 }                                    
                             }                   
                             if(bBackcar)
@@ -1155,7 +1155,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin15_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 右转灯", "4103 右转脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 右转灯", "4103 右转脚短路或者断路");
                                 }                                 
                             }
                             if(bRepaired)
@@ -1164,7 +1164,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin19_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 一键修复", "4103 一键修复脚异常或者其他原因");
+                                    UpdateListView(sender, "4103 一键修复", "4103 一键修复脚短路或者断路");
                                 }
                                     
                             }                 
@@ -1185,7 +1185,7 @@ namespace RokyTask
                             {
                                 UpdateRK4110Items(sender, RK4110ITEM.PWM, null, INFO_LEVEL.FAIL);
                                 InputPinError = true;
-                                UpdateListView(sender, "4103 -PWM", "4103 PWM 异常或者其他原因");
+                                UpdateListView(sender, "4103 -PWM", "4103 PWM 短路或者断路");
                             }
                             else
                                 UpdateRK4110Items(sender, RK4110ITEM.PWM, null, INFO_LEVEL.PASS);
@@ -1199,7 +1199,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin8_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM左转指示", "4103 LCM左转指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM左转指示", "4103 LCM左转指示短路或者断路");
                                 }
                             }
                             if(bLcm_F)
@@ -1208,7 +1208,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin24_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM远光指示", "4103 LCM远光指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM远光指示", "4103 LCM远光指示短路或者断路");
                                 }
                             }
                             if(bLcm_R)
@@ -1217,7 +1217,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin7_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_READY指示", "4103 LCM_READY指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_READY指示", "4103 LCM_READY指示短路或者断路");
                                 }
                             }
                             if(bLcm_P)
@@ -1226,7 +1226,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin23_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示短路或者断路");
                                 }
                             }
                             if(bLcm_R)
@@ -1235,7 +1235,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin25_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_右转指示", "4103 LCM_右转指示异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_右转指示", "4103 LCM_右转指示短路或者断路");
                                 }
                             }     
                             if(bLcm_CS)
@@ -1244,7 +1244,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin21_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_CS脚", "4103 LCM_CS异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_CS脚", "4103 LCM_CS短路或者断路");
                                 }
                             }                       
                             if(bLcm_CLK)
@@ -1253,7 +1253,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin9_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK短路或者断路");
                                 }
                             }
                             if(bLcm_DO)
@@ -1262,7 +1262,7 @@ namespace RokyTask
                                 {
                                     mRK4110Pins.Pin10_Open = true;
                                     InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_DO脚", "4103 LCM_DO异常或者其他原因");
+                                    UpdateListView(sender, "4103 LCM_DO脚", "4103 LCM_DO短路或者断路");
                                 }
                             }                            
                         }

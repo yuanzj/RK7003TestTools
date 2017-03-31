@@ -132,6 +132,7 @@ namespace RokyTask
         Step22_LeftBackLightShort = 22,
         Step23_RightBackLightShort = 23,
         Step24_BackGroundLightShort = 24,
+        Step25_SpareInit = 25,
     }
 
     public enum Task_Level
@@ -543,7 +544,7 @@ namespace RokyTask
                                     ReTryCnts = 0;
                                 }
                             }                            
-                            break;                        
+                            break;                                                   
                         case TaskSteps.Step24_BackGroundLightShort:
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
@@ -556,7 +557,7 @@ namespace RokyTask
                                 }
                                 else if (level == Task_Level.TRUE)
                                 {
-                                    mTaskSteps = TaskSteps.Step1_SelfTest;
+                                    mTaskSteps = TaskSteps.Step25_SpareInit;
                                     mGet700ResultParam.ack_device = Const.PCU;//发给PCU
                                     mGet700ResultParam.ecu_status = 0x34;//默认;//默认
                                     mGet700ResultParam.server_mode = 0x04;//开启软件上电
@@ -565,8 +566,24 @@ namespace RokyTask
                                     mGet700ResultParam.level_ctrl = 0x0100;//开启铁喇叭
                                     mGet700ResultParam.limit_per = 0;
                                     mGet700ResultParam.trigger_ctrl = 0;
+                                    ReTryCnts = 0;
                                 }
                             }                            
+                            break;
+                        case TaskSteps.Step25_SpareInit:
+                            if (ReTryCnts++ >= 1)
+                            {
+                                mTaskSteps = TaskSteps.Step1_SelfTest;
+                                mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                mGet700ResultParam.backlight = 0;
+                                mGet700ResultParam.batt_soc = 0;
+                                mGet700ResultParam.level_ctrl = 0x0100;//开启铁喇叭
+                                mGet700ResultParam.limit_per = 0;
+                                mGet700ResultParam.trigger_ctrl = 0;
+                                ReTryCnts = 0;
+                            }
                             break;
                         case TaskSteps.Step1_SelfTest:
                             level = Step1_SelfTest(sender, mEventArgs.Data);
@@ -583,7 +600,7 @@ namespace RokyTask
                             else if (level == Task_Level.REPEAT)
                             {
 
-                            }
+                            }                             
                             break;
                         case TaskSteps.Step2_CheckEcuOpen:
                             level = Step2_CheckEcuOpen(sender, mEventArgs.Data);
@@ -1902,7 +1919,7 @@ namespace RokyTask
             byte mDcCurrent = (byte)mArgs.DcCurrent;            
             if (mAskDevice == Const.PCU)
             {
-                if ((mDcCurrent * 100 <= 50) || (mDcCurrent * 100 >= 150))//判断DC输出电流
+                if (mDcCurrent * 100 > 100)//判断DC输出电流 d
                 {                    
                     Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
                     return Task_Level.FALSE;
@@ -1925,7 +1942,7 @@ namespace RokyTask
             byte mDcCurrent = (byte)mArgs.DcCurrent;
             if(mAskDevice == Const.PCU)
             {
-                if ((mDcCurrent * 100 <= 100) || (mDcCurrent * 100 >= 300))//判断DC输出电流
+                if (mDcCurrent * 100 > 200)//判断DC输出电流
                 {
                     Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
                     return Task_Level.FALSE;

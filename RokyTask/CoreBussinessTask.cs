@@ -313,6 +313,11 @@ namespace RokyTask
         private int PotTickCnt { get; set; }
         #endregion
 
+        #region MyRegion
+        private static readonly log4net.ILog Log =
+            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        #endregion
+
         #region 构造函数
         public CoreBussinessTask()
         {            
@@ -406,9 +411,9 @@ namespace RokyTask
                 SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
                 if (mEventArgs.Data != null)
                 {
-                    bool bExcute = false;
+                    bool bExcute = false;                    
                     Task_Level level = Task_Level.FALSE;
-                    switch(mTaskSteps)
+                    switch (mTaskSteps)
                     {
                         case TaskSteps.Step0_Init:
                             if (ReTryCnts++ >= 1)
@@ -419,7 +424,9 @@ namespace RokyTask
                             break;                        
                         case TaskSteps.Step14_IronHornShort:
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
-                            if(level == Task_Level.FALSE)
+                            string ironhorn = String.Format("铁喇叭 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                            Log.Info(ironhorn);
+                            if (level == Task_Level.FALSE)
                             {
                                 bExcute = true;
                                 mRK7001Pins.Pin4_Open = true;
@@ -433,9 +440,11 @@ namespace RokyTask
                             }
                             break;                        
                         case TaskSteps.Step15_LeftLightShort:
-                            level = getLeftRightLightCurrent(sender, mEventArgs.Data);
+                            level = getLeftRightLightCurrent(sender, mEventArgs.Data);                            
                             if (ReTryCnts++ >= 1)
                             {
+                                string leftlight = String.Format("左转灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(leftlight);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -453,9 +462,11 @@ namespace RokyTask
                             }                            
                             break;
                         case TaskSteps.Step16_RightLightShort:
-                            level = getLeftRightLightCurrent(sender, mEventArgs.Data);
+                            level = getLeftRightLightCurrent(sender, mEventArgs.Data);                            
                             if (ReTryCnts++ >= 1)
                             {
+                                string rightlight = String.Format("右转灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(rightlight);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -476,6 +487,8 @@ namespace RokyTask
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
                             {
+                                string headlight = String.Format("前车灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(headlight);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -494,6 +507,8 @@ namespace RokyTask
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
                             {
+                                string farlight = String.Format("远光灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(farlight);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -512,6 +527,8 @@ namespace RokyTask
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
                             {
+                                string taillight = String.Format("尾灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(taillight);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -530,6 +547,8 @@ namespace RokyTask
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
                             {
+                                string brakelight = String.Format("刹车灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(brakelight);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -549,6 +568,8 @@ namespace RokyTask
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
                             {
+                                string red = String.Format("背景灯红 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(red);
                                 if (level == Task_Level.FALSE)
                                 {
                                     bExcute = true;
@@ -587,6 +608,8 @@ namespace RokyTask
                             break;
                         case TaskSteps.Step1_SelfTest:
                             level = Step1_SelfTest(sender, mEventArgs.Data);
+                            string selfCheck = String.Format("自检 开启铁喇叭 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                            Log.Info(selfCheck);
                             if (level == Task_Level.FALSE)
                                 bExcute = true;
                             else if (level == Task_Level.TRUE)
@@ -2275,9 +2298,11 @@ namespace RokyTask
         }
         #endregion
 
+
         #region 执行任务
         public void ExcuteTask()
-        {            
+        {
+            Log.Info("开始测试......");
             InitParameters();
             mRK7001Pins = new PIN_STATUS();
             mRK4110Pins = new PIN_STATUS();

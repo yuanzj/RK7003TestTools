@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonUtils;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -18,6 +19,8 @@ namespace RK7001Test
         private int com_index { get; set; }
         private int mode_index { get; set; }
         #endregion
+
+        
 
         public Login()
         {

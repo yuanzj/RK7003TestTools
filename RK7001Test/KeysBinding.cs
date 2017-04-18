@@ -99,6 +99,15 @@ namespace RK7001Test
                 }
             };
 
+            mPhoneTask.ReadKeysHandler += (object _sender, EventArgs _e) =>
+            {
+                UIEventArgs mArgs = _e as UIEventArgs;
+                if (mArgs != null)
+                {
+                    ReadKeyValues(mArgs.level, mArgs.num, mArgs.key1, mArgs.key2);
+                }
+            };
+
             TestTimeTicker = new System.Timers.Timer(1000);
             TestTimeTicker.Enabled = false;
             TestTimeTicker.Elapsed += new ElapsedEventHandler((object source, ElapsedEventArgs ElapsedEventArgs) =>
@@ -128,8 +137,9 @@ namespace RK7001Test
             SetValidSN(INFO_LEVEL.INIT);
             SetBindKey1(INFO_LEVEL.INIT);
             SetBindKey2(INFO_LEVEL.INIT);
-            SetWriteNVFlag(INFO_LEVEL.INIT);
+            SetWriteNVFlag(INFO_LEVEL.INIT);            
             SetKeyValue(KeyType.NONE_KEY, 0);
+            ReadKeyValues(INFO_LEVEL.INIT, 0, 0, 0);
         }
         #endregion
 
@@ -203,7 +213,12 @@ namespace RK7001Test
                         this.textBox_SN.Enabled = true;
                         this.textBox_SN.Text = "";
                         this.textBox_SN.Focus();
-                        break;                                                                                             
+                        break;
+                    case STEP_LEVEL.READ_KEYS:
+                        this.panel_MainResult.BackColor = Color.Yellow;
+                        this.label_MainResult.Text = "读地址码...";
+                        this.label_MainTip.Text = "";
+                        break;                                                                                            
                 }
             }
         }
@@ -344,7 +359,6 @@ namespace RK7001Test
                         this.pictureBox_BindKey2.Visible = true;
                         this.pictureBox_BindKey2.Image = global::RK7001Test.Properties.Resources.ic_loading;
                         break;
-
                 }
             }
         }
@@ -385,6 +399,49 @@ namespace RK7001Test
                         this.pictureBox_WriteNV.Image = global::RK7001Test.Properties.Resources.ic_loading;
                         break;
 
+                }
+            }
+        }
+        #endregion
+
+        #region  读钥匙
+        delegate void ReadKeyValuesCallback(INFO_LEVEL level, int num, int key1, int key2);
+        private void ReadKeyValues(INFO_LEVEL level, int num, int key1, int key2)
+        {
+            if (this.label_ReadKey.InvokeRequired)//如果调用控件的线程和创建创建控件的线程不是同一个则为True
+            {
+                while (!this.label_ReadKey.IsHandleCreated)
+                {
+                    //解决窗体关闭时出现“访问已释放句柄“的异常
+                    if (this.label_ReadKey.Disposing || this.label_ReadKey.IsDisposed)
+                        return;
+                }
+                ReadKeyValuesCallback d = new ReadKeyValuesCallback(ReadKeyValues);
+                this.label_ReadKey.Invoke(d, new object[] { level, num, key1, key2 });
+            }
+            else
+            {
+                string msg = String.Format("Key1:{0:X} Key2:{1:X}", key1, key2);
+                switch(level)
+                {
+                    case INFO_LEVEL.INIT:
+                        this.label_ReadKey.Text = "";
+                        this.pictureBox_ReadKey.Visible = false;
+                        break;
+                    case INFO_LEVEL.PASS:
+                        this.label_ReadKey.Text = msg;
+                        this.pictureBox_ReadKey.Visible = true;
+                        this.pictureBox_ReadKey.Image = global::RK7001Test.Properties.Resources.OK;
+                        break;
+                    case INFO_LEVEL.FAIL:
+                        this.label_ReadKey.Text = msg;
+                        this.pictureBox_ReadKey.Visible = true;
+                        this.pictureBox_ReadKey.Image = global::RK7001Test.Properties.Resources.Shape;
+                        break;
+                    case INFO_LEVEL.PROCESS:
+                        this.pictureBox_ReadKey.Visible = true;
+                        this.pictureBox_ReadKey.Image = global::RK7001Test.Properties.Resources.ic_loading;
+                        break;
                 }
             }
         }
@@ -444,11 +501,11 @@ namespace RK7001Test
                         this.label_Key2Value.Text = "";
                         break;
                     case KeyType.BIND_KEY1:
-                        this.label_Key1Value.Text = msg.ToString();
+                        this.label_Key1Value.Text = msg.ToString("X");
                         break;
                     case KeyType.BIND_KEY2:
-                        this.label_Key2Value.Text = msg.ToString();
-                        break;                    
+                        this.label_Key2Value.Text = msg.ToString("X");
+                        break;                                       
                 }
             }
         }
@@ -465,7 +522,8 @@ namespace RK7001Test
                 SetValidSN(INFO_LEVEL.PROCESS);
                 SetBindKey1(INFO_LEVEL.PROCESS);
                 SetWriteNVFlag(INFO_LEVEL.PROCESS);
-                this.pictureBox_BindKey2.Visible = false;           
+                this.pictureBox_BindKey2.Visible = false;
+                ReadKeyValues(INFO_LEVEL.PROCESS, 0, 0, 0);          
             }
             else if (mPhoneTask.KeyNumber == 2)
             {
@@ -473,6 +531,7 @@ namespace RK7001Test
                 SetBindKey1(INFO_LEVEL.PROCESS);
                 SetBindKey2(INFO_LEVEL.PROCESS);
                 SetWriteNVFlag(INFO_LEVEL.PROCESS);
+                ReadKeyValues(INFO_LEVEL.PROCESS, 0, 0, 0);
             }
 
             SetKeyValue(KeyType.NONE_KEY, 0);

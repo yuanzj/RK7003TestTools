@@ -69,6 +69,9 @@ namespace RokyTask
 
     public class UIEventArgs : EventArgs
     {
+        public int num { get; set; }
+        public int key1 { get; set; }
+        public int key2 { get; set; }
         public string msg { get; set; }
         public string submsg { get; set; }
         public INFO_LEVEL level { get; set; }

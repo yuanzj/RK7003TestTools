@@ -43,9 +43,9 @@
             this.pictureBox_BindKey1 = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
             this.panel_BindKey2 = new System.Windows.Forms.Panel();
+            this.label7 = new System.Windows.Forms.Label();
             this.label_Key2Value = new System.Windows.Forms.Label();
             this.pictureBox_BindKey2 = new System.Windows.Forms.PictureBox();
-            this.label7 = new System.Windows.Forms.Label();
             this.panel_WriteNV = new System.Windows.Forms.Panel();
             this.label_Key2Check = new System.Windows.Forms.Label();
             this.pictureBox_WriteNV = new System.Windows.Forms.PictureBox();
@@ -56,6 +56,10 @@
             this.label_MainTip = new System.Windows.Forms.Label();
             this.label_TimeCount = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.pictureBox_ReadKey = new System.Windows.Forms.PictureBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label_ReadKey = new System.Windows.Forms.Label();
             this.panel_SN.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_SN)).BeginInit();
             this.panel_BindKey1.SuspendLayout();
@@ -65,6 +69,8 @@
             this.panel_WriteNV.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_WriteNV)).BeginInit();
             this.panel_MainResult.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ReadKey)).BeginInit();
             this.SuspendLayout();
             // 
             // label_MainResult
@@ -128,12 +134,12 @@
             // columnHeader2
             // 
             this.columnHeader2.Text = "结果";
-            this.columnHeader2.Width = 200;
+            this.columnHeader2.Width = 400;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "解决方案";
-            this.columnHeader3.Width = 350;
+            this.columnHeader3.Width = 550;
             // 
             // panel_SN
             // 
@@ -228,6 +234,17 @@
             this.panel_BindKey2.Size = new System.Drawing.Size(491, 70);
             this.panel_BindKey2.TabIndex = 16;
             // 
+            // label7
+            // 
+            this.label7.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.ForeColor = System.Drawing.Color.Black;
+            this.label7.Location = new System.Drawing.Point(8, 7);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(261, 54);
+            this.label7.TabIndex = 2;
+            this.label7.Text = "绑定第二把钥匙";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // label_Key2Value
             // 
             this.label_Key2Value.Font = new System.Drawing.Font("新宋体", 18F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -249,17 +266,6 @@
             this.pictureBox_BindKey2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox_BindKey2.TabIndex = 4;
             this.pictureBox_BindKey2.TabStop = false;
-            // 
-            // label7
-            // 
-            this.label7.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label7.ForeColor = System.Drawing.Color.Black;
-            this.label7.Location = new System.Drawing.Point(8, 7);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(261, 54);
-            this.label7.TabIndex = 2;
-            this.label7.Text = "绑定第二把钥匙";
-            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // panel_WriteNV
             // 
@@ -374,11 +380,58 @@
             this.label13.TabIndex = 23;
             this.label13.Text = "秒";
             // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.BackColor = System.Drawing.SystemColors.Window;
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.label_ReadKey);
+            this.panel1.Controls.Add(this.pictureBox_ReadKey);
+            this.panel1.Controls.Add(this.label5);
+            this.panel1.Location = new System.Drawing.Point(605, 390);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(492, 70);
+            this.panel1.TabIndex = 18;
+            // 
+            // pictureBox_ReadKey
+            // 
+            this.pictureBox_ReadKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox_ReadKey.Image = global::RK7001Test.Properties.Resources.OK;
+            this.pictureBox_ReadKey.Location = new System.Drawing.Point(414, 5);
+            this.pictureBox_ReadKey.Name = "pictureBox_ReadKey";
+            this.pictureBox_ReadKey.Size = new System.Drawing.Size(70, 56);
+            this.pictureBox_ReadKey.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox_ReadKey.TabIndex = 5;
+            this.pictureBox_ReadKey.TabStop = false;
+            // 
+            // label5
+            // 
+            this.label5.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label5.ForeColor = System.Drawing.Color.Black;
+            this.label5.Location = new System.Drawing.Point(6, 7);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(191, 54);
+            this.label5.TabIndex = 3;
+            this.label5.Text = "读钥匙地址码";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label_ReadKey
+            // 
+            this.label_ReadKey.Font = new System.Drawing.Font("新宋体", 14.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label_ReadKey.ForeColor = System.Drawing.SystemColors.AppWorkspace;
+            this.label_ReadKey.Location = new System.Drawing.Point(178, 20);
+            this.label_ReadKey.Name = "label_ReadKey";
+            this.label_ReadKey.Size = new System.Drawing.Size(230, 28);
+            this.label_ReadKey.TabIndex = 6;
+            this.label_ReadKey.Text = "12323";
+            this.label_ReadKey.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // KeysBinding
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1107, 772);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel_BindKey2);
             this.Controls.Add(this.panel_BindKey1);
             this.Controls.Add(this.panel_SN);
@@ -408,6 +461,8 @@
             this.panel_WriteNV.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_WriteNV)).EndInit();
             this.panel_MainResult.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_ReadKey)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -442,5 +497,9 @@
         private System.Windows.Forms.Label label_Key1Value;
         private System.Windows.Forms.Label label_Key2Value;
         private System.Windows.Forms.Label label_Key2Check;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.PictureBox pictureBox_ReadKey;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label_ReadKey;
     }
 }

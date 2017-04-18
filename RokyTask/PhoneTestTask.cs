@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Forms;
 
 namespace RokyTask
 {
@@ -19,7 +20,8 @@ namespace RokyTask
         SN_VALID = 1,
         KEY1_BIND = 2,
         KEY2_BIND = 3,
-        WRITE_NV = 4
+        WRITE_NV = 4,
+        READ_KEYS = 5
     }
 
     public enum KeyType
@@ -28,6 +30,7 @@ namespace RokyTask
         BIND_KEY1 = 1,
         BIND_KEY2 = 2,
         WRITE_NV = 3,
+        READ_KEYS = 4
     }
 
     public enum STEP_LEVEL
@@ -41,6 +44,7 @@ namespace RokyTask
         PASS = 6,
         FAIL = 7,
         BIND_TIMEOUT = 8,
+        READ_KEYS = 9,
     }
 
     public class StepArgs : EventArgs
@@ -75,6 +79,7 @@ namespace RokyTask
         private int mKey1Value { get; set; }
         private int mKey2Value { get; set; }
         private int mTimeout { get; set; }
+        private INFO_LEVEL mReadKeyMode { get; set; }
         Hashtable ht;//存储钥匙的键和值
 
         #endregion
@@ -87,6 +92,7 @@ namespace RokyTask
         public event EventHandler WriteNVHandler;
         public event EventHandler ListViewHandler;
         public event EventHandler KeyValueHandler;
+        public event EventHandler ReadKeysHandler;
         #endregion
 
         #region 注册串口事件
@@ -95,11 +101,15 @@ namespace RokyTask
         //CCU 绑定
         SimpleSerialPortTask<get7001Result, get7001ResultRsp> mBindKey1Task;
         get7001Result mBindKey1Param;
+
         SimpleSerialPortTask<get7001Result, get7001ResultRsp> mBindKey2Task;
         get7001Result mBindKey2Param;
 
         SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp> mWriteKeyTask;
         writeKeyAddrReq mWriteKeyParam;
+
+        SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp> mReadKeyAddrTask;
+        writeKeyAddrReq mReadKeyAddrParam;
         //同步报文
         SimpleSerialPortTask<NullEntity, pcTakeoverReq> mBroadCastTask;
         //停止同步报文
@@ -208,10 +218,8 @@ namespace RokyTask
                     else
                     {
                         SetValidSN(sender, INFO_LEVEL.PASS);
-                        SetMainText(sender, STEP_LEVEL.BIND_KEY1);
-                        mBindKey1Param.ack_device = Const.PCU;
-                        mBindKey1Task.Excute();
-                        mTimeout = 100;
+                        mReadKeyMode = INFO_LEVEL.PROCESS;
+                        mReadKeyAddrTask.Excute();                       
                     }
                 }
                 else
@@ -419,8 +427,7 @@ namespace RokyTask
             mWriteKeyTask = new SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp>();
             mWriteKeyParam = mWriteKeyTask.GetRequestEntity();
             mWriteKeyParam.Key1Index = 0;
-            mWriteKeyParam.Key2Index = 1;
-            mWriteKeyParam.KeyNumber = 2;
+            mWriteKeyParam.Key2Index = 1;            
             mWriteKeyParam.DeviceType = Const.CCU;
             mWriteKeyTask.RetryMaxCnts = 0;
             mWriteKeyTask.Timerout = 10 * 1000;
@@ -433,10 +440,9 @@ namespace RokyTask
                     if(mResult == 0)
                     {
                         ht.Clear();
-                        SetWriteNV(sender, INFO_LEVEL.PASS);                   
-                        SetMainText(sender, STEP_LEVEL.PASS);
-                        mRecoverTask.Excute();
-                        StopTask();
+                        SetWriteNV(sender, INFO_LEVEL.PASS);
+                        mReadKeyMode = INFO_LEVEL.PASS;
+                        mReadKeyAddrTask.Excute();
                     }
                 }
                 else
@@ -449,6 +455,81 @@ namespace RokyTask
                 }
             };
 
+            mReadKeyAddrTask = new SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp>();
+            mReadKeyAddrParam = mReadKeyAddrTask.GetRequestEntity();
+            mReadKeyAddrParam.Key1Index = 0;
+            mReadKeyAddrParam.Key2Index = 1;
+            mReadKeyAddrParam.Key1Value = new byte[3];
+            mReadKeyAddrParam.Key2Value = new byte[3];
+            mReadKeyAddrParam.KeyNumber = 0XFF;//读NV里的钥匙
+            mReadKeyAddrParam.DeviceType = Const.CCU;
+            mReadKeyAddrTask.RetryMaxCnts = 0;
+            mReadKeyAddrTask.Timerout = 10 * 1000;
+            mReadKeyAddrTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<writeKeyAddrRsp> mEventArgs = e as SerialPortEventArgs<writeKeyAddrRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    int num = mEventArgs.Data.KeyNumber;
+                    byte[] key1 = new byte[3];
+                    key1 = mEventArgs.Data.Key1Value;
+                    byte[] key2 = new byte[3];
+                    key2 = mEventArgs.Data.Key2Value;
+                    int mKey1 = key1[0] << 16 | key1[1] << 8 | key1[2];
+                    int mKey2 = key2[0] << 16 | key2[1] << 8 | key2[2];
+                    
+                    if (mReadKeyMode == INFO_LEVEL.PASS)
+                    {
+                        string msg = String.Format("绑定后，当前已绑定{0}把，钥匙1:{1:X}, 钥匙2:{2:X}", num, mKey1, mKey2);
+                        SetListView(sender, msg, "");
+                        
+                        if(KeyNumber == 2)
+                        {
+                            if(mKey1Value == mKey1 && mKey2Value == mKey2)
+                            {
+                                SetReadKeys(sender, INFO_LEVEL.PASS, num, mKey1, mKey2);
+                                SetMainText(sender, STEP_LEVEL.PASS);
+                            }
+                            else
+                            {
+                                SetReadKeys(sender, INFO_LEVEL.FAIL, num, mKey1, mKey2);
+                                SetMainText(sender, STEP_LEVEL.FAIL);
+                            }
+                        }
+                        else if(KeyNumber == 1)
+                        {
+                            if (mKey1Value == mKey1)
+                            {
+                                SetReadKeys(sender, INFO_LEVEL.PASS, num, mKey1, mKey2);
+                                SetMainText(sender, STEP_LEVEL.PASS);
+                            }
+                            else
+                            {
+                                SetReadKeys(sender, INFO_LEVEL.FAIL, num, mKey1, mKey2);
+                                SetMainText(sender, STEP_LEVEL.FAIL);
+                            }
+                        }
+                        mRecoverTask.Excute();
+                        StopTask();
+                    }
+                    else
+                    {
+                        string msg = String.Format("绑定前，已绑定{0}把，钥匙1:{1:X}, 钥匙2:{2:X}", num, mKey1, mKey2);
+                        SetListView(sender, msg, "");
+                        mBindKey1Param.ack_device = Const.PCU;
+                        mBindKey1Task.Excute();
+                        mTimeout = 100;
+                    }                   
+                }
+                else
+                {
+                    SetListView(sender, " 读钥匙地址失败", "设备异常或通讯有异常");
+                    SetItemFail(sender, BindSteps.READ_KEYS);
+                    SetMainText(sender, STEP_LEVEL.FAIL);
+                    mRecoverTask.Excute();
+                    StopTask();
+                }
+            };
         }
         #endregion
       
@@ -462,22 +543,34 @@ namespace RokyTask
                     SetBindKey1(sender, INFO_LEVEL.INIT);
                     SetBindKey2(sender, INFO_LEVEL.INIT);
                     SetWriteNV(sender, INFO_LEVEL.INIT);
+                    SetReadKeys(sender, INFO_LEVEL.INIT, 0, 0, 0);
                     break;
                 case BindSteps.SN_VALID:
                     SetValidSN(sender, INFO_LEVEL.FAIL);
                     SetBindKey1(sender, INFO_LEVEL.INIT);
                     SetBindKey2(sender, INFO_LEVEL.INIT);
                     SetWriteNV(sender, INFO_LEVEL.INIT);
+                    SetReadKeys(sender, INFO_LEVEL.INIT, 0, 0, 0);
                     break;
                 case BindSteps.KEY1_BIND:
                     SetBindKey1(sender, INFO_LEVEL.FAIL);
                     SetBindKey2(sender, INFO_LEVEL.INIT);
                     SetWriteNV(sender, INFO_LEVEL.INIT);
+                    SetReadKeys(sender, INFO_LEVEL.INIT, 0, 0, 0);
                     break;
                 case BindSteps.KEY2_BIND:
                     SetBindKey2(sender, INFO_LEVEL.FAIL);
                     SetWriteNV(sender, INFO_LEVEL.INIT);
-                    break;                 
+                    SetReadKeys(sender, INFO_LEVEL.INIT, 0, 0, 0);
+                    break;
+                case BindSteps.WRITE_NV:
+                    SetWriteNV(sender, INFO_LEVEL.FAIL);
+                    SetReadKeys(sender, INFO_LEVEL.INIT, 0, 0, 0);
+                    break;
+                case BindSteps.READ_KEYS:
+                    SetReadKeys(sender, INFO_LEVEL.FAIL, 0, 0, 0);
+                    break;
+                                     
             }
         }
         #endregion
@@ -545,6 +638,21 @@ namespace RokyTask
         }
         #endregion
 
+        #region 写ReadKeys
+        private void SetReadKeys(object sender, INFO_LEVEL _level, int _num, int key1, int key2)
+        {
+            if(ReadKeysHandler != null)
+            {
+                UIEventArgs mArgs = new UIEventArgs();
+                mArgs.level = _level;
+                mArgs.num = _num;
+                mArgs.key1 = key1;
+                mArgs.key2 = key2;
+                ReadKeysHandler(sender, mArgs);
+            }
+        }
+        #endregion
+
         #region 设置钥匙值的显示
         private void SetKeyValue(object sender, KeyType _type, int _value)
         {
@@ -598,6 +706,8 @@ namespace RokyTask
             ht = new Hashtable();
             mKey1Value = 0;
             mKey2Value = 0;
+            mWriteKeyParam.KeyNumber = KeyNumber;
+            mReadKeyMode = INFO_LEVEL.PROCESS;
             mTimeout = 100;
             mGetDevInfoTask.ClearAllEvent();
             mBindKey1Task.ClearAllEvent();

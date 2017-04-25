@@ -437,13 +437,10 @@ namespace RokyTask
                 if (mEventArgs.Data != null)
                 {
                     byte mResult = (byte)mEventArgs.Data.Result;
-                    if(mResult == 0)
-                    {
-                        ht.Clear();
-                        SetWriteNV(sender, INFO_LEVEL.PASS);
-                        mReadKeyMode = INFO_LEVEL.PASS;
-                        mReadKeyAddrTask.Excute();
-                    }
+                    ht.Clear();
+                    SetWriteNV(sender, INFO_LEVEL.PASS);
+                    mReadKeyMode = INFO_LEVEL.PASS;
+                    mReadKeyAddrTask.Excute();
                 }
                 else
                 {

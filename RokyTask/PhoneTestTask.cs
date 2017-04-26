@@ -437,10 +437,21 @@ namespace RokyTask
                 if (mEventArgs.Data != null)
                 {
                     byte mResult = (byte)mEventArgs.Data.Result;
-                    ht.Clear();
-                    SetWriteNV(sender, INFO_LEVEL.PASS);
-                    mReadKeyMode = INFO_LEVEL.PASS;
-                    mReadKeyAddrTask.Excute();
+                    if(mResult == 1)
+                    {
+                        ht.Clear();
+                        SetWriteNV(sender, INFO_LEVEL.PASS);
+                        mReadKeyMode = INFO_LEVEL.PASS;
+                        mReadKeyAddrTask.Excute();
+                    }
+                    else
+                    {
+                        SetListView(sender, "写钥匙地址到设备失败", "写NV未成功，或通讯有异常");
+                        SetItemFail(sender, BindSteps.WRITE_NV);
+                        SetMainText(sender, STEP_LEVEL.FAIL);
+                        mRecoverTask.Excute();
+                        StopTask();
+                    }                    
                 }
                 else
                 {

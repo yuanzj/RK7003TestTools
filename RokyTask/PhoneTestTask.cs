@@ -429,8 +429,8 @@ namespace RokyTask
             mWriteKeyParam.Key1Index = 0;
             mWriteKeyParam.Key2Index = 1;            
             mWriteKeyParam.DeviceType = Const.CCU;
-            mWriteKeyTask.RetryMaxCnts = 1;
-            mWriteKeyTask.Timerout = 5 * 1000;
+            mWriteKeyTask.RetryMaxCnts = 0;
+            mWriteKeyTask.Timerout = 10 * 1000;
             mWriteKeyTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<writeKeyAddrRsp> mEventArgs = e as SerialPortEventArgs<writeKeyAddrRsp>;
@@ -517,6 +517,7 @@ namespace RokyTask
                                 SetMainText(sender, STEP_LEVEL.FAIL);
                             }
                         }
+
                         mRecoverTask.Excute();
                         StopTask();
                     }

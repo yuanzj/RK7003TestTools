@@ -57,12 +57,12 @@ namespace RK7001Test
             {
                 this.toolStripStatusLabel_mode.Text = "当前模式: 板测模式";
                 //版本号
-                this.Text = String.Format("RK7010板测工具 V{0}", AssemblyFileVersion());
+                this.Text = String.Format("RK7xx板测工具 V{0}", AssemblyFileVersion());
             }
             else if (mode == FACTORY_MODE.CHECK_MODE)
             {
                 this.toolStripStatusLabel_mode.Text = "当前模式: 复检模式";
-                this.Text = String.Format("RK7010板测工具 V{0}", AssemblyFileVersion());
+                this.Text = String.Format("RK7xx板测工具 V{0}", AssemblyFileVersion());
             }
             
             #region Listview初始化
@@ -131,6 +131,37 @@ namespace RK7001Test
             mCoreTask.DefaultBT = ConfigurationManager.AppSettings["DefaultBT"].ToString();
             mCoreTask.DefaultBLE = ConfigurationManager.AppSettings["DefaultBLE"].ToString();
             mCoreTask.DefaultKeyt = ConfigurationManager.AppSettings["DefaultKeyt"].ToString();
+
+            mCoreTask.b7xxPin1 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin1"].ToString());
+            mCoreTask.b7xxPin2 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin2"].ToString());
+            mCoreTask.b7xxPin3 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin3"].ToString());
+            mCoreTask.b7xxPin4 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin4"].ToString());
+            mCoreTask.b7xxPin5 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin5"].ToString());
+            mCoreTask.b7xxPin6 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin6"].ToString());
+            mCoreTask.b7xxPin7 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin7"].ToString());
+            mCoreTask.b7xxPin8 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin8"].ToString());
+            mCoreTask.b7xxPin9 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin9"].ToString());
+            mCoreTask.b7xxPin10 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin10"].ToString());
+            mCoreTask.b7xxPin11 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin11"].ToString());
+            mCoreTask.b7xxPin12 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin12"].ToString());
+            mCoreTask.b7xxPin13 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin13"].ToString());
+            mCoreTask.b7xxPin14 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin14"].ToString());
+            mCoreTask.b7xxPin15 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin15"].ToString());
+            mCoreTask.b7xxPin16 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin16"].ToString());
+            mCoreTask.b7xxPin17 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin17"].ToString());
+            mCoreTask.b7xxPin18 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin18"].ToString());
+            mCoreTask.b7xxPin19 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin19"].ToString());
+            mCoreTask.b7xxPin20= Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin20"].ToString());
+            mCoreTask.b7xxPin21 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin21"].ToString());
+            mCoreTask.b7xxPin22 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin22"].ToString());
+            mCoreTask.b7xxPin23 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin23"].ToString());
+            mCoreTask.b7xxPin24 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin24"].ToString());
+            mCoreTask.b7xxPin25 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin25"].ToString());
+            mCoreTask.b7xxPin26 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin26"].ToString());
+            mCoreTask.b7xxPin27 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin27"].ToString());
+            mCoreTask.b7xxPin28 = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_Pin28"].ToString());
+            mCoreTask.b7xxBuzzer = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_BUZZER"].ToString());
+            mCoreTask.b7xx_SADDLE = Convert.ToBoolean(ConfigurationManager.AppSettings["7xx_SADDLE"].ToString());
 
             mCoreTask.Update4103ListViewHandler += (object _sender, EventArgs _e) =>
             {
@@ -723,176 +754,595 @@ namespace RK7001Test
         {
             if(level == INFO_LEVEL.INIT)
             {
-                for(int i = 1; i <=28; i++)
-                {
-                    if(i == 1 || i == 7 || i == 22 || i == 10 || i == 14)
-                        Set7001Pin(i, INFO_LEVEL.GREY);
-                    else
-                        Set7001Pin(i, INFO_LEVEL.INIT);
-                }
+                if (mCoreTask.b7xxPin1)
+                    Set7001Pin(1, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(1, INFO_LEVEL.GREY);
+
+                if (mCoreTask.b7xxPin2)
+                    Set7001Pin(2, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(2, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin3)
+                    Set7001Pin(3, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(3, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin4)
+                    Set7001Pin(4, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(4, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin5)
+                    Set7001Pin(5, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(5, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin6)
+                    Set7001Pin(6, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(6, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin7)
+                    Set7001Pin(7, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(7, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin8)
+                    Set7001Pin(8, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(8, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin9)
+                    Set7001Pin(9, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(9, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin10)
+                    Set7001Pin(10, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(10, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin11)
+                    Set7001Pin(11, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(11, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin12)
+                    Set7001Pin(12, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(12, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin13)
+                    Set7001Pin(13, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(13, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin14)
+                    Set7001Pin(14, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(14, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin15)
+                    Set7001Pin(15, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(15, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin16)
+                    Set7001Pin(16, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(16, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin17)
+                    Set7001Pin(17, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(17, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin18)
+                    Set7001Pin(18, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(18, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin19)
+                    Set7001Pin(19, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(19, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin20)
+                    Set7001Pin(20, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(20, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin21)
+                    Set7001Pin(21, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(21, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin1)
+                    Set7001Pin(1, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(1, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin22)
+                    Set7001Pin(22, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(22, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin23)
+                    Set7001Pin(23, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(23, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin24)
+                    Set7001Pin(24, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(24, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin25)
+                    Set7001Pin(25, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(25, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin26)
+                    Set7001Pin(26, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(26, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin27)
+                    Set7001Pin(27, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(27, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin28)
+                    Set7001Pin(28, INFO_LEVEL.INIT);
+                else
+                    Set7001Pin(28, INFO_LEVEL.GREY);
+
                 return;
+
             }
             else if (level == INFO_LEVEL.PROCESS)
             {
-                for (int i = 1; i <= 28; i++)
-                {
-                    if (i == 1 || i == 7 || i == 22 || i == 10 || i == 14)
-                        Set7001Pin(i, INFO_LEVEL.GREY);
-                    else
-                        Set7001Pin(i, INFO_LEVEL.PROCESS);
-                }
-                return;         
+                if (mCoreTask.b7xxPin1)
+                    Set7001Pin(1, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(1, INFO_LEVEL.GREY);
+
+                if (mCoreTask.b7xxPin2)
+                    Set7001Pin(2, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(2, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin3)
+                    Set7001Pin(3, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(3, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin4)
+                    Set7001Pin(4, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(4, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin5)
+                    Set7001Pin(5, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(5, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin6)
+                    Set7001Pin(6, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(6, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin7)
+                    Set7001Pin(7, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(7, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin8)
+                    Set7001Pin(8, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(8, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin9)
+                    Set7001Pin(9, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(9, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin10)
+                    Set7001Pin(10, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(10, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin11)
+                    Set7001Pin(11, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(11, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin12)
+                    Set7001Pin(12, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(12, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin13)
+                    Set7001Pin(13, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(13, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin14)
+                    Set7001Pin(14, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(14, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin15)
+                    Set7001Pin(15, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(15, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin16)
+                    Set7001Pin(16, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(16, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin17)
+                    Set7001Pin(17, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(17, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin18)
+                    Set7001Pin(18, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(18, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin19)
+                    Set7001Pin(19, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(19, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin20)
+                    Set7001Pin(20, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(20, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin21)
+                    Set7001Pin(21, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(21, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin1)
+                    Set7001Pin(1, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(1, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin22)
+                    Set7001Pin(22, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(22, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin23)
+                    Set7001Pin(23, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(23, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin24)
+                    Set7001Pin(24, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(24, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin25)
+                    Set7001Pin(25, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(25, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin26)
+                    Set7001Pin(26, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(26, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin27)
+                    Set7001Pin(27, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(27, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin28)
+                    Set7001Pin(28, INFO_LEVEL.PROCESS);
+                else
+                    Set7001Pin(28, INFO_LEVEL.GREY);
+
+                return;
             }
             else if(level == INFO_LEVEL.PASS)
             {
-                for (int i = 1; i <= 28; i++)
-                {
-                    if (i == 1 || i == 7 || i == 22 || i == 10 || i == 14)
-                        Set7001Pin(i, INFO_LEVEL.GREY);
-                    else
-                        Set7001Pin(i, INFO_LEVEL.PASS);
-                }
+                if (mCoreTask.b7xxPin1)
+                    Set7001Pin(1, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(1, INFO_LEVEL.GREY);
+
+                if (mCoreTask.b7xxPin2)
+                    Set7001Pin(2, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(2, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin3)
+                    Set7001Pin(3, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(3, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin4)
+                    Set7001Pin(4, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(4, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin5)
+                    Set7001Pin(5, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(5, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin6)
+                    Set7001Pin(6, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(6, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin7)
+                    Set7001Pin(7, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(7, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin8)
+                    Set7001Pin(8, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(8, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin9)
+                    Set7001Pin(9, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(9, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin10)
+                    Set7001Pin(10, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(10, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin11)
+                    Set7001Pin(11, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(11, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin12)
+                    Set7001Pin(12, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(12, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin13)
+                    Set7001Pin(13, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(13, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin14)
+                    Set7001Pin(14, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(14, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin15)
+                    Set7001Pin(15, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(15, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin16)
+                    Set7001Pin(16, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(16, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin17)
+                    Set7001Pin(17, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(17, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin18)
+                    Set7001Pin(18, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(18, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin19)
+                    Set7001Pin(19, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(19, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin20)
+                    Set7001Pin(20, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(20, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin21)
+                    Set7001Pin(21, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(21, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin1)
+                    Set7001Pin(1, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(1, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin22)
+                    Set7001Pin(22, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(22, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin23)
+                    Set7001Pin(23, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(23, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin24)
+                    Set7001Pin(24, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(24, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin25)
+                    Set7001Pin(25, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(25, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin26)
+                    Set7001Pin(26, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(26, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin27)
+                    Set7001Pin(27, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(27, INFO_LEVEL.GREY);
+                if (mCoreTask.b7xxPin28)
+                    Set7001Pin(28, INFO_LEVEL.PASS);
+                else
+                    Set7001Pin(28, INFO_LEVEL.GREY);
+
                 return;
             }
 
             //判断错误
-            /*
-            if(status.Pin1_Open || status.Pin1_Short)
-                Set7001Pin(1, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(1, INFO_LEVEL.PASS);
-            */
-            if (status.Pin2_Open || status.Pin2_Short)
-                Set7001Pin(2, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(2, INFO_LEVEL.PASS);
-            if (status.Pin3_Open || status.Pin3_Short)
-                Set7001Pin(3, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(3, INFO_LEVEL.PASS);
-            if (status.Pin4_Open || status.Pin4_Short)
-                Set7001Pin(4, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(4, INFO_LEVEL.PASS);
-            if (status.Pin5_Open || status.Pin5_Short)
-                Set7001Pin(5, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(5, INFO_LEVEL.PASS);
-            if (status.Pin6_Open || status.Pin6_Short)
-                Set7001Pin(6, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(6, INFO_LEVEL.PASS);
-            /*
-            if (status.Pin7_Open || status.Pin7_Short)
-                Set7001Pin(7, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(7, INFO_LEVEL.PASS);
-            */
-            if (status.Pin8_Open || status.Pin8_Short)
-                Set7001Pin(8, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(8, INFO_LEVEL.PASS);
-            if (status.Pin9_Open || status.Pin9_Short)
-                Set7001Pin(9, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(9, INFO_LEVEL.PASS);
-            /*
-            if (status.Pin10_Open || status.Pin10_Short)
-                Set7001Pin(10, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(10, INFO_LEVEL.PASS);
-            */
-            if (status.Pin11_Open || status.Pin11_Short)
-                Set7001Pin(11, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(11, INFO_LEVEL.PASS);
-            if (status.Pin12_Open || status.Pin12_Short)
-                Set7001Pin(12, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(12, INFO_LEVEL.PASS);
-            
-            if (status.Pin13_Open || status.Pin13_Short)
-                Set7001Pin(13, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(13, INFO_LEVEL.PASS);
-            /*
-            if (status.Pin14_Open || status.Pin14_Short)
-                Set7001Pin(14, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(14, INFO_LEVEL.PASS);
-            */
-            if (status.Pin15_Open || status.Pin15_Short)
-                Set7001Pin(15, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(15, INFO_LEVEL.PASS);
-            
-            if (status.Pin16_Open || status.Pin16_Short)
-                Set7001Pin(16, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(16, INFO_LEVEL.PASS);
-            if (status.Pin17_Open || status.Pin17_Short)
-                Set7001Pin(17, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(17, INFO_LEVEL.PASS);
-            if (status.Pin18_Open || status.Pin18_Short)
-                Set7001Pin(18, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(18, INFO_LEVEL.PASS);
-            if (status.Pin19_Open || status.Pin19_Short)
-                Set7001Pin(19, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(19, INFO_LEVEL.PASS);
+            if (mCoreTask.b7xxPin1)
+            {
+                if (status.Pin1_Open || status.Pin1_Short)
+                    Set7001Pin(1, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(1, INFO_LEVEL.PASS);
+            }
+            if (mCoreTask.b7xxPin2)
+            {
+                if (status.Pin2_Open || status.Pin2_Short)
+                    Set7001Pin(2, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(2, INFO_LEVEL.PASS);
+            }
 
-            if (status.Pin20_Open || status.Pin20_Short)
-                Set7001Pin(20, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(20, INFO_LEVEL.PASS);
-            if (status.Pin21_Open || status.Pin21_Short)
-                Set7001Pin(21, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(21, INFO_LEVEL.PASS);
-            /*
-            if (status.Pin22_Open || status.Pin22_Short)
-                Set7001Pin(22, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(22, INFO_LEVEL.PASS);
-            */
-            if (status.Pin23_Open || status.Pin23_Short)
-                Set7001Pin(23, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(23, INFO_LEVEL.PASS);
-            
-            if (status.Pin24_Open || status.Pin24_Short)
-                Set7001Pin(24, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(24, INFO_LEVEL.PASS);
-            
-            if (status.Pin25_Open || status.Pin25_Short)
-                Set7001Pin(25, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(25, INFO_LEVEL.PASS);
-            if (status.Pin26_Open || status.Pin26_Short)
-                Set7001Pin(26, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(26, INFO_LEVEL.PASS);
-            if (status.Pin27_Open || status.Pin27_Short)
-                Set7001Pin(27, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(27, INFO_LEVEL.PASS);
-            if (status.Pin28_Open || status.Pin28_Short)
-                Set7001Pin(28, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(28, INFO_LEVEL.PASS);
-            /*
-            if (status.Pin29_Open || status.Pin29_Short)
-                Set7001Pin(29, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(29, INFO_LEVEL.PASS);
-            if (status.Pin30_Open || status.Pin30_Short)
-                Set7001Pin(30, INFO_LEVEL.FAIL);
-            else
-                Set7001Pin(30, INFO_LEVEL.PASS);
-            */
+            if (mCoreTask.b7xxPin3)
+            {
+                if (status.Pin3_Open || status.Pin3_Short)
+                    Set7001Pin(3, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(3, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin4)
+            {
+                if (status.Pin4_Open || status.Pin4_Short)
+                    Set7001Pin(4, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(4, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin5)
+            {
+                if (status.Pin5_Open || status.Pin5_Short)
+                    Set7001Pin(5, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(5, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin6)
+            {
+                if (status.Pin6_Open || status.Pin6_Short)
+                    Set7001Pin(6, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(6, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin7)
+            {
+                if (status.Pin7_Open || status.Pin7_Short)
+                    Set7001Pin(7, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(7, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin8)
+            {
+                if (status.Pin8_Open || status.Pin8_Short)
+                    Set7001Pin(8, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(8, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin9)
+            {
+                if (status.Pin9_Open || status.Pin9_Short)
+                    Set7001Pin(9, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(9, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin10)
+            {
+                if (status.Pin10_Open || status.Pin10_Short)
+                    Set7001Pin(10, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(10, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin11)
+            {
+                if (status.Pin11_Open || status.Pin11_Short)
+                    Set7001Pin(11, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(11, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin12)
+            {
+                if (status.Pin12_Open || status.Pin12_Short)
+                    Set7001Pin(12, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(12, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin13)
+            {
+                if (status.Pin13_Open || status.Pin13_Short)
+                    Set7001Pin(13, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(13, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin14)
+            {
+                if (status.Pin14_Open || status.Pin14_Short)
+                    Set7001Pin(14, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(14, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin15)
+            {
+                if (status.Pin15_Open || status.Pin15_Short)
+                    Set7001Pin(15, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(15, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin16)
+            {
+                if (status.Pin16_Open || status.Pin16_Short)
+                    Set7001Pin(16, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(16, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin17)
+            {
+                if (status.Pin17_Open || status.Pin17_Short)
+                    Set7001Pin(17, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(17, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin18)
+            {
+                if (status.Pin18_Open || status.Pin18_Short)
+                    Set7001Pin(18, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(18, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin19)
+            {
+                if (status.Pin19_Open || status.Pin19_Short)
+                    Set7001Pin(19, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(19, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin20)
+            {
+                if (status.Pin20_Open || status.Pin20_Short)
+                    Set7001Pin(20, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(20, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin21)
+            {
+                if (status.Pin21_Open || status.Pin21_Short)
+                    Set7001Pin(21, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(21, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin22)
+            {
+                if (status.Pin22_Open || status.Pin22_Short)
+                    Set7001Pin(22, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(22, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin23)
+            {
+                if (status.Pin23_Open || status.Pin23_Short)
+                    Set7001Pin(23, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(23, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin24)
+            {
+                if (status.Pin24_Open || status.Pin24_Short)
+                    Set7001Pin(24, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(24, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin25)
+            {
+                if (status.Pin25_Open || status.Pin25_Short)
+                    Set7001Pin(25, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(25, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin26)
+            {
+                if (status.Pin26_Open || status.Pin26_Short)
+                    Set7001Pin(26, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(26, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin27)
+            {
+                if (status.Pin27_Open || status.Pin27_Short)
+                    Set7001Pin(27, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(27, INFO_LEVEL.PASS);
+            }
+
+            if (mCoreTask.b7xxPin28)
+            {
+                if (status.Pin28_Open || status.Pin28_Short)
+                    Set7001Pin(28, INFO_LEVEL.FAIL);
+                else
+                    Set7001Pin(28, INFO_LEVEL.PASS);
+            }
         }
         #endregion
 

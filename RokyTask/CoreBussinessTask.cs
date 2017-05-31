@@ -251,6 +251,37 @@ namespace RokyTask
         public bool bLcm_CLK { get; set; }
         public bool bLcm_DO { get; set; }
 
+        public bool b7xxPin1 { get; set; }
+        public bool b7xxPin2 { get; set; }
+        public bool b7xxPin3 { get; set; }
+        public bool b7xxPin4 { get; set; }
+        public bool b7xxPin5 { get; set; }
+        public bool b7xxPin6 { get; set; }
+        public bool b7xxPin7 { get; set; }
+        public bool b7xxPin8 { get; set; }
+        public bool b7xxPin9 { get; set; }
+        public bool b7xxPin10 { get; set; }
+        public bool b7xxPin11 { get; set; }
+        public bool b7xxPin12 { get; set; }
+        public bool b7xxPin13 { get; set; }
+        public bool b7xxPin14 { get; set; }
+        public bool b7xxPin15 { get; set; }
+        public bool b7xxPin16 { get; set; }
+        public bool b7xxPin17 { get; set; }
+        public bool b7xxPin18 { get; set; }
+        public bool b7xxPin19 { get; set; }
+        public bool b7xxPin20 { get; set; }
+        public bool b7xxPin21 { get; set; }
+        public bool b7xxPin22 { get; set; }
+        public bool b7xxPin23 { get; set; }
+        public bool b7xxPin24 { get; set; }
+        public bool b7xxPin25 { get; set; }
+        public bool b7xxPin26 { get; set; }
+        public bool b7xxPin27 { get; set; }
+        public bool b7xxPin28 { get; set; }
+        public bool b7xxBuzzer { get; set; }
+        public bool b7xx_SADDLE { get; set; }
+
         public bool bServerActivated { get; set; }
         public string DefaultSN { get; set; }
         public string DefaultBT { get; set; }
@@ -1457,14 +1488,18 @@ namespace RokyTask
                     {
                         UpdateRK7001Items(sender, RK7001ITEM.AMPLIFY, null, INFO_LEVEL.PASS);
                     }
-                    if ((mDeviceFault >> 2 & 0x1) == 1)//dc使能控制
+
+                    if(b7xxPin11 && b7xxPin19)
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin11_Open = true;
-                        mRK7001Pins.Pin19_Open = true;
-                        UpdateListView(sender, "7010 DC故障", "ACC_DC或者12V有问题");
+                        if ((mDeviceFault >> 2 & 0x1) == 1)//dc使能控制
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin11_Open = true;
+                            mRK7001Pins.Pin19_Open = true;
+                            UpdateListView(sender, "7010 DC故障", "ACC_DC或者12V有问题");
+                        }
                     }
-                    
+                                        
                     if ((mDeviceFault >> 5 & 0x1) == 1) //mosfet故障
                     {
                         testResult = true;
@@ -1475,171 +1510,306 @@ namespace RokyTask
                     {
                         UpdateRK7001Items(sender, RK7001ITEM.MOSFET, null, INFO_LEVEL.PASS);
                     }
-                    if ((mCutError1 >> 0 & 0x1) == 1)//前左转
+
+                    if(b7xxPin25)
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin25_Open = true;
-                        UpdateListView(sender, "7010前左转灯断路", "该pin脚可能断路或其他原因");
+                        if ((mCutError1 >> 0 & 0x1) == 1)//前左转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin25_Open = true;
+                            UpdateListView(sender, "7010前左转灯断路", "该pin脚可能断路或其他原因");
+                        }
                     }
-                    if ((mCutError1 >> 1 & 0x1) == 1)//后左转
+                    
+                    if(b7xxPin28)
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin28_Open = true;
-                        UpdateListView(sender, "7010后左转灯断路", "该pin脚可能断路或其他原因");
+                        if ((mCutError1 >> 1 & 0x1) == 1)//后左转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin28_Open = true;
+                            UpdateListView(sender, "7010后左转灯断路", "该pin脚可能断路或其他原因");
+                        }
                     }
-                    if ((mCutError1 >> 2 & 0x1) == 1)//前右转
+                    
+                    if(b7xxPin24)
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin24_Open = true;
-                        UpdateListView(sender, "7010前右转灯断路", "该pin脚可能断路或其他原因");
-                    }
-                    if ((mCutError1 >> 3 & 0x1) == 1)//后右转
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin27_Open = true;
-                        UpdateListView(sender, "7010后右转灯断路", "该pin脚可能断路或其他原因");
-                    }
-                    if ((mCutError1 >> 4 & 0x1) == 1)//近光
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin5_Open = true;
-                        UpdateListView(sender, "7010近光灯断路", "该pin脚可能断路或其他原因");
-                    }
-                    if ((mCutError1 >> 5 & 0x1) == 1)//远光
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin6_Open = true;
-                        UpdateListView(sender, "7010远光灯断路", "该pin脚可能断路或其他原因");
-                    }
-                    if ((mCutError1 >> 6 & 0x1) == 1)//尾灯
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin2_Open = true;
-                        UpdateListView(sender, "7010尾灯断路", "该pin脚可能断路或其他原因");
+                        if ((mCutError1 >> 2 & 0x1) == 1)//前右转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin24_Open = true;
+                            UpdateListView(sender, "7010前右转灯断路", "该pin脚可能断路或其他原因");
+                        }
                     }
 
-                    if ((mCutError1 >> 7 & 0x1) == 1)//刹车灯
+                    if (b7xxPin27)
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin3_Open = true;
-                        UpdateListView(sender, "7010刹车灯断路", "该pin脚可能断路或其他原因");
+                        if ((mCutError1 >> 3 & 0x1) == 1)//后右转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin27_Open = true;
+                            UpdateListView(sender, "7010后右转灯断路", "该pin脚可能断路或其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin5)
+                    {
+                        if ((mCutError1 >> 4 & 0x1) == 1)//近光
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin5_Open = true;
+                            UpdateListView(sender, "7010近光灯断路", "该pin脚可能断路或其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin6)
+                    {
+                        if ((mCutError1 >> 5 & 0x1) == 1)//远光
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin6_Open = true;
+                            UpdateListView(sender, "7010远光灯断路", "该pin脚可能断路或其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin2)
+                    {
+                        if ((mCutError1 >> 6 & 0x1) == 1)//尾灯
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin2_Open = true;
+                            UpdateListView(sender, "7010尾灯断路", "该pin脚可能断路或其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin3)
+                    {
+                        if ((mCutError1 >> 7 & 0x1) == 1)//刹车灯
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin3_Open = true;
+                            UpdateListView(sender, "7010刹车灯断路", "该pin脚可能断路或其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin23)
+                    {
+                        if ((mCutError2 >> 0 & 0x1) == 1)//背景灯R
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin23_Open = true;
+                            UpdateListView(sender, "7010背景灯红断路", "该pin脚可能断路或其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin7)
+                    {
+                        if ((mCutError2 >> 1 & 0x1) == 1)//背景灯G
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin7_Open = true;
+                            UpdateListView(sender, "7010背景绿或者龙头锁负断路", "该pin脚可能断路或其他原因");
+                        }
                     }
 
-                    if ((mCutError2 >> 0 & 0x1) == 1)//背景灯R
+                    if(b7xxPin22)
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin23_Open = true;
-                        UpdateListView(sender, "7010背景灯红断路", "该pin脚可能断路或其他原因");
+                        if ((mCutError2 >> 2 & 0x1) == 1)//背景灯B
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin22_Open = true;
+                            UpdateListView(sender, "7010背景蓝或者龙头锁正断路", "该pin脚可能断路或其他原因");
+                        }
                     }
-                    /*
-                    if ((mCutError2 >> 1 & 0x1) == 1)//背景灯G
-                        mRK7001Pins.Pin7_Open = true;
-                    if ((mCutError2 >> 2 & 0x1) == 1)//背景灯B
-                        mRK7001Pins.Pin22_Open = true;
-                    */
-                    if ((mCutError2 >> 3 & 0x1) == 1)//喇叭
+                    
+                    if(b7xxPin4)
+                    {
+                        if ((mCutError2 >> 3 & 0x1) == 1)//喇叭
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin4_Open = true;
+                            UpdateListView(sender, "7010铁喇叭故障", "该pin脚短路或者断路");
+                        }
+                    }
+
+
+                    if(b7xxBuzzer)
+                    {
+                        if ((mCutError2 >> 4 & 0x1) == 1)//BUZZER
+                        {
+                            testResult = true;
+                            UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
+                        }
+                        else
+                            UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+                    }
+
+                    if (b7xx_SADDLE)
+                    {
+                        if ((mCutError2 >> 5 & 0x1) == 1)//鞍座锁
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin1_Open = true;
+                            UpdateListView(sender, "7010 鞍座锁", "该pin脚短路或者断路");
+                        }
+                    }
+
+                    if (b7xxPin25)
+                    {
+                        if ((mShortError1 >> 0 & 0x1) == 1)//前左转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin25_Short = true;
+                            UpdateListView(sender, "7010前左转灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin28)
+                    {
+                        if ((mShortError1 >> 1 & 0x1) == 1)//后左转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin28_Short = true;
+                            UpdateListView(sender, "7010后左转灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin24)
+                    {
+                        if ((mShortError1 >> 2 & 0x1) == 1)//前右转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin24_Short = true;
+                            UpdateListView(sender, "7010前右转灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin27)
+                    {
+                        if ((mShortError1 >> 3 & 0x1) == 1)//后右转
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin27_Short = true;
+                            UpdateListView(sender, "7010后右转灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin5)
+                    {
+                        if ((mShortError1 >> 4 & 0x1) == 1)//近光
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin5_Short = true;
+                            UpdateListView(sender, "7010近光灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin6)
+                    {
+                        if ((mShortError1 >> 5 & 0x1) == 1)//远光
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin6_Short = true;
+                            UpdateListView(sender, "7010远光灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin2)
+                    {
+                        if ((mShortError1 >> 6 & 0x1) == 1)//尾灯
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin2_Short = true;
+                            UpdateListView(sender, "7010尾灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin3)
+                    {
+                        if ((mShortError1 >> 7 & 0x1) == 1)//刹车灯
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin3_Short = true;
+                            UpdateListView(sender, "7010刹车灯短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin23)
+                    {
+                        if ((mShortError2 >> 0 & 0x1) == 1)//背景灯R
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin23_Short = true;
+                            UpdateListView(sender, "7010背景灯红短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxPin7)
+                    {
+                        if ((mShortError2 >> 1 & 0x1) == 1)//背景灯G
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin7_Short = true;
+                            UpdateListView(sender, "7010背景绿短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+
+                    if(b7xxPin22)
+                    {
+                        if ((mShortError2 >> 2 & 0x1) == 1)//背景灯B
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin22_Short = true;
+                            UpdateListView(sender, "7010背景蓝短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+
+                    if(b7xxPin4)
+                    {
+                        if ((mShortError2 >> 3 & 0x1) == 1)//喇叭
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin4_Open = true;
+                            UpdateListView(sender, "7010铁喇叭短路", "该pin脚短路或者其他原因");
+                        }
+                    }
+                    
+                    if(b7xxBuzzer)
+                    {
+                        if ((mShortError2 >> 4 & 0x1) == 1)//BUZZER
+                        {
+                            testResult = true;
+                            UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
+                        }
+                        else
+                            UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
+                    }
+
+                    if (b7xx_SADDLE)
+                    {
+                        if ((mCutError2 >> 5 & 0x1) == 1)//鞍座锁
+                        {
+                            testResult = true;
+                            mRK7001Pins.Pin1_Open = true;
+                            UpdateListView(sender, "7010 鞍座锁", "该pin脚短路或者断路");
+                        }
+                    }
+                }
+
+                if(b7xxPin4)
+                {
+                    if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
                     {
                         testResult = true;
                         mRK7001Pins.Pin4_Open = true;
-                        UpdateListView(sender, "7010铁喇叭故障", "该pin脚短路或者断路");
-                    }
-                    /*
-                    if ((mCutError2 >> 4 & 0x1) == 1)//BUZZER
-                    {
-                        testResult = true;
-                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
+                        UpdateListView(sender, "7010铁喇叭故障", "采样电流异常");
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
                     }
                     else
-                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
-                    */
-                    if ((mShortError1 >> 0 & 0x1) == 1)//前左转
                     {
-                        testResult = true;
-                        mRK7001Pins.Pin25_Short = true;
-                        UpdateListView(sender, "7010前左转灯短路", "该pin脚短路或者其他原因");
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
                     }
-                    if ((mShortError1 >> 1 & 0x1) == 1)//后左转
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin28_Short = true;
-                        UpdateListView(sender, "7010后左转灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError1 >> 2 & 0x1) == 1)//前右转
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin24_Short = true;
-                        UpdateListView(sender, "7010前右转灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError1 >> 3 & 0x1) == 1)//后右转
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin27_Short = true;
-                        UpdateListView(sender, "7010后右转灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError1 >> 4 & 0x1) == 1)//近光
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin5_Short = true;
-                        UpdateListView(sender, "7010近光灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError1 >> 5 & 0x1) == 1)//远光
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin6_Short = true;
-                        UpdateListView(sender, "7010远光灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError1 >> 6 & 0x1) == 1)//尾灯
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin2_Short = true;
-                        UpdateListView(sender, "7010尾灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError1 >> 7 & 0x1) == 1)//刹车灯
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin3_Short = true;
-                        UpdateListView(sender, "7010刹车灯短路", "该pin脚短路或者其他原因");
-                    }
-                    if ((mShortError2 >> 0 & 0x1) == 1)//背景灯R
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin23_Short = true;
-                        UpdateListView(sender, "7010背景灯红短路", "该pin脚短路或者其他原因");
-                    }
-                    /*
-                    if ((mShortError2 >> 1 & 0x1) == 1)//背景灯G
-                        mRK7001Pins.Pin7_Short = true;
-                    if ((mShortError2 >> 2 & 0x1) == 1)//背景灯B
-                        mRK7001Pins.Pin22_Short = true;
-                    */
-                    if ((mShortError2 >> 3 & 0x1) == 1)//喇叭
-                    {
-                        testResult = true;
-                        mRK7001Pins.Pin4_Open = true;
-                        UpdateListView(sender, "7010铁喇叭短路", "该pin脚短路或者其他原因");
-                    }
-                    /*
-                    if ((mShortError2 >> 4 & 0x1) == 1)//BUZZER
-                    {
-                        testResult = true;
-                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.FAIL);
-                    }
-                    else
-                        UpdateRK7001Items(sender, RK7001ITEM.BUZZER, null, INFO_LEVEL.PASS);
-                    */                    
                 }
-
-                if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
-                {
-                    testResult = true;
-                    mRK7001Pins.Pin4_Open = true;
-                    UpdateListView(sender, "7010铁喇叭故障", "采样电流异常");
-                    Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
-                }
-                else
-                {
-                    Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
-                }
+                
 
                 if (!testResult)
                 {                      

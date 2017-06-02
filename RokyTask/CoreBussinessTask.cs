@@ -134,8 +134,17 @@ namespace RokyTask
         Step21_PotSwitchShort = 21,
         Step22_LeftBackLightShort = 22,
         Step23_RightBackLightShort = 23,
-        Step24_BackGroundLightShort = 24,
+        Step24_BackGroundLight_1_Short = 24,
         Step25_SpareInit = 25,
+        Step26_TrunkShort = 26,
+        Step27_BackGroundLight_2_Short = 27,
+        Step28_BackGroundLight_3_Short = 28,
+        Step29_Trunk_breakoff = 29,
+        Step30_BackGroundLight_2_breakoff = 30,
+        Step31_BackGroundLight_3_breakoff = 31,
+        Step29_SpareInit = 32,
+        Step30_SpareInit = 33,
+        Step31_SpareInit = 34,
     }
 
     public enum Task_Level
@@ -591,14 +600,36 @@ namespace RokyTask
                                 }
                                 else if (level == Task_Level.TRUE)
                                 {
-                                    mTaskSteps = TaskSteps.Step24_BackGroundLightShort;
-                                    mGet700ResultParam.level_ctrl = 0x0000;//背景灯红短路
-                                    mGet700ResultParam.backlight = 0xff0000;
+                                    mTaskSteps = TaskSteps.Step26_TrunkShort;
+                                    mGet700ResultParam.level_ctrl = 0x0;//
+                                    mGet700ResultParam.trigger_ctrl = 0x1; //坐桶开关
                                     ReTryCnts = 0;
                                 }
                             }                            
-                            break;                                                   
-                        case TaskSteps.Step24_BackGroundLightShort:
+                            break;
+                        case TaskSteps.Step26_TrunkShort:
+                            level = CheckSampleCurrent(sender, mEventArgs.Data);
+                            if (ReTryCnts++ >= 1)
+                            {
+                                string brakelight = String.Format("坐桶开关 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(brakelight);
+                                if (level == Task_Level.FALSE)
+                                {
+                                    bExcute = true;
+                                    mRK7001Pins.Pin1_Open = true;
+                                    UpdateListView(sender, "7010 坐桶开关", "Mosfet可能短路");
+                                }
+                                else if (level == Task_Level.TRUE)
+                                {
+                                    mTaskSteps = TaskSteps.Step24_BackGroundLight_1_Short;
+                                    mGet700ResultParam.level_ctrl = 0x0000;
+                                    mGet700ResultParam.trigger_ctrl = 0x0; 
+                                    mGet700ResultParam.backlight = 0xff0000;//背景灯红短路
+                                    ReTryCnts = 0;
+                                }
+                            }
+                            break;
+                        case TaskSteps.Step24_BackGroundLight_1_Short:
                             level = CheckSampleCurrent(sender, mEventArgs.Data);
                             if (ReTryCnts++ >= 1)
                             {
@@ -609,6 +640,50 @@ namespace RokyTask
                                     bExcute = true;
                                     mRK7001Pins.Pin23_Open = true;
                                     UpdateListView(sender, "7010 背景灯红灯", "Mosfet可能短路");
+                                }
+                                else if (level == Task_Level.TRUE)
+                                {
+                                    mTaskSteps = TaskSteps.Step27_BackGroundLight_2_Short;
+                                    mGet700ResultParam.level_ctrl = 0x0000;
+                                    mGet700ResultParam.backlight = 0;
+                                    mGet700ResultParam.trigger_ctrl = 0x2; //背景灯绿短路
+                                    ReTryCnts = 0;
+                                }
+                            }                            
+                            break;
+                        case TaskSteps.Step27_BackGroundLight_2_Short:
+                            level = CheckSampleCurrent(sender, mEventArgs.Data);
+                            if (ReTryCnts++ >= 1)
+                            {
+                                string red = String.Format("背景灯绿 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(red);
+                                if (level == Task_Level.FALSE)
+                                {
+                                    bExcute = true;
+                                    mRK7001Pins.Pin7_Open = true;
+                                    UpdateListView(sender, "7010 背景灯绿灯", "Mosfet可能短路");
+                                }
+                                else if (level == Task_Level.TRUE)
+                                {
+                                    mTaskSteps = TaskSteps.Step28_BackGroundLight_3_Short;
+                                    mGet700ResultParam.level_ctrl = 0x0000;
+                                    mGet700ResultParam.backlight = 0;
+                                    mGet700ResultParam.trigger_ctrl = 4; ;//背景灯蓝短路
+                                    ReTryCnts = 0;
+                                }
+                            }
+                            break;
+                        case TaskSteps.Step28_BackGroundLight_3_Short:
+                            level = CheckSampleCurrent(sender, mEventArgs.Data);
+                            if (ReTryCnts++ >= 1)
+                            {
+                                string red = String.Format("背景灯蓝 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(red);
+                                if (level == Task_Level.FALSE)
+                                {
+                                    bExcute = true;
+                                    mRK7001Pins.Pin22_Open = true;
+                                    UpdateListView(sender, "7010 背景灯蓝灯", "Mosfet可能短路");
                                 }
                                 else if (level == Task_Level.TRUE)
                                 {
@@ -623,7 +698,7 @@ namespace RokyTask
                                     mGet700ResultParam.trigger_ctrl = 0;
                                     ReTryCnts = 0;
                                 }
-                            }                            
+                            }
                             break;
                         case TaskSteps.Step25_SpareInit:
                             if (ReTryCnts++ >= 1)
@@ -641,23 +716,149 @@ namespace RokyTask
                             }
                             break;
                         case TaskSteps.Step1_SelfTest:
-                            level = Step1_SelfTest(sender, mEventArgs.Data);
+                            { 
+                            level = Step1_SelfTest(sender, mEventArgs.Data,TaskSteps.Step1_SelfTest);
                             string selfCheck = String.Format("自检 开启铁喇叭 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
                             Log.Info(selfCheck);
                             if (level == Task_Level.FALSE)
                                 bExcute = true;
                             else if (level == Task_Level.TRUE)
                             {
-                                mTaskSteps = TaskSteps.Step2_CheckEcuOpen;
-                                mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
-                                mGet700ResultParam.ecu_status = 0x34;
-                                mGet700ResultParam.server_mode = 0x4;
-                                mGet700ResultParam.level_ctrl = 0x0100;
-                            }
+                                    mTaskSteps = TaskSteps.Step29_SpareInit;
+                                    mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                    mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                    mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                    mGet700ResultParam.backlight = 0;
+                                    mGet700ResultParam.batt_soc = 0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    mGet700ResultParam.limit_per = 0;
+                                    mGet700ResultParam.trigger_ctrl = 1;
+                                    ReTryCnts = 0;
+                                }
                             else if (level == Task_Level.REPEAT)
                             {
 
-                            }                             
+                            }
+                            }
+                            break;
+                        case TaskSteps.Step29_SpareInit:
+                            if (ReTryCnts++ >= 1)
+                            {
+                                mTaskSteps = TaskSteps.Step29_Trunk_breakoff;
+                                mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                mGet700ResultParam.backlight = 0;
+                                mGet700ResultParam.batt_soc = 0;
+                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.limit_per = 0;
+                                mGet700ResultParam.trigger_ctrl = 1;
+                                ReTryCnts = 0;
+                            }
+                            break;
+
+                        case TaskSteps.Step29_Trunk_breakoff:
+                            {
+                                level = Step1_SelfTest(sender, mEventArgs.Data, TaskSteps.Step29_Trunk_breakoff);
+                                string selfCheck = String.Format("自检 开启座桶 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(selfCheck);
+                                if (level == Task_Level.FALSE)
+                                    bExcute = true;
+                                else if (level == Task_Level.TRUE)
+                                {
+                                    mTaskSteps = TaskSteps.Step30_SpareInit;
+                                    mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                    mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                    mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                    mGet700ResultParam.backlight = 0;
+                                    mGet700ResultParam.batt_soc = 0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    mGet700ResultParam.limit_per = 0;
+                                    mGet700ResultParam.trigger_ctrl = 4;
+                                    ReTryCnts = 0;
+                                }
+                                else if (level == Task_Level.REPEAT)
+                                {
+
+                                }
+                            }
+                            break;
+                        case TaskSteps.Step30_SpareInit:
+                            if (ReTryCnts++ >= 1)
+                            {
+                                mTaskSteps = TaskSteps.Step30_BackGroundLight_2_breakoff;
+                                mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                mGet700ResultParam.backlight = 0;
+                                mGet700ResultParam.batt_soc = 0;
+                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.limit_per = 0;
+                                mGet700ResultParam.trigger_ctrl = 4; //背景灯绿短路
+                                ReTryCnts = 0;
+                            }
+                            break;
+                        case TaskSteps.Step30_BackGroundLight_2_breakoff:
+                            {
+                                level = Step1_SelfTest(sender, mEventArgs.Data, TaskSteps.Step30_BackGroundLight_2_breakoff);
+                                string selfCheck = String.Format("自检 绿灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(selfCheck);
+                                if (level == Task_Level.FALSE)
+                                    bExcute = true;
+                                else if (level == Task_Level.TRUE)
+                                {
+                                    mTaskSteps = TaskSteps.Step31_SpareInit;
+                                    mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                    mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                    mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                    mGet700ResultParam.backlight = 0;
+                                    mGet700ResultParam.batt_soc = 0;
+                                    mGet700ResultParam.level_ctrl = 0;
+                                    mGet700ResultParam.limit_per = 0;
+                                    mGet700ResultParam.trigger_ctrl = 2;
+                                    ReTryCnts = 0;
+                                }
+                                else if (level == Task_Level.REPEAT)
+                                {
+
+                                }
+                            }
+                            break;
+                        case TaskSteps.Step31_SpareInit:
+                            if (ReTryCnts++ >= 1)
+                            {
+                                mTaskSteps = TaskSteps.Step31_BackGroundLight_3_breakoff;
+                                mGet700ResultParam.ack_device = Const.PCU;//发给PCU
+                                mGet700ResultParam.ecu_status = 0x34;//默认;//默认
+                                mGet700ResultParam.server_mode = 0x04;//开启软件上电
+                                mGet700ResultParam.backlight = 0;
+                                mGet700ResultParam.batt_soc = 0;
+                                mGet700ResultParam.level_ctrl = 0;
+                                mGet700ResultParam.limit_per = 0;
+                                mGet700ResultParam.trigger_ctrl = 2;
+                                ReTryCnts = 0;
+                            }
+                            break;
+                        case TaskSteps.Step31_BackGroundLight_3_breakoff:
+                            {
+                                level = Step1_SelfTest(sender, mEventArgs.Data, TaskSteps.Step31_BackGroundLight_3_breakoff);
+                                string selfCheck = String.Format("自检 蓝灯 采样电流:{0}", mEventArgs.Data.DcCurrent * 100);
+                                Log.Info(selfCheck);
+                                if (level == Task_Level.FALSE)
+                                    bExcute = true;
+                                else if (level == Task_Level.TRUE)
+                                {
+                                    mTaskSteps = TaskSteps.Step2_CheckEcuOpen;
+                                    mGet700ResultParam.ack_device = Const.TESTSERVER;//发给SERVER
+                                    mGet700ResultParam.ecu_status = 0x34;
+                                    mGet700ResultParam.server_mode = 0x4;
+                                    mGet700ResultParam.level_ctrl = 0x0100;
+                                }
+                                else if (level == Task_Level.REPEAT)
+                                {
+
+                                }
+                            }
                             break;
                         case TaskSteps.Step2_CheckEcuOpen:
                             level = Step2_CheckEcuOpen(sender, mEventArgs.Data);
@@ -1455,7 +1656,7 @@ namespace RokyTask
         }
 
         #region Step1：Client 自检检测  
-        private Task_Level Step1_SelfTest(object sender, get7001ResultRsp mArgs)
+        private Task_Level Step1_SelfTest(object sender, get7001ResultRsp mArgs, TaskSteps step)
         {
             byte mAskDevice = (byte)mArgs.ack_device;//应答设备
             byte mAskResult = (byte)mArgs.ack_value;//响应
@@ -1795,7 +1996,7 @@ namespace RokyTask
                     }
                 }
 
-                if(b7xxPin4)
+                if(b7xxPin4 && (step== TaskSteps.Step1_SelfTest))
                 {
                     if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
                     {
@@ -1809,7 +2010,52 @@ namespace RokyTask
                         Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
                     }
                 }
-                
+
+                if (b7xxPin1 && (step == TaskSteps.Step29_Trunk_breakoff))
+                {
+                    if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin1_Open = true;
+                        UpdateListView(sender, "7010座桶故障", "采样电流异常");
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
+                    }
+                    else
+                    {
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
+                    }
+                }
+
+                if (b7xxPin7 && (step == TaskSteps.Step30_BackGroundLight_2_breakoff))
+                {
+                    if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin7_Open = true;
+                        UpdateListView(sender, "7010绿灯故障", "采样电流异常");
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
+                    }
+                    else
+                    {
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
+                    }
+                }
+
+                if (b7xxPin22 && (step == TaskSteps.Step31_BackGroundLight_3_breakoff))
+                {
+                    if ((mDcCurrent * 100 < 50) || (mDcCurrent * 100 > 150))//判断DC输出电流
+                    {
+                        testResult = true;
+                        mRK7001Pins.Pin22_Open = true;
+                        UpdateListView(sender, "7010蓝灯故障", "采样电流异常");
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
+                    }
+                    else
+                    {
+                        Console.WriteLine("mDcCurrent={0}", mDcCurrent * 100);
+                    }
+                }
+
 
                 if (!testResult)
                 {                      

@@ -2102,7 +2102,7 @@ namespace RokyTask
                 {
                     bFlag = true;
                     UpdateVddGpsPin(sender, INFO_LEVEL.FAIL);
-                    UpdateListView(sender, "ACC_CCU错误", "ACC_CCU的pin脚短路或者断路或者其他原因");
+                    UpdateListView(sender, "检查ACC_ECU-ACC_CCU错误", "ACC_CCU的pin脚短路或者断路或者其他原因");
                 }
                 /*
                 else

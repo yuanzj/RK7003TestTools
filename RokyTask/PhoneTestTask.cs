@@ -111,10 +111,10 @@ namespace RokyTask
         SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp> mReadKeyAddrTask;
         writeKeyAddrReq mReadKeyAddrParam;
         //同步报文
-        SimpleSerialPortTask<NullEntity, pcTakeoverReq> mBroadCastTask;
+        SimpleSerialPortTask<NullEntity, get4103BroadcastReq> mBroadCastTask;
         //停止同步报文
-        SimpleSerialPortTask<pcTakeOverRsp, NullEntity> mStopSyncTask;
-        pcTakeOverRsp mStopSyncParam;
+        SimpleSerialPortTask<get4103BroadcastRsp, NullEntity> mStopSyncTask;
+        get4103BroadcastRsp mStopSyncParam;
         //监控报文
         SimpleSerialPortTask<NullEntity, pcTakeoverReq> mMonitorTask;
         //恢复同步报文
@@ -144,14 +144,28 @@ namespace RokyTask
             mRecoverParam.param2 = 0;
             //等待同步报文
             //监听0x06
-            mBroadCastTask = new SimpleSerialPortTask<NullEntity, pcTakeoverReq>();
+            mBroadCastTask = new SimpleSerialPortTask<NullEntity, get4103BroadcastReq>();
             mBroadCastTask.RetryMaxCnts = 0;
             mBroadCastTask.Timerout = 30 * 1000;
             mBroadCastTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
-                SerialPortEventArgs<pcTakeoverReq> mEventArgs = e as SerialPortEventArgs<pcTakeoverReq>;
+                SerialPortEventArgs<get4103BroadcastReq> mEventArgs = e as SerialPortEventArgs<get4103BroadcastReq>;
                 if (mEventArgs.Data != null)
                 {
+                    byte hw1 = (byte)(mEventArgs.Data.hardwareID >> 24);
+                    byte hw2 = (byte)(mEventArgs.Data.hardwareID >> 16);
+                    byte hw3 = (byte)(mEventArgs.Data.hardwareID >> 8);
+
+                    string softVersion = String.Format("W{0}{1:D2}.{2:D2}", (byte)(mEventArgs.Data.hardwareID >> 24),
+                                                                       (byte)(mEventArgs.Data.hardwareID >> 16),
+                                                                       (byte)(mEventArgs.Data.hardwareID >> 8));
+                    DeviceInfo info = new DeviceInfo();
+                    info.sw = softVersion;
+
+                    mStopSyncParam.firmwareYears = (byte)(mEventArgs.Data.hardwareID >> 24);
+                    mStopSyncParam.firmwareWeeks = (byte)(mEventArgs.Data.hardwareID >> 16);
+                    mStopSyncParam.firmwareVersion = (byte)(mEventArgs.Data.hardwareID >> 8);
+                
                     //PC接管报文的响应
                     mStopSyncTask.Excute();
                     //启动监控，防止没有发成功，直到由PC接管为止
@@ -180,20 +194,19 @@ namespace RokyTask
                 }
                 else
                 {
-                    SetMainText(sender,  STEP_LEVEL.CHECK_SN);
+                    SetMainText(sender, STEP_LEVEL.CHECK_SN);
                     mGetDevInfoTask.Excute();
                 }
             };
 
             //停止同步报文
-            mStopSyncTask = new SimpleSerialPortTask<pcTakeOverRsp, NullEntity>();
+            mStopSyncTask = new SimpleSerialPortTask<get4103BroadcastRsp, NullEntity>();
             mStopSyncParam = mStopSyncTask.GetRequestEntity();
+            mStopSyncParam.deviceType = 0xF1;
+            mStopSyncParam.hardwareID = 0xF1;
             mStopSyncTask.RetryMaxCnts = 0;
             mStopSyncTask.Timerout = 1000;
-            mStopSyncParam.DeviceType = 0xF1;
-            mStopSyncParam.HardWareID = 0xF1;
-            mStopSyncParam.FirmID = 0;
-            
+
             //获取SN号
             mGetDevInfoTask = new SimpleSerialPortTask<getDevinfoReq, getDevinfoRsp>();
             mDevInfoParam = mGetDevInfoTask.GetRequestEntity();
@@ -219,7 +232,7 @@ namespace RokyTask
                     {
                         SetValidSN(sender, INFO_LEVEL.PASS);
                         mReadKeyMode = INFO_LEVEL.PROCESS;
-                        mReadKeyAddrTask.Excute();                       
+                        mReadKeyAddrTask.Excute();
                     }
                 }
                 else
@@ -231,7 +244,7 @@ namespace RokyTask
                     StopTask();
                 }
             };
-           
+
             mBindKey1Task = new SimpleSerialPortTask<get7001Result, get7001ResultRsp>();
             mBindKey1Param = mBindKey1Task.GetRequestEntity();
             mBindKey1Param.ack_device = Const.PCU;
@@ -239,16 +252,16 @@ namespace RokyTask
             mBindKey1Param.ecu_status = 0x34;
             mBindKey1Param.level_ctrl = 0x0000;
             mBindKey1Task.RetryMaxCnts = 0;
-            mBindKey1Task.Timerout = 10*1000;
+            mBindKey1Task.Timerout = 10 * 1000;
             mBindKey1Task.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<get7001ResultRsp> mEventArgs = e as SerialPortEventArgs<get7001ResultRsp>;
                 if (mEventArgs.Data != null)
-                {         
+                {
                     byte mAskDevice = (byte)mEventArgs.Data.ack_device;//应答设备
                     byte mAskResult = (byte)mEventArgs.Data.ack_value;//响应
                     int temp = (byte)mEventArgs.Data.CutError_1 |
-                                          mEventArgs.Data.CutError_2 << 8  |
+                                          mEventArgs.Data.CutError_2 << 8 |
                                           mEventArgs.Data.ShortError_1 << 16;
                     int iAddrCode = temp >> 4;
                     if (mAskDevice == Const.PCU)
@@ -276,11 +289,11 @@ namespace RokyTask
                             valueMax = value;
                     }
                     //判断次数是否超过某一值
-                    if(valueMax >= this.TryCnts)
+                    if (valueMax >= this.TryCnts)
                     {
-                        foreach(int key in ht.Keys)
+                        foreach (int key in ht.Keys)
                         {
-                            if((int)ht[key] == valueMax)
+                            if ((int)ht[key] == valueMax)
                             {
                                 SetBindKey1(sender, INFO_LEVEL.PASS);
                                 //保存Key1按键
@@ -289,7 +302,7 @@ namespace RokyTask
                                 byte[] temp1 = new byte[3];
                                 temp1[0] = (byte)(mKey1Value >> 16 & 0xFF);
                                 temp1[1] = (byte)(mKey1Value >> 8 & 0xFF);
-                                temp1[2] = (byte)(mKey1Value& 0xFF);
+                                temp1[2] = (byte)(mKey1Value & 0xFF);
                                 mWriteKeyParam.Key1Value = temp1;
                                 SetKeyValue(sender, KeyType.BIND_KEY1, mKey1Value);
                                 ht.Clear();
@@ -309,8 +322,8 @@ namespace RokyTask
                                 return;
                             }
                         }
-                    }   
-                    if(mTimeout-- > 0)
+                    }
+                    if (mTimeout-- > 0)
                     {
                         Thread.Sleep(50);
                         mBindKey1Task.Excute();
@@ -322,7 +335,7 @@ namespace RokyTask
                         SetMainText(sender, STEP_LEVEL.BIND_TIMEOUT);
                         mRecoverTask.Excute();
                         StopTask();
-                    }                                           
+                    }
                 }
                 else
                 {
@@ -352,10 +365,10 @@ namespace RokyTask
                     int temp = (byte)mEventArgs.Data.CutError_1 |
                                           mEventArgs.Data.CutError_2 << 8 |
                                           mEventArgs.Data.ShortError_1 << 16;
-                    int iAddrCode = temp >> 4;                    
+                    int iAddrCode = temp >> 4;
                     if (mAskDevice == Const.PCU)
-                    {                        
-                            // 如果不为0， 说明有按下，把地址码键值存入List
+                    {
+                        // 如果不为0， 说明有按下，把地址码键值存入List
                         if (iAddrCode != 0 && iAddrCode != mKey1Value)
                         {
                             // 先判断是否含有某个Key
@@ -427,7 +440,7 @@ namespace RokyTask
             mWriteKeyTask = new SimpleSerialPortTask<writeKeyAddrReq, writeKeyAddrRsp>();
             mWriteKeyParam = mWriteKeyTask.GetRequestEntity();
             mWriteKeyParam.Key1Index = 0;
-            mWriteKeyParam.Key2Index = 1;            
+            mWriteKeyParam.Key2Index = 1;
             mWriteKeyParam.DeviceType = Const.CCU;
             mWriteKeyTask.RetryMaxCnts = 0;
             mWriteKeyTask.Timerout = 10 * 1000;
@@ -437,7 +450,7 @@ namespace RokyTask
                 if (mEventArgs.Data != null)
                 {
                     byte mResult = (byte)mEventArgs.Data.Result;
-                    if(mResult == 1)
+                    if (mResult == 1)
                     {
                         ht.Clear();
                         SetWriteNV(sender, INFO_LEVEL.PASS);
@@ -451,7 +464,7 @@ namespace RokyTask
                         SetMainText(sender, STEP_LEVEL.FAIL);
                         mRecoverTask.Excute();
                         StopTask();
-                    }                    
+                    }
                 }
                 else
                 {
@@ -485,15 +498,15 @@ namespace RokyTask
                     key2 = mEventArgs.Data.Key2Value;
                     int mKey1 = key1[0] << 16 | key1[1] << 8 | key1[2];
                     int mKey2 = key2[0] << 16 | key2[1] << 8 | key2[2];
-                    
+
                     if (mReadKeyMode == INFO_LEVEL.PASS)
                     {
                         string msg = String.Format("绑定后，当前已绑定{0}把，钥匙1:{1:X}, 钥匙2:{2:X}", num, mKey1, mKey2);
                         SetListView(sender, msg, "");
-                        
-                        if(KeyNumber == 2)
+
+                        if (KeyNumber == 2)
                         {
-                            if(mKey1Value == mKey1 && mKey2Value == mKey2)
+                            if (mKey1Value == mKey1 && mKey2Value == mKey2)
                             {
                                 SetReadKeys(sender, INFO_LEVEL.PASS, num, mKey1, mKey2);
                                 SetMainText(sender, STEP_LEVEL.PASS);
@@ -504,7 +517,7 @@ namespace RokyTask
                                 SetMainText(sender, STEP_LEVEL.FAIL);
                             }
                         }
-                        else if(KeyNumber == 1)
+                        else if (KeyNumber == 1)
                         {
                             if (mKey1Value == mKey1)
                             {
@@ -528,7 +541,7 @@ namespace RokyTask
                         mBindKey1Param.ack_device = Const.PCU;
                         mBindKey1Task.Excute();
                         mTimeout = 100;
-                    }                   
+                    }
                 }
                 else
                 {

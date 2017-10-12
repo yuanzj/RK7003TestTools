@@ -53,6 +53,9 @@
     <Compile Include="Entity\Protocols\ProtocolAttribute.cs" />
     <Compile Include="Entity\Protocols\request\boardTestResultReq.cs" />
     <Compile Include="Entity\Protocols\request\btTestReq.cs" />
+    <Compile Include="Entity\Protocols\request\CheckTSStatusReq.cs" />
+    <Compile Include="Entity\Protocols\request\WriteSnReq.cs" />
+    <Compile Include="Entity\Protocols\request\CheckTSReq.cs" />
     <Compile Include="Entity\Protocols\request\getDevinfoReq.cs" />
     <Compile Include="Entity\Protocols\request\getNVInfoReq.cs" />
     <Compile Include="Entity\Protocols\request\NullEntity.cs" />
@@ -67,6 +70,8 @@
     <Compile Include="Entity\Protocols\request\ParameterSettingReq.cs" />
     <Compile Include="Entity\Protocols\request\SaveNvReq.cs" />
     <Compile Include="Entity\Protocols\response\boardTestResultRsp.cs" />
+    <Compile Include="Entity\Protocols\response\TSWriteSnStatusRsp.cs" />
+    <Compile Include="Entity\Protocols\response\TSCheckRsp.cs" />
     <Compile Include="Entity\Protocols\response\chk4103ServerRsp.cs" />
     <Compile Include="Entity\Protocols\response\get4103BroadcastRsp.cs" />
     <Compile Include="Entity\Protocols\response\get7001ResultRsp.cs" />
@@ -77,6 +82,7 @@
     <Compile Include="Entity\Protocols\response\ResetEcuRsp.cs" />
     <Compile Include="Entity\Protocols\response\SaveNvRsp.cs" />
     <Compile Include="Entity\Protocols\response\writeKeyAddrRsp.cs" />
+    <Compile Include="Entity\Protocols\response\TSWriteSnRsp.cs" />
     <Compile Include="ManualVisio.cs">
       <SubType>Form</SubType>
     </Compile>

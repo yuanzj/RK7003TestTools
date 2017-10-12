@@ -88,6 +88,21 @@ namespace RokyTask
         public const int WRITE_KEY_REQ = 0X2D;
 
         public const int WRITE_KEY_RSP = 0XAD;
+           
+        public const int PC_CHECK_TS_REQ = 0X32;
 
+        public const int TS_CHECK_RSP = 0XB2;
+
+        public const int PC_WRITE_SN_REQ = 0X33;
+
+        public const int TS_WRITE_SN_RSP = 0XB3;
+
+        public const int CHECK_TS_STATUS_REQ = 0X35;
+
+        public const int TS_CHECK_STATUS_RSP = 0XB5;
+
+        public const int WRITE_TS_KEY_REQ = 0X36;
+
+        public const int TS_WRITE_KEY_RSP = 0XB6;
     }
 }

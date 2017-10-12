@@ -57,12 +57,12 @@ namespace RK7001Test
             {
                 this.toolStripStatusLabel_mode.Text = "当前模式: 板测模式";
                 //版本号
-                this.Text = String.Format("RK7xx板测工具 V{0}", AssemblyFileVersion());
+                this.Text = String.Format("RK4300板测工具 V{0}", AssemblyFileVersion());
             }
             else if (mode == FACTORY_MODE.CHECK_MODE)
             {
                 this.toolStripStatusLabel_mode.Text = "当前模式: 复检模式";
-                this.Text = String.Format("RK7xx板测工具 V{0}", AssemblyFileVersion());
+                this.Text = String.Format("RK4300板测工具 V{0}", AssemblyFileVersion());
             }
             
             #region Listview初始化

@@ -351,6 +351,18 @@ namespace RokyTask
         SimpleSerialPortTask<btTestRsp, NullEntity> mCompeteTestTask;
         btTestRsp mBtTestRspParam;
 
+        //5.1.1	PC探测TS请求(0X32)
+        SimpleSerialPortTask<CheckTSReq, TSCheckRsp> checkTSTask;
+        CheckTSReq mCheckTSReqParam;
+
+        //5.1.3	PC写号请求（0X33）
+        SimpleSerialPortTask<WriteSnReq, TSWriteSnRsp> writeSnTask;
+        WriteSnReq mWriteSnReqParam;
+
+        //5.1.7	PC查询TS状态请求（0X35）
+        SimpleSerialPortTask<CheckTSStatusReq, TSWriteSnStatusRsp> checkTSStatusTask;
+        CheckTSStatusReq mCheckTSStatusReqParam;
+
         int retryCount;
         
         //执行Timer
@@ -1412,8 +1424,162 @@ namespace RokyTask
             mCompeteTestTask = new SimpleSerialPortTask<btTestRsp, NullEntity>();
             mBtTestRspParam = mCompeteTestTask.GetRequestEntity();
             mBtTestRspParam.status = 0;
-            mCompeteTestTask.RetryMaxCnts = 0;            
-#endregion
+            mCompeteTestTask.RetryMaxCnts = 0;
+            #endregion
+
+            #region PC探测TS请求(0X32)
+            checkTSTask = new SimpleSerialPortTask<CheckTSReq, TSCheckRsp>();
+            mCheckTSReqParam = checkTSTask.GetRequestEntity();
+            mCheckTSReqParam.deviceType = 0;
+            mCheckTSReqParam.reserveValue = new byte[] { 0xff, 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff };
+            checkTSTask.RetryMaxCnts = 6;
+            checkTSTask.Timerout = 500;
+            checkTSTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<TSCheckRsp> mEventArgs = e as SerialPortEventArgs<TSCheckRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    mWriteSnReqParam.sn = ByteProcess.stringToByteArray(mSN);
+                    mWriteSnReqParam.sntemp = new byte[4];
+                    mWriteSnReqParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
+                    mWriteSnReqParam.key = ByteProcess.stringToByteArray(mKeyt);
+                    mWriteSnReqParam.reserve = new byte[] { 0xff, 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff };
+                    
+                    //等待接受结果
+                    SetMainText(sender, "RK4300 写号...", "", INFO_LEVEL.PROCESS);
+                    //发现测试server存在则发送
+                    writeSnTask.Excute();
+                }
+                else
+                {
+                    SetMainText(sender, "写号失败", "", INFO_LEVEL.FAIL);
+                    UpdateListView(sender, "错误原因", "测试Server无回应");
+
+                    StopTask();
+                }
+            };
+            #endregion
+
+            #region 5.1.3	PC写号请求（0X33）
+            //< add key = "DefaultSN" value = "B123456789" />
+            //< add key = "DefaultBT" value = "002715081234" />
+            // < add key = "DefaultBLE" value = "c02715081234" />
+            //  < add key = "DefaultKeyt" value = "ndc982bwn291nu8wa3zjy58w" />
+                        writeSnTask = new SimpleSerialPortTask<WriteSnReq, TSWriteSnRsp>();
+            mWriteSnReqParam = writeSnTask.GetRequestEntity();
+            mWriteSnReqParam.sn = ByteProcess.stringToByteArray("B123456789");
+            mWriteSnReqParam.sntemp = new byte[4];
+            mWriteSnReqParam.bleAddr = ByteProcess.stringToByteArrayNoColon("c02715081234");
+            mWriteSnReqParam.key = ByteProcess.stringToByteArray("ndc982bwn291nu8wa3zjy58w");
+            mWriteSnReqParam.reserve = new byte[] { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+            writeSnTask.RetryMaxCnts = 6;
+            writeSnTask.Timerout = 500;
+            writeSnTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<TSWriteSnRsp> mEventArgs = e as SerialPortEventArgs<TSWriteSnRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    //发现测试server存在则发送
+                    SetMainText(sender, "RK4300 检查写号结果...", "", INFO_LEVEL.PROCESS);
+                    Thread.Sleep(500);
+                    checkTSStatusTask.Excute();
+                }
+                else
+                {
+                    SetMainText(sender, "写号失败", "", INFO_LEVEL.FAIL);
+                    UpdateListView(sender, "错误原因", "写号指令无回应");
+
+                    StopTask();
+                }
+            };
+            #endregion
+
+            #region 5.1.7	PC查询TS状态请求（0X35）
+            checkTSStatusTask = new SimpleSerialPortTask<CheckTSStatusReq, TSWriteSnStatusRsp>();
+            mCheckTSStatusReqParam = checkTSStatusTask.GetRequestEntity();
+            mCheckTSStatusReqParam.checkType = 0;
+            mCheckTSStatusReqParam.reserveValue = new byte[] { 0xff, 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff , 0xff };
+            checkTSStatusTask.RetryMaxCnts = 6;
+            checkTSStatusTask.Timerout = 500;
+            checkTSStatusTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
+            {
+                SerialPortEventArgs<TSWriteSnStatusRsp> mEventArgs = e as SerialPortEventArgs<TSWriteSnStatusRsp>;
+                if (mEventArgs.Data != null)
+                {
+                    //发现测试server存在则发送
+                    TSWriteSnStatusRsp mTSWriteSnStatusRsp = mEventArgs.Data;
+
+                    if (mTSWriteSnStatusRsp.checkType == 0)
+                    {
+                        retryCount++;
+
+                        if (mTSWriteSnStatusRsp.subStatus == 0)
+                        {
+
+                            String tempBLEAddr = Util.ToHexString(ByteProcess.stringToByteArrayNoColon(mBLEaddr));
+
+                            string sn = ByteProcess.byteArrayToString(mTSWriteSnStatusRsp.sn);
+                            string ble = Util.ToHexString(mTSWriteSnStatusRsp.bleAddr);
+                            string key = ByteProcess.byteArrayToString(mTSWriteSnStatusRsp.key);
+                            string devInfo = String.Format("SN:{0},BLE4.0地址:{1},密钥:{2}", sn, ble, key);
+
+                            if (mSN == sn && tempBLEAddr == ble && mKeyt == key)
+                            {
+                                SetMainText(sender, "写号成功", "", INFO_LEVEL.PASS);
+                                UpdateListView(sender, "当前设备信息", devInfo);
+
+                                StopTask();
+                                return;
+                            }
+                            else
+                            {
+                                SetMainText(sender, "写号失败，写入与读取不一致", "", INFO_LEVEL.FAIL);
+                                UpdateListView(sender, "当前设备信息", devInfo);
+
+                                StopTask();
+                                return;
+                            }
+
+                        }
+                        else {
+
+                            //1：CCU 报文未停止
+                            //2：CCU未响应
+                            if (retryCount >= 5) {
+                                SetMainText(sender, "写号失败", "", INFO_LEVEL.FAIL);
+                                if (mTSWriteSnStatusRsp.subStatus == 1)
+                                {
+                                    UpdateListView(sender, "错误原因", "CCU 报文未停止");
+                                }
+                                else if (mTSWriteSnStatusRsp.subStatus == 2)
+                                {
+                                    UpdateListView(sender, "错误原因", "CCU 未响应");
+                                }
+                                else
+                                {
+                                    UpdateListView(sender, "错误原因", "未知");
+                                }
+                                
+
+                                StopTask();
+                            }
+                        }
+
+                        
+                    }
+
+                }
+                else
+                {
+                    SetMainText(sender, "写号失败", "", INFO_LEVEL.FAIL);
+                    UpdateListView(sender, "错误原因", "写号指令无回应");
+
+                    StopTask();
+                }
+            };
+            #endregion
+
+
         }
 
         #region Step1：Client 自检检测  
@@ -2185,8 +2351,8 @@ namespace RokyTask
                     else
                     {
                         UpdateValidSN(sender, INFO_LEVEL.PASS);
-                        SetMainText(sender, "监听中控报文？", "", INFO_LEVEL.PROCESS);
-                        mFirstRunningReqTask.Excute();
+                        SetMainText(sender, "检查测试Server", "", INFO_LEVEL.PROCESS);
+                        checkTSTask.Excute();
                     }                
                 }
                 else
@@ -2434,6 +2600,15 @@ namespace RokyTask
             mGetDevinfoTask.ClearAllEvent();
             mGetDevinfoTask.EnableTimeOutHandler = true;
 
+            //新版检查测试server
+            checkTSTask.ClearAllEvent();
+            checkTSTask.EnableTimeOutHandler = true;
+
+            writeSnTask.ClearAllEvent();
+            writeSnTask.EnableTimeOutHandler = true;
+
+            checkTSStatusTask.ClearAllEvent();
+            checkTSStatusTask.EnableTimeOutHandler = true;
 
         }
         #endregion
@@ -2474,6 +2649,16 @@ namespace RokyTask
             mGetDevinfoTask.ClearAllEvent();
             mGetDevinfoTask.EnableTimeOutHandler = false;
 
+            //新版检查测试server
+            checkTSTask.ClearAllEvent();
+            checkTSTask.EnableTimeOutHandler = false;
+
+            writeSnTask.ClearAllEvent();
+            writeSnTask.EnableTimeOutHandler = false;
+
+            checkTSStatusTask.ClearAllEvent();
+            checkTSStatusTask.EnableTimeOutHandler = false;
+
             UpdatePotTicker(this, "", INFO_LEVEL.INIT);
         }
         #endregion
@@ -2511,8 +2696,8 @@ namespace RokyTask
                     mBLEaddr = DefaultBLE;
                     mKeyt = DefaultKeyt;
                     UpdateValidSN(this, INFO_LEVEL.PASS);
-                    SetMainText(this, "监听中控报文？...", "", INFO_LEVEL.PROCESS);
-                    mFirstRunningReqTask.Excute();
+                    SetMainText(this, "检查测试Server", "", INFO_LEVEL.PROCESS);
+                    checkTSTask.Excute();
                 }
             }
             else if(mode == FACTORY_MODE.CHECK_MODE)//如果是复检模式,SN号仍使

@@ -120,7 +120,19 @@ namespace RokyTask
         //恢复同步报文
         SimpleSerialPortTask<ResetEcuReq, NullEntity> mRecoverTask;
         ResetEcuReq mRecoverParam;
-        
+
+        //5.1.1	PC探测TS请求(0X32)
+        SimpleSerialPortTask<CheckTSReq, TSCheckRsp> checkTSTask;
+        CheckTSReq mCheckTSReqParam;
+
+        //5.1.3	PC写号请求（0X33）
+        SimpleSerialPortTask<WriteSnReq, TSWriteSnRsp> writeSnTask;
+        WriteSnReq mWriteSnReqParam;
+
+        //5.1.7	PC查询TS状态请求（0X35）
+        SimpleSerialPortTask<CheckTSStatusReq, TSWriteSnStatusRsp> checkTSStatusTask;
+        CheckTSStatusReq mCheckTSStatusReqParam;
+
         #endregion
 
         #region 构造函数

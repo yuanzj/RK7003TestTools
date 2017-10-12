@@ -350,6 +350,8 @@ namespace RokyTask
         //发送0xA6
         SimpleSerialPortTask<btTestRsp, NullEntity> mCompeteTestTask;
         btTestRsp mBtTestRspParam;
+
+        int retryCount;
         
         //执行Timer
         System.Timers.Timer DynamicPotTicker;
@@ -375,7 +377,7 @@ namespace RokyTask
             mGetDevinfoParam = mGetDevinfoTask.GetRequestEntity();
             mGetDevinfoParam.devType = 0X08;
             mGetDevinfoTask.Timerout = 1000;
-            mGetDevinfoTask.RetryMaxCnts = 1;
+            mGetDevinfoTask.RetryMaxCnts = 3;
             mGetDevinfoTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<getDevinfoRsp> mEventArgs = e as SerialPortEventArgs<getDevinfoRsp>;
@@ -389,7 +391,7 @@ namespace RokyTask
                     mParamSettingParam.adcParam = temp;
                     mParamSettingParam.v15Param = temp;
                     mParamSettingParam.sntemp = temp;
-                    SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
+                    
                     mParamSettingReqTask.Excute();
                     string sn = ByteProcess.byteArrayToString(mEventArgs.Data.devSN);
                     byte[] edrByteArray = new byte[6];
@@ -399,7 +401,26 @@ namespace RokyTask
                     string ble = Util.ToHexString(mEventArgs.Data.devBLEaddr);
                     string key = ByteProcess.byteArrayToString(mEventArgs.Data.devKeyt);
                     string devInfo = String.Format("SN:{0},BT2.1地址:{1},BLE4.0地址:{2},密钥:{3}",sn, edr, ble,key);
-                    UpdateListView(sender, "当前设备信息", devInfo);
+
+
+                    if (mSN == sn)
+                    {
+                        SetMainText(sender, "配置成功...", "", INFO_LEVEL.PASS);
+                        UpdateListView(sender, "当前设备信息", devInfo);
+                  
+                        StopTask();
+
+                        return;
+                    }
+                    else {
+                        SetMainText(sender, "配置失败...", "", INFO_LEVEL.FAIL);
+                        UpdateListView(sender, "当前设备信息", devInfo);
+
+                        StopTask();
+
+                        return;
+                    }
+                    
                 }
                 else
                 {
@@ -1228,6 +1249,31 @@ namespace RokyTask
                     {                        
                         SetMainText(sender, "等待4103参数配置请求...", "", INFO_LEVEL.PROCESS);
                         mParamSettingReqTask.Excute();
+
+                        mParamSettingParam.testItem = 0xFF;//写号
+                        mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
+                        byte[] aArray = new byte[6];
+                        aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
+                        Array.Reverse(aArray);
+                        mParamSettingParam.edrAddr = aArray;
+                        mParamSettingParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
+                        mParamSettingParam.key = ByteProcess.stringToByteArray(mKeyt);
+                        byte[] temp = new byte[4];
+                        mParamSettingParam.adcParam = temp;
+                        mParamSettingParam.v15Param = temp;
+                        mParamSettingParam.sntemp = temp;
+
+                        //等待接受结果
+                        SetMainText(sender, "RK4300 写号...", "", INFO_LEVEL.PROCESS);
+                        Thread.Sleep(3 * 1000);
+                        mRecvTestResultTask.Excute();
+
+
+                        UpdateRK4110Items(sender, RK4110ITEM.INIT, null, INFO_LEVEL.PASS);
+                        UpdateRK4110Pins(sender, mRK4110Pins, INFO_LEVEL.PASS);
+                        Thread.Sleep(2 * 1000);
+                        SetMainText(sender, "获得中控设备信息...", "", INFO_LEVEL.PROCESS);
+                        mGetDevinfoTask.Excute();
                     }
                     else if(mode == FACTORY_MODE.CHECK_MODE)
                     {                        
@@ -1247,43 +1293,18 @@ namespace RokyTask
             #region 发送0x86, 接受0x03
             mParamSettingReqTask = new SimpleSerialPortTask<get4103BroadcastRsp, ParameterSettingReq>();
             mFirstRunRspParam = mParamSettingReqTask.GetRequestEntity();
-            mParamSettingReqTask.RetryMaxCnts = 10;
+            mParamSettingReqTask.RetryMaxCnts = 2;
             mParamSettingReqTask.Timerout = 1000;            
             mParamSettingReqTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<ParameterSettingReq> mEventArgs = e as SerialPortEventArgs<ParameterSettingReq>;
                 if (mEventArgs.Data != null)
                 {
-                    mParamSettingParam.deviceType = 0x03;
-                    if(mode == FACTORY_MODE.TEST_MODE)
-                    {
-                        mParamSettingParam.testItem = 0xFF;//写号
-                        mParamSettingParam.sn = ByteProcess.stringToByteArray(mSN);
-                        byte[] aArray = new byte[6];
-                        aArray = ByteProcess.stringToByteArrayNoColon(mBTaddr);
-                        Array.Reverse(aArray);
-                        mParamSettingParam.edrAddr = aArray;
-                        mParamSettingParam.bleAddr = ByteProcess.stringToByteArrayNoColon(mBLEaddr);
-                        mParamSettingParam.key = ByteProcess.stringToByteArray(mKeyt);
-                        byte[] temp = new byte[4];
-                        mParamSettingParam.adcParam = temp;
-                        mParamSettingParam.v15Param = temp;
-                        mParamSettingParam.sntemp = temp;
-                    }
-                    else if(mode == FACTORY_MODE.CHECK_MODE)
-                    {
-                        mParamSettingParam.testItem = 0xBF;//不写号
-                    }                                        
-                    //等待接受结果
-                    SetMainText(sender, "RK4110 测试中...", "", INFO_LEVEL.PROCESS);
-                    Thread.Sleep(5);
-                    mRecvTestResultTask.Excute();
+                   
                 }
                 else
                 {
-                    SetMainText(sender, "未收到参数配置请求!", "FAIL", INFO_LEVEL.FAIL);
-                    UpdateListView(sender, "测试异常中断", "夹具被弹起，或485通讯失败");
-                    StopTask();
+                   
                 }
             };
 #endregion
@@ -1291,280 +1312,20 @@ namespace RokyTask
             #region 发送0x83， 接受0x23
             mRecvTestResultTask = new SimpleSerialPortTask<ParameterSettingRsp, boardTestResultReq>();
             mParamSettingParam = mRecvTestResultTask.GetRequestEntity();
-            mRecvTestResultTask.RetryMaxCnts = 5;
-            mRecvTestResultTask.Timerout = 10 * 1000;
+            mRecvTestResultTask.RetryMaxCnts = 2;
+            mRecvTestResultTask.Timerout =  1000;
             mRecvTestResultTask.SimpleSerialPortTaskOnPostExecute += (object sender, EventArgs e) =>
             {
                 SerialPortEventArgs<boardTestResultReq> mEventArgs = e as SerialPortEventArgs<boardTestResultReq>;
                 if (mEventArgs.Data != null)
                 {
-                    ushort m_result = (ushort)mEventArgs.Data.result;
-                    int inputPin = (int)mEventArgs.Data.inputPin;
-                    byte outpin1 = (byte)mEventArgs.Data.outpin1;
-                    byte outpin2 = (byte)mEventArgs.Data.outpin2;
-                    byte extensionOut = (byte)mEventArgs.Data.extensionOut;
-                    bool InputPinError = false;
-                    if(m_result == 0)
-                    {
-                        UpdateRK4110Items(sender, RK4110ITEM.INIT, null, INFO_LEVEL.PASS);
-                        UpdateRK4110Pins(sender, mRK4110Pins, INFO_LEVEL.PASS);
-                        Thread.Sleep(5);
-                        mSaveNvReqTask.Excute();
-                    }
-                    else
-                    {
-                        if ((m_result >> 0 & 0x1) == 1)
-                        {
-                            UpdateRK4110Items(sender, RK4110ITEM.GSENSOR, null, INFO_LEVEL.FAIL);
-                            InputPinError = true;
-                            UpdateListView(sender, "Gsensor故障", "Gsensor芯片或者外围元件有问题");
-                        }
-                        else
-                            UpdateRK4110Items(sender, RK4110ITEM.GSENSOR, null, INFO_LEVEL.PASS);
-                        
-                        if ((m_result >> 1 & 0x1) == 1)
-                        {
-                            UpdateRK4110Items(sender, RK4110ITEM.LIGHTSENSOR, null, INFO_LEVEL.FAIL);
-                            InputPinError = true;
-                            mRK4110Pins.Pin11_Open = true;
-                            mRK4110Pins.Pin22_Open = true;
-                            UpdateListView(sender, "光感异常", "VLCM或者ADC_IN的pin脚有问题或者电压不在范围内");
-                        }
-                        else
-                            UpdateRK4110Items(sender, RK4110ITEM.LIGHTSENSOR, null, INFO_LEVEL.PASS);                        
-                        /*
-                        if ((m_result >> 2 & 0x1) == 1)
-                        {
-                            UpdateRK4110Items(sender, RK4110ITEM.VDD33, null, INFO_LEVEL.FAIL);
-                            InputPinError = true;
-                        }
-                        else
-                            UpdateRK4110Items(sender, RK4110ITEM.VDD33, null, INFO_LEVEL.PASS);                        
-                        if((m_result >> 3 & 0x1) == 1)
-                        {
-                            mRK4110Pins.Pin30_Open = true;
-                            InputPinError = true;
-                            UpdateListView(sender, "VDD_GPS异常", "VDD_GPS脚异常或者测的电压不在范围内");
-                        }
-                        */
-                        if ((m_result >> 4 & 0x1) == 1) 
-                        {
-                            if ((inputPin >> 0 & 0x1) == 1) //右转灯 => 档位(RK7010)
-                            {
-                                mRK4110Pins.Pin27_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103档位", "档位脚短路或者断路");
-                            }
-                            if ((inputPin >> 1 & 0x1) == 1)//左转灯 => P档（RK7010）
-                            {
-                                mRK4110Pins.Pin28_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 P档", "P档脚短路或者断路");
-                            }
-                            if ((inputPin >> 2 & 0x1) == 1)//远近光 => 大灯（RK7010）
-                            {
-                                mRK4110Pins.Pin3_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 大灯", "大灯灯脚短路或者断路");
-                            }
-                            if ((inputPin >> 3 & 0x1) == 1)//喇叭 => 双闪（RK7010）
-                            {
-                                mRK4110Pins.Pin4_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103双闪", "双闪脚短路或者断路");
-                            }
-                            if ((inputPin >> 4 & 0x1) == 1)//P档切换 => 巡航（RK7010）
-                            {
-                                mRK4110Pins.Pin12_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 巡航", "巡航脚短路或者断路");
-                            }
-                            if ((inputPin >> 5 & 0x1) == 1)//Power档切换  => 左转灯
-                            {
-                                mRK4110Pins.Pin18_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 左转灯", "左转灯脚短路或者断路");
-                            }
-                            if ((inputPin >> 6 & 0x1) == 1)//开关大灯 => PASS(RK7010)
-                            {
-                                mRK4110Pins.Pin14_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 PASS", "PASS灯脚短路或者断路");
-                            }
-                            if ((inputPin >> 7 & 0x1) == 1)//自动大灯 => 远近光（RK7010）
-                            {
-                                mRK4110Pins.Pin13_Open = true;
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 远近光", "远近光灯脚短路或者断路");
-                            }
-                            /*
-                            if ((inputPin >> 8 & 0x1) == 1)
-                            {
-                                UpdateRK4110Items(sender, RK4110ITEM.GPIO26, null, INFO_LEVEL.FAIL);
-                                InputPinError = true;
-                            }
-                            else
-                                UpdateRK4110Items(sender, RK4110ITEM.GPIO26, null, INFO_LEVEL.PASS);
-                            */
-                            if(bCruised)
-                            {
-                                if ((inputPin >> 9 & 0x1) == 1)  //巡航开关 =》 空
-                                {
-                                    mRK4110Pins.Pin26_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 巡航开关", "4103巡航开关脚短路或者断路");
-                                }                                    
-                            }
-                            if(bPushcar)
-                            {
-                                if ((inputPin >> 10 & 0x1) == 1) //推车开关  => 铁喇叭（RK7010）
-                                {
-                                    mRK4110Pins.Pin17_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 铁喇叭", "4103 铁喇叭脚短路或者断路");
-                                }                                    
-                            }                   
-                            if(bBackcar)
-                            {
-                                if ((inputPin >> 11 & 0x1) == 1) //倒车开关 => 右转
-                                {
-                                    mRK4110Pins.Pin15_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 右转灯", "4103 右转脚短路或者断路");
-                                }                                 
-                            }
-                            if(bRepaired)
-                            {
-                                if ((inputPin >> 12 & 0x1) == 1)//一键修复  =》 空
-                                {
-                                    mRK4110Pins.Pin19_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 一键修复", "4103 一键修复脚短路或者断路");
-                                }
-                                    
-                            }                 
-                        }
-                        //output pin
-                        if ((m_result >> 5 & 0x1) == 1)
-                        {
-                            /*
-                            if ((outpin1 >> 2 & 0x1) == 1)
-                            {
-                                UpdateRK4110Items(sender, RK4110ITEM.GPIO27, null, INFO_LEVEL.FAIL);
-                                InputPinError = true;
-                            }
-                            else
-                                UpdateRK4110Items(sender, RK4110ITEM.GPIO27, null, INFO_LEVEL.PASS);
-                            */
-                            if ((outpin1 >> 3 & 0x1) == 1)
-                            {
-                                UpdateRK4110Items(sender, RK4110ITEM.PWM, null, INFO_LEVEL.FAIL);
-                                InputPinError = true;
-                                UpdateListView(sender, "4103 -PWM", "4103 PWM 短路或者断路");
-                            }
-                            else
-                                UpdateRK4110Items(sender, RK4110ITEM.PWM, null, INFO_LEVEL.PASS);
-                        }
-                        //扩展pin脚
-                        if ((m_result >> 8 & 0x1) == 1)
-                        {
-                            if(bLcm_L)
-                            {
-                                if ((extensionOut >> 0 & 0x1) == 1)//LCM_左转指示
-                                {
-                                    mRK4110Pins.Pin8_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM左转指示", "4103 LCM左转指示短路或者断路");
-                                }
-                            }
-                            if(bLcm_F)
-                            {
-                                if ((extensionOut >> 1 & 0x1) == 1)//LCM_远光指示
-                                {
-                                    mRK4110Pins.Pin24_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM远光指示", "4103 LCM远光指示短路或者断路");
-                                }
-                            }
-                            if(bLcm_R)
-                            {
-                                if ((extensionOut >> 2 & 0x1) == 1)//LCM_READY指示
-                                {
-                                    mRK4110Pins.Pin7_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_READY指示", "4103 LCM_READY指示短路或者断路");
-                                }
-                            }
-                            if(bLcm_P)
-                            {
-                                if ((extensionOut >> 3 & 0x1) == 1) //LCM_PARK指示
-                                {
-                                    mRK4110Pins.Pin23_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_P档指示", "4103 LCM_P档指示短路或者断路");
-                                }
-                            }
-                            if(bLcm_R)
-                            {
-                                if ((extensionOut >> 4 & 0x1) == 1)//LCM_右转指示
-                                {
-                                    mRK4110Pins.Pin25_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_右转指示", "4103 LCM_右转指示短路或者断路");
-                                }
-                            }     
-                            if(bLcm_CS)
-                            {
-                                if ((extensionOut >> 5 & 0x1) == 1)//LCM_CS
-                                {
-                                    mRK4110Pins.Pin21_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_CS脚", "4103 LCM_CS短路或者断路");
-                                }
-                            }                       
-                            if(bLcm_CLK)
-                            {
-                                if ((extensionOut >> 6 & 0x1) == 1)//LCM_CLK
-                                {
-                                    mRK4110Pins.Pin9_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_CLK脚", "4103 LCM_CLK短路或者断路");
-                                }
-                            }
-                            if(bLcm_DO)
-                            {
-                                if ((extensionOut >> 7 & 0x1) == 1)//LCM_DO
-                                {
-                                    mRK4110Pins.Pin10_Open = true;
-                                    InputPinError = true;
-                                    UpdateListView(sender, "4103 LCM_DO脚", "4103 LCM_DO短路或者断路");
-                                }
-                            }                            
-                        }
-                        //最后判断
-                        if(!InputPinError)
-                        {
-                            UpdateRK4110Items(sender, RK4110ITEM.INIT, null, INFO_LEVEL.PASS);
-                            UpdateRK4110Pins(sender, mRK4110Pins, INFO_LEVEL.PASS);
-                            Thread.Sleep(5);
-                            mSaveNvReqTask.Excute();
-                        }
-                        else
-                        {
-                            //更新RK4110的Pin脚图
-                            UpdateRK4110Pins(sender, mRK4110Pins, INFO_LEVEL.FAIL);
-                            SetMainText(sender, "测试失败!", "FAIL", INFO_LEVEL.FAIL);
-                            StopTask();
-                            return;
-                        }                           
-                    }                    
+                  
                 }
                 else
                 {
-                    SetMainText(sender, "未收到测试结果!", "FAIL", INFO_LEVEL.FAIL);
-                    UpdateListView(sender, "测试异常中断", "夹具被弹起，或485通讯失败");
-                    StopTask();
+                
                 }
+
             };
 #endregion
 
@@ -2424,8 +2185,8 @@ namespace RokyTask
                     else
                     {
                         UpdateValidSN(sender, INFO_LEVEL.PASS);
-                        SetMainText(sender, "测试Server是否在线？", "", INFO_LEVEL.PROCESS);
-                        mChk4103ServerTask.Excute();
+                        SetMainText(sender, "监听中控报文？", "", INFO_LEVEL.PROCESS);
+                        mFirstRunningReqTask.Excute();
                     }                
                 }
                 else
@@ -2722,6 +2483,7 @@ namespace RokyTask
         public void ExcuteTask()
         {
             Log.Info("开始测试......");
+            retryCount = 0;
             InitParameters();
             mRK7001Pins = new PIN_STATUS();
             mRK4110Pins = new PIN_STATUS();
@@ -2749,14 +2511,14 @@ namespace RokyTask
                     mBLEaddr = DefaultBLE;
                     mKeyt = DefaultKeyt;
                     UpdateValidSN(this, INFO_LEVEL.PASS);
-                    SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
-                    mChk4103ServerTask.Excute();
+                    SetMainText(this, "监听中控报文？...", "", INFO_LEVEL.PROCESS);
+                    mFirstRunningReqTask.Excute();
                 }
             }
             else if(mode == FACTORY_MODE.CHECK_MODE)//如果是复检模式,SN号仍使
             {                
-                SetMainText(this, "测试Server是否在线？...", "", INFO_LEVEL.PROCESS);
-                mChk4103ServerTask.Excute();
+                SetMainText(this, "监听中控报文？...", "", INFO_LEVEL.PROCESS);
+                mFirstRunningReqTask.Excute();
             }                  
         }
         #endregion

@@ -1186,7 +1186,7 @@ namespace RokyTask
                     UpdateRK7001Items(sender, RK7001ITEM.VERSION, info, INFO_LEVEL.NONE);
                     if (j >= 10)
                     {
-                        SetMainText(sender, "RK7010未上电", "FAIL", INFO_LEVEL.FAIL);
+                        SetMainText(sender, "RK4300未上电", "FAIL", INFO_LEVEL.FAIL);
                         StopTask();
                         return;
                     }
@@ -1194,11 +1194,11 @@ namespace RokyTask
                     mTaskSteps = TaskSteps.Step0_Init;
                     mGet7001ResultTask.Excute();
                     Thread.Sleep(500);
-                    SetMainText(sender, "RK7010自测中...", "", INFO_LEVEL.PROCESS);
+                    SetMainText(sender, "RK4300自测中...", "", INFO_LEVEL.PROCESS);
                 }
                 else
                 {
-                    SetMainText(sender, "RK7010未上电", "FAIL", INFO_LEVEL.FAIL);
+                    SetMainText(sender, "RK4300未上电", "FAIL", INFO_LEVEL.FAIL);
                     UpdateListView(sender, "测试异常中断", "夹具被弹起，或485通讯失败");
                     StopTask();
                 }
@@ -1405,7 +1405,7 @@ namespace RokyTask
                     }                        
                     else
                     {                        
-                        SetMainText(sender, "获取RK7010版本号...", "", INFO_LEVEL.PROCESS);
+                        SetMainText(sender, "获取RK4300版本号...", "", INFO_LEVEL.PROCESS);
                         Thread.Sleep(5);
                         mGet7001VersionTask.Excute();
                     }          
@@ -2265,7 +2265,7 @@ namespace RokyTask
         public void RK7001KSICheckFail()
         {
             mGet7001ResultTask.ClearAllEvent();
-            SetMainText(this, "RK7010目检失败!", "FAIL", INFO_LEVEL.FAIL);
+            SetMainText(this, "RK4300目检失败!", "FAIL", INFO_LEVEL.FAIL);
         }
         #endregion
 

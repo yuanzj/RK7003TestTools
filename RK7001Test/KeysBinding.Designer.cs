@@ -447,7 +447,7 @@
             this.KeyPreview = true;
             this.Name = "KeysBinding";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "RK7010整测工具V2.0.6";
+            this.Text = "RK4300整测工具V2.0.6";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.KeyBindForm_Closed);
             this.Load += new System.EventHandler(this.KeyBindForm_Load);

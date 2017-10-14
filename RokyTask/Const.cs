@@ -84,10 +84,6 @@ namespace RokyTask
         public const byte PCU = 0X07;
 
         public const byte CCU = 0X08;
-
-        public const int WRITE_KEY_REQ = 0X2D;
-
-        public const int WRITE_KEY_RSP = 0XAD;
            
         public const int PC_CHECK_TS_REQ = 0X32;
 
@@ -101,8 +97,8 @@ namespace RokyTask
 
         public const int TS_CHECK_STATUS_RSP = 0XB5;
 
-        public const int WRITE_TS_KEY_REQ = 0X36;
+        public const int WRITE_KEY_REQ = 0X36;
 
-        public const int TS_WRITE_KEY_RSP = 0XB6;
+        public const int WRITE_KEY_RSP = 0XB6;
     }
 }

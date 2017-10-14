@@ -71,7 +71,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(553, 148);
             this.label1.TabIndex = 1;
-            this.label1.Text = "RK7010生产测试工具";
+            this.label1.Text = "RK4300生产测试工具";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label4
@@ -155,7 +155,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "RK7010生产测试工具";
+            this.Text = "RK4300生产测试工具";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LoginForm_Closed);
             this.Load += new System.EventHandler(this.LoginForm_Load);
             this.panel1.ResumeLayout(false);

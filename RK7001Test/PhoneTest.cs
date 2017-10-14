@@ -27,7 +27,7 @@ namespace RK7001Test
         private void PhoneTest_Load(object sender, EventArgs e)
         {
             //版本号
-            this.Text = String.Format("RK7010配对工具 V{0}", AssemblyFileVersion());
+            this.Text = String.Format("RK4300配对工具 V{0}", AssemblyFileVersion());
 
             mPhoneTask = new PhoneTestTask();
             mPhoneTask.KeyNumber = int.Parse(ConfigurationManager.AppSettings["KeysNumber"].ToString());

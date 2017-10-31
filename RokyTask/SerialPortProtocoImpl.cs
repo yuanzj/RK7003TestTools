@@ -19,13 +19,7 @@ namespace RokyTask
             int _dataLength = DataLength(buf);
             if (_dataLength <= 0)
                 return false;
-            //和校验算法
-            int sumValue = 0;
-            for (int i = 0; i < (_dataLength - 1); i++)
-            {
-                sumValue += buf[i];
-            }
-            if (ByteProcess.intToByteArray(sumValue)[3] == buf[_dataLength - 1])
+            if (CRCITU.IsCrc16Good(buf.ToArray()))
             {
                 return true;
             }
@@ -70,26 +64,19 @@ namespace RokyTask
         public byte[] Encode()
         {
             byte[] Args = this.Entity.Encode();
-            int sum = 0;
-            byte[] bytesNew = new byte[Args.Length + MinLength()];
-            bytesNew[0] = (byte)Entity.GetCommand();
-            bytesNew[1] = (byte)bytesNew.Length;
+            
+            List<byte> buf = new List<byte>();
+            buf.AddRange(new byte[] { (byte)Entity.GetCommand() , (byte)(Args.Length + MinLength()) });
+            buf.AddRange(Args);
+            byte[] crc = CRCITU.GetCrc16(buf.ToArray());
+            buf.AddRange(new byte[] { crc [1], crc [0]});
 
-            sum += bytesNew[0];
-            sum += bytesNew[1];
-            for (int i = 0; i < Args.Length; i++)
-            {
-                bytesNew[2 + i] = Args[i];
-                sum += Args[i];
-            }
-            bytesNew[bytesNew.Length - 1] = ByteProcess.intToByteArray(sum)[3];
-
-            return bytesNew;
+            return buf.ToArray();
         }
 
         public int MinLength()
         {
-            return 3;
+            return 4;
         }
 
         public bool StartInProtocol(List<byte> buf)

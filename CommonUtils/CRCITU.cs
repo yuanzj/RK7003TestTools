@@ -85,7 +85,8 @@ namespace CommonUtils
             byte[] FromHeadToVaild = GetHeadToVaildData(FromHeadToCRC);     //头到验证域
             byte[] CRCFromPackage = GetCRCFromPackage(FromHeadToCRC);       //获取客户端传来的包中的CRC数组   
             byte[] TrueCRCValue = GetCrc16(FromHeadToVaild);                //获取客户端传来的包应该的CRC数组
-            return BytesEquals(CRCFromPackage, TrueCRCValue);
+            byte[] TrueCRCValue1 = new byte[] { TrueCRCValue[1], TrueCRCValue[0] };
+            return BytesEquals(CRCFromPackage, TrueCRCValue1);
         }
         /// <summary>
         /// 比较两个字节数组是否相等

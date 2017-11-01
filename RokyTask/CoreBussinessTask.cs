@@ -1513,6 +1513,12 @@ namespace RokyTask
                     {
                         retryCount++;
 
+                        if (retryCount < 3) {
+                            Thread.Sleep(200);
+                            checkTSStatusTask.Excute();
+                            return;
+                        }
+
                         if (mTSWriteSnStatusRsp.subStatus == 0)
                         {
 

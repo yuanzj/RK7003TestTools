@@ -168,6 +168,12 @@ namespace RokyTask
                     {
                         retryCount++;
 
+                        if (retryCount < 5) {
+                            Thread.Sleep(500);
+                            checkTSStatusTask.Excute();
+                            return;
+                        }
+
                         if (mTSWriteSnStatusRsp.subStatus == 0)
                         {
                             string sn = ByteProcess.byteArrayToString(mTSWriteSnStatusRsp.sn);
@@ -189,6 +195,8 @@ namespace RokyTask
                                     showErrorMsg(sender, "SN号获取失败", "", BindSteps.SN_VALID, STEP_LEVEL.FAIL);
                                 }
                                 else {
+
+                                    Thread.Sleep(500);
                                     checkTSStatusTask.Excute();
                                 }
                             }
@@ -205,6 +213,7 @@ namespace RokyTask
                             }
                             else
                             {
+                                Thread.Sleep(200);
                                 checkTSStatusTask.Excute();
                             }
                         }

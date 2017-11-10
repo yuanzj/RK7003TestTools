@@ -1448,6 +1448,7 @@ namespace RokyTask
                     //等待接受结果
                     SetMainText(sender, "RK4300 写号...", "", INFO_LEVEL.PROCESS);
                     //发现测试server存在则发送
+                    Thread.Sleep(2000);
                     writeSnTask.Excute();
                 }
                 else
@@ -1481,7 +1482,7 @@ namespace RokyTask
                 {
                     //发现测试server存在则发送
                     SetMainText(sender, "RK4300 检查写号结果...", "", INFO_LEVEL.PROCESS);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     checkTSStatusTask.Excute();
                 }
                 else
@@ -1514,7 +1515,7 @@ namespace RokyTask
                         retryCount++;
 
                         if (retryCount < 3) {
-                            Thread.Sleep(200);
+                            Thread.Sleep(500);
                             checkTSStatusTask.Excute();
                             return;
                         }
